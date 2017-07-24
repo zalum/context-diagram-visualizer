@@ -1,0 +1,8 @@
+folder product{
+[app2]
+[app1]
+[app3]
+}
+[precedingapp]-->[app1]
+[app1]-->[app2]
+[app2]-->[app3]
