@@ -1,4 +1,3 @@
-import sys
 import graph_output
 import graph_input
 import system_graph

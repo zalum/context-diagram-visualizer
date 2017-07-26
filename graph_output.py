@@ -4,4 +4,4 @@ def writeAsText(lines):
         f.write(line+"\n")
 
 def writeAsImage(lines):
-    print("not implemented")
+    #cat test.txt|java -jar plantuml.1.2017.15.jar -pipe > somefile.png
