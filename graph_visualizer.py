@@ -12,16 +12,18 @@ class GraphVisualizer:
 
   def _drawProduct(self,product):
       applicationsKey = self.systemGraph.getApplicationKeysInProduct(product)
-      drawnProudct = ["folder %s{"%self.systemGraph.getVertexName(product)]
+      drawnProudct = ["folder %s{"%self._drawProductName(product)]
       drawnProudct.extend([self._drawApplicationByKey(applicationKey) for applicationKey in applicationsKey])
       drawnProudct.append("}")
       return drawnProudct
   def _drawApplicationByKey(self,key):
       return self._drawApplicationByName(self.systemGraph.getVertexNameByKey(key))
+  def _drawProductName(self,product):
+      return self.systemGraph.getVertexName(product).replace(" ","_")
   def _drawApplicationByVertex(self,vertex):
-      return self._drawApplicationByName(vertex["name"])
+      return self._drawApplicationByName(self.systemGraph.getVertexName(vertex))
   def _drawApplicationByName(self,name):
-    return "[%s]"%name
+      return "[%s]"%name
   def _drawEdges(self,edge):
       return "[%s]-->[%s]"%(self.systemGraph.getVertexNameByKey(edge["start"]),\
                             self.systemGraph.getVertexNameByKey(edge["end"]))

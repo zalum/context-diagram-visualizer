@@ -35,6 +35,17 @@ class GraphVisualizerTestCases(unittest.TestCase):
          }
        expectedResult =["folder product{","[app1]","}","[app1]-->[app2]"]
        self._runDrawTest(graph,expectedResult)
+
+  def testNameEscaping(self):
+      graph = {
+          "vertexes":[{"key":"1","name":"app 1","type":"application"},
+                      {"key":"2","name":"product 1","type":"product"},
+                      {"key":"3","name":"app 2","type":"application"}],
+          "edges":[{"start":"1","end":"2"},
+                   {"start":"1","end":"3"}]
+      }
+      expectedResult =["folder product_1{","[app 1]","}","[app 1]-->[app 2]"]
+      self._runDrawTest(graph,expectedResult)
   def _runDrawTest(self, graphDictionary,expectedResult):
      systemGraph = system_graph.SystemGraph(graphDictionary)
      result = graph_visualizer.GraphVisualizer(systemGraph).draw()
