@@ -1,17 +1,20 @@
 import subprocess
+import io
 
-def writeAsText(lines):
+def writeAsFile(lines):
     f = open('output.plantuml', 'w')
-    content = _prepare_content(lines)
+    content = writeAsText(lines)
     f.write(content)
 
 
 def writeAsImage(lines):
-    f = open('output.jpg', 'w')
-    p = subprocess.Popen(["java","-jar","/data/tools/plant-uml/plantuml.1.2017.15.jar","-pipe"],stdin=subprocess.PIPE,stdout = f)
-    content = _prepare_content(lines)
+    output = b''
+    p = subprocess.Popen(["java","-jar","/data/tools/plant-uml/plantuml.1.2017.15.jar","-pipe"],
+                         stdin = subprocess.PIPE,stdout = subprocess.PIPE)
+    content = writeAsText(lines)
     result = p.communicate(bytes(content,"UTF-8"))
+    return io.BytesIO(result[0])
 
 
-def _prepare_content(lines):
+def writeAsText(lines):
     return "\n".join(lines)

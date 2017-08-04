@@ -1,10 +1,11 @@
 from flask import Flask
-import graph_input
+import graph_output
 import system_graph
-import json
 import graph_visualizer
 from flask import abort
 from flask import request
+from flask import send_file
+import io
 
 app = Flask(__name__)
 
@@ -14,10 +15,10 @@ def get_product_graph(format="text"):
     inputSystemGraph = system_graph.SystemGraph(request.get_json())
     lines = graph_visualizer.GraphVisualizer(inputSystemGraph).draw()
     if format == "text":
-        return str.join("\n",lines)
+        return graph_output.writeAsText(lines)
     else:
         if format == "image":
-            abort(501)
+            return send_file(graph_output.writeAsImage(lines),mimetype="image/jpeg")
         else:
             abort(406)
 
