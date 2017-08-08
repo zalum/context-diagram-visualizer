@@ -9,7 +9,7 @@ class GraphVisualizerTestCases(unittest.TestCase):
       "edges":[{"start":"1","end":"2"}]
       }
     expectedResult =["[app1]-->[app2]"]
-    self._runDrawTest(graph,expectedResult)
+    self.run_draw_context_diagram_test(graph,expectedResult)
 
   def testDrawProductWithOneApp(self):
       graph = {
@@ -17,14 +17,16 @@ class GraphVisualizerTestCases(unittest.TestCase):
         "edges":[{"start":"2","end":"1"}]
         }
       expectedResult =["folder app1{","[app2]","}"]
-      self._runDrawTest(graph,expectedResult)
+      self.run_draw_context_diagram_test(graph,expectedResult)
+
   def testDrawProudctWithOutgoingAppRelation(self):
       graph = {
         "vertexes":[{"key":"1","name":"app1","type":"application"},{"key":"2","name":"product","type":"product"}],
         "edges":[{"start":"2","end":"1"}]
         }
       expectedResult =["folder product{","}"]
-      self._runDrawTest(graph,expectedResult)
+      self.run_draw_context_diagram_test(graph,expectedResult)
+
   def testProductWithEdge(self):
        graph = {
          "vertexes":[{"key":"1","name":"app1","type":"application"},
@@ -34,7 +36,7 @@ class GraphVisualizerTestCases(unittest.TestCase):
                   {"start":"1","end":"3"}]
          }
        expectedResult =["folder product{","[app1]","}","[app1]-->[app2]"]
-       self._runDrawTest(graph,expectedResult)
+       self.run_draw_context_diagram_test(graph,expectedResult)
 
   def testNameEscaping(self):
       graph = {
@@ -45,8 +47,10 @@ class GraphVisualizerTestCases(unittest.TestCase):
                    {"start":"1","end":"3"}]
       }
       expectedResult =["folder product_1{","[app 1]","}","[app 1]-->[app 2]"]
-      self._runDrawTest(graph,expectedResult)
-  def _runDrawTest(self, graphDictionary,expectedResult):
-     systemGraph = system_graph.SystemGraph(graphDictionary)
-     result = graph_visualizer.GraphVisualizer(systemGraph).draw()
-     self.assertListEqual(expectedResult,result)
+      self.run_draw_context_diagram_test(graph,expectedResult)
+
+  def run_draw_context_diagram_test(self, graphDictionary, expectedResult):
+      systemGraph = system_graph.SystemGraph(graphDictionary)
+      result = graph_visualizer.GraphVisualizer(systemGraph).draw()
+      self.assertListEqual(expectedResult,result)
+

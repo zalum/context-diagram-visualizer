@@ -6,7 +6,7 @@ class Graph:
         return self.graph["vertexes"]
 
     def getEdges(self):
-        return self.graph["edges"]
+        return self.graph["edges"] if "edges" in self.graph else []
 
     def is_vertex_of_type(self, vertex, type):
         return vertex["type"] == type
