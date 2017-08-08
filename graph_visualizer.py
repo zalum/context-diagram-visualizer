@@ -1,6 +1,6 @@
 import system_graph
 
-class GraphVisualizer:
+class ContextDiagramGraphVisualizer:
   def __init__(self,systemGraph):
       self.systemGraph = systemGraph
 

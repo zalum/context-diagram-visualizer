@@ -51,6 +51,6 @@ class GraphVisualizerTestCases(unittest.TestCase):
 
   def run_draw_context_diagram_test(self, graphDictionary, expectedResult):
       systemGraph = system_graph.SystemGraph(graphDictionary)
-      result = graph_visualizer.GraphVisualizer(systemGraph).draw()
+      result = graph_visualizer.ContextDiagramGraphVisualizer(systemGraph).draw()
       self.assertListEqual(expectedResult,result)
 

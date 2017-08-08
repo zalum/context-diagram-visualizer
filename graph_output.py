@@ -8,7 +8,6 @@ def writeAsFile(lines):
 
 
 def writeAsImage(lines):
-    output = b''
     p = subprocess.Popen(["java","-jar","/data/tools/plant-uml/plantuml.1.2017.15.jar","-pipe"],
                          stdin = subprocess.PIPE,stdout = subprocess.PIPE)
     content = writeAsText(lines)

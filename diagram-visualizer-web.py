@@ -12,7 +12,7 @@ app = Flask(__name__)
 def get_product_graph(format="text"):
     print(request.data)
     inputSystemGraph = system_graph.SystemGraph(request.get_json())
-    lines = graph_visualizer.GraphVisualizer(inputSystemGraph).draw()
+    lines = graph_visualizer.ContextDiagramGraphVisualizer(inputSystemGraph).draw()
     if format == "text":
         return graph_output.writeAsText(lines)
     else:

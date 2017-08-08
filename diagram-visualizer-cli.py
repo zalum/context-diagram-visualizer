@@ -5,7 +5,7 @@ import graph_visualizer
 
 def drawSystemGraph():
     inputSystemGraph = system_graph.SystemGraph(graph_input.getSystemGraph())
-    lines = graph_visualizer.GraphVisualizer(inputSystemGraph).draw()
+    lines = graph_visualizer.ContextDiagramGraphVisualizer(inputSystemGraph).draw()
     graph_output.writeAsImage(lines)
 
 def drawDatamodel():
