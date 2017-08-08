@@ -5,7 +5,6 @@ import graph_visualizer
 from flask import abort
 from flask import request
 from flask import send_file
-import io
 
 app = Flask(__name__)
 
