@@ -8,9 +8,8 @@ from flask import send_file
 
 app = Flask(__name__)
 
-@app.route("/product/format=<string:format>",methods=['POST'])
+@app.route("/context-diagram/format=<string:format>",methods=['POST'])
 def get_product_graph(format="text"):
-    print(request.data)
     inputSystemGraph = system_graph.SystemGraph(request.get_json())
     lines = graph_visualizer.ContextDiagramGraphVisualizer(inputSystemGraph).draw()
     if format == "text":
@@ -21,6 +20,9 @@ def get_product_graph(format="text"):
         else:
             abort(406)
 
+@app.route("/context-diagram/global-graph/vertex/",methods=['POST'])
+def add_new_vertex():
+    #idea
 
 if __name__ == "__main__":
     app.run()

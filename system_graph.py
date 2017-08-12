@@ -1,6 +1,7 @@
 
 class Graph:
-    def __init__(self,graph):
+
+    def __init__(self,graph = {"vertexes":[],"edges":[]}):
         self.graph = graph
     def getVertexes(self):
         return self.graph["vertexes"]
@@ -16,6 +17,14 @@ class Graph:
 
     def _get_vertex_by_key(self, key):
         return list(filter(lambda x: x["key"]==key,self.getVertexes())).pop(0)
+
+    def add_vertex(self, key, type):
+        vertex = {"key":key,"type":type}
+        self.graph["vertexes"].append(vertex)
+
+    def add_edge(self, startKey, endKey):
+        edge = {"start":startKey,"end":endKey}
+        self.graph["edges"].append(edge)
 
 class SystemGraph(Graph):
 
@@ -117,3 +126,5 @@ class DatamodelGraph(Graph):
                 "table":self.get_table_for_column(column2)
             }
         }
+
+

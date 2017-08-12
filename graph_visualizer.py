@@ -41,16 +41,14 @@ class DatamodelVisualizer():
     def draw(self):
         lines = []
         [lines.extend(self._drawSchema(schema)) for schema in self.dataModelGraph.getSchemas()]
+        [lines.extend(self._draw_foreign_key(fk)) for fk in self.dataModelGraph.get_foreign_keys()]
         return lines
 
 
     def _drawSchema(self, schema):
         tables = self.dataModelGraph.get_tables_in_schema(schema)
-        foreign_keys = self.dataModelGraph.get_foreign_keys()
         drawn_schema = ["package \"%s\"{"%schema["key"]]
         [drawn_schema.extend(self._draw_table(table)) for table in tables]
-        [drawn_schema.extend(self._draw_foreign_key(fk)) for fk in foreign_keys]
-
         drawn_schema.append("}")
         return drawn_schema
 
