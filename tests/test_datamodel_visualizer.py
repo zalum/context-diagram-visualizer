@@ -21,6 +21,28 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
         expected_result =["package \"SCHEMA1\"{","class TABLE1 {","}","}"]
         self.run_draw_datamodel_test(graph,expected_result)
 
+    def test_draw_table_with_column(self):
+        graph = {
+            "vertexes":[{"key":"SCHEMA1","type":"schema"},
+                        {"key":"TABLE1","type":"table"},
+                        {"key":"T1_ID","type":"column"}
+                        ],
+            "edges":[{"start":"TABLE1","end":"SCHEMA1"},{"start":"T1_ID","end":"TABLE1"}]
+        }
+        expected_result =["package \"SCHEMA1\"{","class TABLE1 {","+ T1_ID","}","}"]
+        self.run_draw_datamodel_test(graph,expected_result)
+
+    def test_draw_table_with_colapsed_column(self):
+        graph = {
+            "vertexes":[{"key":"SCHEMA1","type":"schema"},
+                        {"key":"TABLE1","type":"table"},
+                        {"key":"T1_ID","type":"column"}
+                        ],
+            "edges":[{"start":"TABLE1","end":"SCHEMA1"},{"start":"T1_ID","end":"TABLE1"}]
+        }
+        expected_result =["package \"SCHEMA1\"{","class TABLE1 {","}","}"]
+        self.run_draw_datamodel_test(graph,expected_result,True)
+
     def test_draw_foreign_key(self):
         graph = {
             "vertexes":[{"key":"SCHEMA1","type":"schema"},{"key":"TABLE1","type":"table"},{"key":"TABLE2","type":"table"},
@@ -77,8 +99,8 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
                           ]
         self.run_draw_datamodel_test(graph,expected_result)
 
-    def run_draw_datamodel_test(self, graphDictionary, expectedResult):
+    def run_draw_datamodel_test(self, graphDictionary, expectedResult,colapsed_columns = False):
         datamodel_graph = system_graph.DatamodelGraph(graphDictionary)
-        result = graph_visualizer.DatamodelVisualizer(datamodel_graph).draw()
+        result = graph_visualizer.DatamodelVisualizer(datamodel_graph).draw(colapsed_columns)
         self.assertListEqual(expectedResult,result)
 

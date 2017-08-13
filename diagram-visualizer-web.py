@@ -22,7 +22,7 @@ def get_product_graph(format="text"):
 
 @app.route("/context-diagram/global-graph/vertex/",methods=['POST'])
 def add_new_vertex():
-    #idea
+    # idea
 
 if __name__ == "__main__":
     app.run()

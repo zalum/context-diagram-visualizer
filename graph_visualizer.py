@@ -38,24 +38,25 @@ class DatamodelVisualizer():
         """
         self.dataModelGraph = dataModelGraph
 
-    def draw(self):
+    def draw(self,colapsed_columns = False):
         lines = []
-        [lines.extend(self._drawSchema(schema)) for schema in self.dataModelGraph.getSchemas()]
+        [lines.extend(self._drawSchema(schema,colapsed_columns)) for schema in self.dataModelGraph.getSchemas()]
         [lines.extend(self._draw_foreign_key(fk)) for fk in self.dataModelGraph.get_foreign_keys()]
         return lines
 
 
-    def _drawSchema(self, schema):
+    def _drawSchema(self, schema,colapsed_columns = False):
         tables = self.dataModelGraph.get_tables_in_schema(schema)
         drawn_schema = ["package \"%s\"{"%schema["key"]]
-        [drawn_schema.extend(self._draw_table(table)) for table in tables]
+        [drawn_schema.extend(self._draw_table(table,colapsed_columns)) for table in tables]
         drawn_schema.append("}")
         return drawn_schema
 
-    def _draw_table(self, table):
+    def _draw_table(self, table,colapsed_columns=False):
         drawn_table = ["class %s {"%table["key"]]
         columns = self.dataModelGraph.get_columns_in_table(table)
-        [drawn_table.extend(self._draw_column(column)) for column in columns]
+        if colapsed_columns == False:
+            [drawn_table.extend(self._draw_column(column)) for column in columns]
         drawn_table.extend("}")
         return drawn_table
 
