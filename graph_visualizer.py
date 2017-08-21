@@ -41,7 +41,7 @@ class DatamodelVisualizer():
     def draw(self,colapsed_columns = False):
         lines = []
         [lines.extend(self._drawSchema(schema,colapsed_columns)) for schema in self.dataModelGraph.getSchemas()]
-        [lines.extend(self._draw_foreign_key(fk)) for fk in self.dataModelGraph.get_foreign_keys()]
+        [lines.extend(self._draw_foreign_key(fk,colapsed_columns)) for fk in self.dataModelGraph.get_foreign_keys()]
         return lines
 
 
@@ -63,10 +63,24 @@ class DatamodelVisualizer():
     def _draw_column(self, column):
         return ["+ %s"%column["key"]]
 
-    def _draw_foreign_key(self, fk):
+    def _draw_foreign_key_between_tables(self, fk):
+        return ["%s::%s --> %s::%s:%s:%s"% \
+                (fk["start"]["table"]["key"],
+                 fk["start"]["column"]["key"],
+                 fk["end"]["table"]["key"],
+                 fk["end"]["column"]["key"],
+                 fk["start"]["column"]["key"],
+                 fk["end"]["column"]["key"])]
+
+    def _draw_foreign_key_between_columns(self, fk):
         return ["%s::%s --> %s::%s"% \
         (fk["start"]["table"]["key"],
          fk["start"]["column"]["key"],
          fk["end"]["table"]["key"],
          fk["end"]["column"]["key"])]
+
+    def _draw_foreign_key(self, fk, colapsed_columns):
+        if colapsed_columns == True:
+            return self._draw_foreign_key_between_tables(fk)
+        return self._draw_foreign_key_between_columns(fk)
 

@@ -11,7 +11,7 @@ def drawSystemGraph():
 def drawDatamodel():
     f = open('output.png', 'wb')
     inputSystemGraph = system_graph.DatamodelGraph(graph_input.getDatamodelGraph())
-    lines = graph_visualizer.DatamodelVisualizer(inputSystemGraph).draw()
+    lines = graph_visualizer.DatamodelVisualizer(inputSystemGraph).draw(colapsed_columns=True)
     print(lines)
     picture = graph_output.writeAsImage(lines).getvalue()
     f.write(picture)

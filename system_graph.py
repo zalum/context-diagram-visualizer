@@ -16,9 +16,12 @@ class Graph:
         return edge["end"] == vertex["key"]
 
     def _get_vertex_by_key(self, key):
-        return list(filter(lambda x: x["key"]==key,self.getVertexes())).pop(0)
+        filter_result = list(filter(lambda x: x["key"]==key,self.getVertexes()))
+        return filter_result.pop() if len(filter_result)>0 else None
 
     def add_vertex(self, key, type):
+        if self._get_vertex_by_key(key) is not None:
+            return
         vertex = {"key":key,"type":type}
         self.graph["vertexes"].append(vertex)
 
