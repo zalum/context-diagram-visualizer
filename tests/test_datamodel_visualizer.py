@@ -88,7 +88,7 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
                            "class TABLE2 {",
                            "}",
                            "}",
-                           "TABLE1::T1_ID --> TABLE2::T2_ID:T1_ID:T2_ID"
+                           "TABLE1 --> TABLE2 : T1_ID::T2_ID"
                            ]
 
         self.run_draw_datamodel_test(graph,expected_result,colapsed_columns=True)

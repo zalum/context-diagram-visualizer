@@ -64,11 +64,9 @@ class DatamodelVisualizer():
         return ["+ %s"%column["key"]]
 
     def _draw_foreign_key_between_tables(self, fk):
-        return ["%s::%s --> %s::%s:%s:%s"% \
+        return ["%s --> %s : %s::%s"% \
                 (fk["start"]["table"]["key"],
-                 fk["start"]["column"]["key"],
                  fk["end"]["table"]["key"],
-                 fk["end"]["column"]["key"],
                  fk["start"]["column"]["key"],
                  fk["end"]["column"]["key"])]
 
