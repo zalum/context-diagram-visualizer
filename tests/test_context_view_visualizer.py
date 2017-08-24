@@ -8,7 +8,7 @@ class GraphVisualizerTestCases(unittest.TestCase):
       "vertexes":[{"key":"1","name":"app1","type":"application"},{"key":"2","name":"app2","type":"application"}],
       "edges":[{"start":"1","end":"2"}]
       }
-    expectedResult =["[app1]-->[app2]"]
+    expectedResult =["@startuml","left to right direction","[app1]-->[app2]","@enduml"]
     self.run_draw_context_diagram_test(graph,expectedResult)
 
   def testDrawProductWithOneApp(self):
@@ -16,7 +16,7 @@ class GraphVisualizerTestCases(unittest.TestCase):
         "vertexes":[{"key":"1","name":"app1","type":"product"},{"key":"2","name":"app2","type":"application"}],
         "edges":[{"start":"2","end":"1"}]
         }
-      expectedResult =["folder app1{","[app2]","}"]
+      expectedResult =["@startuml","left to right direction","folder app1{","[app2]","}","@enduml"]
       self.run_draw_context_diagram_test(graph,expectedResult)
 
   def testDrawProudctWithOutgoingAppRelation(self):
@@ -24,7 +24,7 @@ class GraphVisualizerTestCases(unittest.TestCase):
         "vertexes":[{"key":"1","name":"app1","type":"application"},{"key":"2","name":"product","type":"product"}],
         "edges":[{"start":"2","end":"1"}]
         }
-      expectedResult =["folder product{","}"]
+      expectedResult =["@startuml","left to right direction","folder product{","}","@enduml"]
       self.run_draw_context_diagram_test(graph,expectedResult)
 
   def testProductWithEdge(self):
@@ -35,7 +35,7 @@ class GraphVisualizerTestCases(unittest.TestCase):
          "edges":[{"start":"1","end":"2"},
                   {"start":"1","end":"3"}]
          }
-       expectedResult =["folder product{","[app1]","}","[app1]-->[app2]"]
+       expectedResult =["@startuml","left to right direction","folder product{","[app1]","}","[app1]-->[app2]","@enduml"]
        self.run_draw_context_diagram_test(graph,expectedResult)
 
   def testNameEscaping(self):
@@ -46,7 +46,7 @@ class GraphVisualizerTestCases(unittest.TestCase):
           "edges":[{"start":"1","end":"2"},
                    {"start":"1","end":"3"}]
       }
-      expectedResult =["folder product_1{","[app 1]","}","[app 1]-->[app 2]"]
+      expectedResult =["@startuml","left to right direction","folder product_1{","[app 1]","}","[app 1]-->[app 2]","@enduml"]
       self.run_draw_context_diagram_test(graph,expectedResult)
 
   def run_draw_context_diagram_test(self, graphDictionary, expectedResult):

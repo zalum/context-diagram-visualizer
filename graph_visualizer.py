@@ -6,10 +6,11 @@ class ContextDiagramGraphVisualizer:
 
   def draw(self):
       orphanApplications = self.systemGraph.getOrphanApplications()
-      lines = []
+      lines = ["@startuml","left to right direction"]
       [lines.extend(self._drawProduct(vertex)) for vertex in self.systemGraph.getVertexes() if self.systemGraph.isProduct(vertex)]
       lines.extend([self._drawEdges(edge) for edge in self.systemGraph.getEdges() if self.systemGraph.edgeBetweenApplications(edge)])
       lines.extend([self._drawApplication(vertex) for vertex in orphanApplications])
+      lines.append("@enduml")
       return lines
 
   def _drawProduct(self,product):
@@ -39,9 +40,10 @@ class DatamodelVisualizer():
         self.dataModelGraph = dataModelGraph
 
     def draw(self,colapsed_columns = False):
-        lines = []
+        lines = ["@startuml","left to right direction"]
         [lines.extend(self._drawSchema(schema,colapsed_columns)) for schema in self.dataModelGraph.getSchemas()]
         [lines.extend(self._draw_foreign_key(fk,colapsed_columns)) for fk in self.dataModelGraph.get_foreign_keys()]
+        lines.append("@enduml")
         return lines
 
 

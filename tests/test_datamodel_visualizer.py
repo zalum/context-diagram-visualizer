@@ -10,7 +10,7 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
             "vertexes":[{"key":"SCHEMA1","type":"schema"}]
         }
 
-        expected_result =["package \"SCHEMA1\"{","}"]
+        expected_result =["@startuml","left to right direction","package \"SCHEMA1\"{","}","@enduml"]
         self.run_draw_datamodel_test(graph,expected_result)
 
     def test_draw_schema_with_table(self):
@@ -18,7 +18,7 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
             "vertexes":[{"key":"SCHEMA1","type":"schema"},{"key":"TABLE1","type":"table"}],
             "edges":[{"start":"TABLE1","end":"SCHEMA1"}]
         }
-        expected_result =["package \"SCHEMA1\"{","class TABLE1 {","}","}"]
+        expected_result =["@startuml","left to right direction","package \"SCHEMA1\"{","class TABLE1 {","}","}","@enduml"]
         self.run_draw_datamodel_test(graph,expected_result)
 
     def test_draw_table_with_column(self):
@@ -29,7 +29,7 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
                         ],
             "edges":[{"start":"TABLE1","end":"SCHEMA1"},{"start":"T1_ID","end":"TABLE1"}]
         }
-        expected_result =["package \"SCHEMA1\"{","class TABLE1 {","+ T1_ID","}","}"]
+        expected_result =["@startuml","left to right direction","package \"SCHEMA1\"{","class TABLE1 {","+ T1_ID","}","}","@enduml"]
         self.run_draw_datamodel_test(graph,expected_result)
 
     def test_draw_table_with_colapsed_column(self):
@@ -40,7 +40,7 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
                         ],
             "edges":[{"start":"TABLE1","end":"SCHEMA1"},{"start":"T1_ID","end":"TABLE1"}]
         }
-        expected_result =["package \"SCHEMA1\"{","class TABLE1 {","}","}"]
+        expected_result =["@startuml","left to right direction","package \"SCHEMA1\"{","class TABLE1 {","}","}","@enduml"]
         self.run_draw_datamodel_test(graph,expected_result,True)
 
 
@@ -57,7 +57,7 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
                 {"start":"T1_ID","end":"T2_ID"},
             ]
         }
-        expected_result = ["package \"SCHEMA1\"{",
+        expected_result = ["@startuml","left to right direction","package \"SCHEMA1\"{",
                          "class TABLE1 {",
                          "+ T1_ID",
                          "}",
@@ -65,7 +65,7 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
                          "+ T2_ID",
                          "}",
                          "}",
-                         "TABLE1::T1_ID --> TABLE2::T2_ID"
+                         "TABLE1::T1_ID --> TABLE2::T2_ID","@enduml"
                          ]
 
         self.run_draw_datamodel_test(graph,expected_result)
@@ -82,13 +82,13 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
                 {"start":"T1_ID","end":"T2_ID"},
             ]
         }
-        expected_result = ["package \"SCHEMA1\"{",
+        expected_result = ["@startuml","left to right direction","package \"SCHEMA1\"{",
                            "class TABLE1 {",
                            "}",
                            "class TABLE2 {",
                            "}",
                            "}",
-                           "TABLE1 --> TABLE2 : T1_ID::T2_ID"
+                           "TABLE1 --> TABLE2 : T1_ID::T2_ID","@enduml"
                            ]
 
         self.run_draw_datamodel_test(graph,expected_result,colapsed_columns=True)
@@ -111,7 +111,7 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
             ]
         }
 
-        expected_result = ["package \"SCHEMA1\"{",
+        expected_result = ["@startuml","left to right direction","package \"SCHEMA1\"{",
                           "class TABLE1 {",
                           "+ T1_ID",
                           "}",
@@ -121,7 +121,7 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
                           "+ T2_ID",
                           "}",
                           "}",
-                          "TABLE1::T1_ID --> TABLE2::T2_ID"
+                          "TABLE1::T1_ID --> TABLE2::T2_ID","@enduml"
                           ]
         self.run_draw_datamodel_test(graph,expected_result)
 
