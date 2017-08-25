@@ -1,29 +1,29 @@
 
 class Graph:
 
-    def __init__(self,graph = {"vertexes":[],"edges":[]}):
+    def __init__(self,graph = {"vertexes":{},"edges":[]}):
         self.graph = graph
     def getVertexes(self):
-        return self.graph["vertexes"]
+        keys = list(self.graph["vertexes"].keys())
+        keys.sort()
+        return keys
 
     def getEdges(self):
         return self.graph["edges"] if "edges" in self.graph else []
 
     def is_vertex_of_type(self, vertex, type):
-        return vertex["type"] == type
+        return self.graph["vertexes"][vertex]["type"] == type
 
     def _isEdgeWithEndVertex(self,edge,vertex):
-        return edge["end"] == vertex["key"]
+        return edge["end"] == vertex
 
-    def _get_vertex_by_key(self, key):
-        filter_result = list(filter(lambda x: x["key"]==key,self.getVertexes()))
-        return filter_result.pop() if len(filter_result)>0 else None
+    def does_vertex_exists(self,key):
+        return key in self.graph["vertexes"]
 
     def add_vertex(self, key, type):
-        if self._get_vertex_by_key(key) is not None:
+        if key in self.graph["vertexes"]:
             return
-        vertex = {"key":key,"type":type}
-        self.graph["vertexes"].append(vertex)
+        self.graph["vertexes"][key] = {"type":type}
 
     def add_edge(self, startKey, endKey):
         edge = {"start":startKey,"end":endKey}
@@ -46,12 +46,8 @@ class SystemGraph(Graph):
     def isProduct(self,vertex):
         return self.is_vertex_of_type(vertex, "product")
 
-    def getVertexNameByKey(self,key):
-        vertex = self._get_vertex_by_key(key)
-        return self.getVertexName(vertex)
-
     def getVertexName(self,vertex):
-        return vertex["name"]
+        return self.graph["vertexes"][vertex]["name"]
 
     def getApplicationKeysInProduct(self,product):
         productEdges = list(filter(lambda edge: self._isEdgeWithEndVertex(edge,product),self.getEdges()))
@@ -64,14 +60,12 @@ class SystemGraph(Graph):
         return False
 
     def _isEdgeWithVertex(self,edge,vertex):
-        return edge["start"] == vertex["key"] or edge["end"] == vertex["key"]
+        return edge["start"] == vertex or edge["end"] == vertex
 
 
 
     def _getOppositeVertex(self,vertex,edge):
-        return  edge["start"] if edge["end"]==vertex["key"] else edge["end"]
-
-
+        return  edge["start"] if edge["end"]==vertex else edge["end"]
 
 
 class DatamodelGraph(Graph):
@@ -84,9 +78,9 @@ class DatamodelGraph(Graph):
         return self.is_vertex_of_type(vertex,"column")
 
     def get_table_for_column(self,column):
-        column_edges = [edge for edge in self.getEdges() if edge["start"]==column["key"]]
+        column_edges = [edge for edge in self.getEdges() if edge["start"]==column]
         for edge in column_edges:
-            vertex = self._get_vertex_by_key(edge["end"])
+            vertex = edge["end"]
             if self._isTable(vertex):
                 return vertex
         return None
@@ -101,22 +95,21 @@ class DatamodelGraph(Graph):
         if self._isTable(vertex) is False:
             return False
         for edge in self.getEdges():
-            if(edge["start"] == vertex["key"] and edge["end"] == schema["key"]):
+            if(edge["start"] == vertex and edge["end"] == schema):
                 return True
         return False
 
     def get_columns_in_table(self, table):
         return list(filter(lambda v:self._is_column(v),
-            map(lambda key: self._get_vertex_by_key(key),
-            map(lambda e: e["start"],
-            filter(lambda edge: self._isEdgeWithEndVertex(edge,table),self.getEdges())))))
+                map(lambda e: e["start"],
+            filter(lambda edge: self._isEdgeWithEndVertex(edge,table),self.getEdges()))))
 
     def get_foreign_keys(self):
         return list(
             map(lambda fk: self._get_foreign_key(fk[0], fk[1]),
-            filter(lambda e: self._is_column(e[0]) and self._is_column(e[1]),
-            map(lambda e: (self._get_vertex_by_key(e["start"]),
-                self._get_vertex_by_key(e["end"])),self.getEdges()))))
+                filter(lambda e: self._is_column(e[0]) and self._is_column(e[1]),
+                       map(lambda e: (e["start"],
+                e["end"]), self.getEdges()))))
 
     def _get_foreign_key(self,column1, column2):
         return {

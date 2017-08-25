@@ -14,14 +14,14 @@ class ContextDiagramGraphVisualizer:
       return lines
 
   def _drawProduct(self,product):
-      applicationsKey = self.systemGraph.getApplicationKeysInProduct(product)
+      applications = self.systemGraph.getApplicationKeysInProduct(product)
       drawnProudct = ["folder %s{"%self._drawProductName(product)]
-      drawnProudct.extend([self._drawApplicationByKey(applicationKey) for applicationKey in applicationsKey])
+      drawnProudct.extend([self._drawApplication(application) for application in applications])
       drawnProudct.append("}")
       return drawnProudct
 
-  def _drawApplicationByKey(self,key):
-      return self._drawApplicationByName(self.systemGraph.getVertexNameByKey(key))
+  def _drawApplication(self, application):
+      return self._drawApplicationByName(self.systemGraph.getVertexName(application))
   def _drawProductName(self,product):
       return self.systemGraph.getVertexName(product).replace(" ","_")
   def _drawApplicationByVertex(self,vertex):
@@ -29,8 +29,8 @@ class ContextDiagramGraphVisualizer:
   def _drawApplicationByName(self,name):
       return "[%s]"%name
   def _drawEdges(self,edge):
-      return "[%s]-->[%s]"%(self.systemGraph.getVertexNameByKey(edge["start"]),\
-                            self.systemGraph.getVertexNameByKey(edge["end"]))
+      return "[%s]-->[%s]"%(self.systemGraph.getVertexName(edge["start"]),\
+                            self.systemGraph.getVertexName(edge["end"]))
 
 class DatamodelVisualizer():
     def __init__(self,dataModelGraph):
@@ -49,13 +49,13 @@ class DatamodelVisualizer():
 
     def _drawSchema(self, schema,colapsed_columns = False):
         tables = self.dataModelGraph.get_tables_in_schema(schema)
-        drawn_schema = ["package \"%s\"{"%schema["key"]]
+        drawn_schema = ["package \"%s\"{"%schema]
         [drawn_schema.extend(self._draw_table(table,colapsed_columns)) for table in tables]
         drawn_schema.append("}")
         return drawn_schema
 
     def _draw_table(self, table,colapsed_columns=False):
-        drawn_table = ["class %s {"%table["key"]]
+        drawn_table = ["class %s {"%table]
         columns = self.dataModelGraph.get_columns_in_table(table)
         if colapsed_columns == False:
             [drawn_table.extend(self._draw_column(column)) for column in columns]
@@ -63,21 +63,21 @@ class DatamodelVisualizer():
         return drawn_table
 
     def _draw_column(self, column):
-        return ["+ %s"%column["key"]]
+        return ["+ %s"%column]
 
     def _draw_foreign_key_between_tables(self, fk):
         return ["%s --> %s : %s::%s"% \
-                (fk["start"]["table"]["key"],
-                 fk["end"]["table"]["key"],
-                 fk["start"]["column"]["key"],
-                 fk["end"]["column"]["key"])]
+                (fk["start"]["table"],
+                 fk["end"]["table"],
+                 fk["start"]["column"],
+                 fk["end"]["column"])]
 
     def _draw_foreign_key_between_columns(self, fk):
         return ["%s::%s --> %s::%s"% \
-        (fk["start"]["table"]["key"],
-         fk["start"]["column"]["key"],
-         fk["end"]["table"]["key"],
-         fk["end"]["column"]["key"])]
+        (fk["start"]["table"],
+         fk["start"]["column"],
+         fk["end"]["table"],
+         fk["end"]["column"])]
 
     def _draw_foreign_key(self, fk, colapsed_columns):
         if colapsed_columns == True:

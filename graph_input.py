@@ -1,10 +1,11 @@
 def getSystemGraph():
-    return {"vertexes":[
-            {"name":"precedingapp","key":"1","type":"application"},
-            {"name": "app1","key":"2","type":"application"},
-            {"name":"app2","key":"3","type":"application"},
-            {"name":"app3","key":"4","type":"application"},
-            {"name": "product","key":"5","type":"product"}],
+    return {"vertexes":{
+            "1":{"name":"precedingapp","type":"application"},
+            "2":{"name": "app1","type":"application"},
+            "3":{"name":"app2","type":"application"},
+            "4":{"name":"app3","type":"application"},
+            "5":{"name": "product","type":"product"}
+            },
             "edges":[
                 {"start":"1","end":"2"},
                 {"start":"2","end":"3"},
@@ -16,16 +17,16 @@ def getSystemGraph():
 
 def getDatamodelGraph():
     return {
-        "vertexes":[
-        {"key":"TABLE1","type":"table"},
-        {"key":"TABLE2","type":"table"},
-        {"key":"SCHEMA1","type":"schema"},
-        {"key":"T1_ID","type":"column"},
-        {"key":"T1_PROPERTY1","type":"column"},
-        {"key":"T1_T2_FK","type":"column"},
-        {"key":"T2_ID","type":"column"},
-        {"key":"T2_PROPERTY1","type":"column"}
-    ],
+        "vertexes":{
+        "TABLE1":{"type":"table"},
+        "TABLE2":{"type":"table"},
+        "SCHEMA1":{"type":"schema"},
+        "T1_ID":{"type":"column"},
+        "T1_PROPERTY1":{"type":"column"},
+        "T1_T2_FK":{"type":"column"},
+        "T2_ID":{"type":"column"},
+        "T2_PROPERTY1":{"type":"column"}
+        },
         "edges":[
             {"start":"T1_ID","end":"TABLE1"},
             {"start":"T1_PROPERTY1","end":"TABLE1"},
