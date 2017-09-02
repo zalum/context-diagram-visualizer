@@ -1,8 +1,12 @@
+import json
 
 class Graph:
 
     def __init__(self,graph = {"vertexes":{},"edges":[]}):
         self.graph = graph
+
+    def to_json(self):
+        return json.dumps(self.graph)
     def getVertexes(self):
         keys = list(self.graph["vertexes"].keys())
         keys.sort()
@@ -71,6 +75,17 @@ class SystemGraph(Graph):
 class DatamodelGraph(Graph):
     def isSchema(self,vertex):
         return self.is_vertex_of_type(vertex, "schema")
+
+    def add_schema(self,schema):
+        self.add_vertex(schema,"schema")
+
+    def add_column(self,column,table):
+        self.add_vertex(column,"column")
+        self.add_edge(column,table)
+
+    def add_table(self,table,schema):
+        self.add_vertex(table,"table")
+        self.add_edge(table,schema)
 
     def _isTable(self, vertex):
         return self.is_vertex_of_type(vertex, "table")
