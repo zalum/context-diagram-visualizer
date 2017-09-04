@@ -9,9 +9,6 @@ import json
 
 system_diagram_controller = Blueprint('system-diagram', 'system-diagram')
 
-"""
-:type: dict[str,system_graph.DatamodelGraph]
-"""
 datamodels={}
 
 
@@ -132,6 +129,22 @@ def add_table(datamodel,schema):
     graph.add_table(table_name,schema)
     [graph.add_column(column,table_name) for column in table["columns"]]
     return graph.to_json()
+
+@system_diagram_controller.route("/datamodel/", methods=['GET'])
+def list_datamodels():
+    """
+    List datamodels
+    ---
+    responses:
+        200:
+            content:
+            text/plain:
+              schema:
+                type: string
+    tags:
+    - datamodel
+    """
+    return json.dumps(list(datamodels.keys()))
 
 @system_diagram_controller.route("/datamodel/<string:datamodel>", methods=['GET'])
 def draw_datamodel(datamodel):

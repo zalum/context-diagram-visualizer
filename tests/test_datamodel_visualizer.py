@@ -125,6 +125,23 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
                           ]
         self.run_draw_datamodel_test(graph,expected_result)
 
+    def test_constructor_when_default_parameter_is_mutated(self):
+        """
+        http://docs.python-guide.org/en/latest/writing/gotchas/
+        """
+
+        datamodel_graph = system_graph.DatamodelGraph()
+        datamodel_graph.add_schema("SCHEMA1")
+
+        result = graph_visualizer.DatamodelVisualizer(datamodel_graph).draw()
+        expected_result =["@startuml","left to right direction","package \"SCHEMA1\"{","}","@enduml"]
+        self.assertListEqual(expected_result,result)
+
+        datamodel_graph = system_graph.DatamodelGraph()
+        result = graph_visualizer.DatamodelVisualizer(datamodel_graph).draw()
+        self.assertListEqual(["@startuml","left to right direction","@enduml"],result)
+
+
     def run_draw_datamodel_test(self, graphDictionary, expectedResult,colapsed_columns = False):
         datamodel_graph = system_graph.DatamodelGraph(graphDictionary)
         result = graph_visualizer.DatamodelVisualizer(datamodel_graph).draw(colapsed_columns)

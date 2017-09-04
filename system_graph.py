@@ -2,8 +2,11 @@ import json
 
 class Graph:
 
-    def __init__(self,graph = {"vertexes":{},"edges":[]}):
-        self.graph = graph
+    def __init__(self,graphx = None):
+        if graphx is None:
+            self.graph = {"vertexes":{},"edges":[]}
+        else:
+            self.graph = graphx
 
     def to_json(self):
         return json.dumps(self.graph)
