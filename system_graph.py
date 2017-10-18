@@ -32,8 +32,10 @@ class Graph:
             return
         self.graph["vertexes"][key] = {"type":type}
 
-    def add_edge(self, startKey, endKey):
-        edge = {"start":startKey,"end":endKey}
+    def add_edge(self, start, end, relation_type = None):
+        edge = {"start":start, "end":end}
+        if relation_type is not None:
+            edge["relation_type"] = relation_type
         self.graph["edges"].append(edge)
 
 class SystemGraph(Graph):
@@ -124,10 +126,8 @@ class DatamodelGraph(Graph):
 
     def get_foreign_keys(self):
         return list(
-            map(lambda fk: self._get_foreign_key(fk[0], fk[1]),
-                filter(lambda e: self._is_column(e[0]) and self._is_column(e[1]),
-                       map(lambda e: (e["start"],
-                e["end"]), self.getEdges()))))
+            map(lambda fk: self._get_foreign_key(fk["start"], fk["end"]),
+            filter(lambda e: "relation_type" in e and e["relation_type"] == "fk", self.getEdges())))
 
     def _get_foreign_key(self,column1, column2):
         return {

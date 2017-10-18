@@ -11,7 +11,7 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
         }
 
         expected_result =["@startuml","left to right direction","package \"SCHEMA1\"{","}","@enduml"]
-        self.run_draw_datamodel_test(graph,expected_result)
+        self.__run_draw_datamodel_test__(graph, expected_result)
 
     def test_draw_schema_with_table(self):
         graph = {
@@ -19,7 +19,7 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
             "edges":[{"start":"TABLE1","end":"SCHEMA1"}]
         }
         expected_result =["@startuml","left to right direction","package \"SCHEMA1\"{","class TABLE1 {","}","}","@enduml"]
-        self.run_draw_datamodel_test(graph,expected_result)
+        self.__run_draw_datamodel_test__(graph, expected_result)
 
     def test_draw_table_with_column(self):
         graph = {
@@ -30,7 +30,7 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
             "edges":[{"start":"TABLE1","end":"SCHEMA1"},{"start":"T1_ID","end":"TABLE1"}]
         }
         expected_result =["@startuml","left to right direction","package \"SCHEMA1\"{","class TABLE1 {","+ T1_ID","}","}","@enduml"]
-        self.run_draw_datamodel_test(graph,expected_result)
+        self.__run_draw_datamodel_test__(graph, expected_result)
 
     def test_draw_table_with_colapsed_column(self):
         graph = {
@@ -41,7 +41,7 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
             "edges":[{"start":"TABLE1","end":"SCHEMA1"},{"start":"T1_ID","end":"TABLE1"}]
         }
         expected_result =["@startuml","left to right direction","package \"SCHEMA1\"{","class TABLE1 {","}","}","@enduml"]
-        self.run_draw_datamodel_test(graph,expected_result,True)
+        self.__run_draw_datamodel_test__(graph, expected_result, True)
 
 
 
@@ -54,7 +54,7 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
                 {"start":"TABLE2","end":"SCHEMA1"},
                 {"start":"T1_ID","end":"TABLE1"},
                 {"start":"T2_ID","end":"TABLE2"},
-                {"start":"T1_ID","end":"T2_ID"},
+                {"start":"T1_ID","end":"T2_ID","relation_type":"fk"},
             ]
         }
         expected_result = ["@startuml","left to right direction","package \"SCHEMA1\"{",
@@ -68,7 +68,7 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
                          "TABLE1::T1_ID --> TABLE2::T2_ID","@enduml"
                          ]
 
-        self.run_draw_datamodel_test(graph,expected_result)
+        self.__run_draw_datamodel_test__(graph, expected_result)
 
     def test_draw_table_with_colapsed_column_with_fk(self):
         graph = {
@@ -79,7 +79,7 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
                 {"start":"TABLE2","end":"SCHEMA1"},
                 {"start":"T1_ID","end":"TABLE1"},
                 {"start":"T2_ID","end":"TABLE2"},
-                {"start":"T1_ID","end":"T2_ID"},
+                {"start":"T1_ID","end":"T2_ID","relation_type":"fk"},
             ]
         }
         expected_result = ["@startuml","left to right direction","package \"SCHEMA1\"{",
@@ -91,7 +91,7 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
                            "TABLE1 --> TABLE2 : T1_ID::T2_ID","@enduml"
                            ]
 
-        self.run_draw_datamodel_test(graph,expected_result,colapsed_columns=True)
+        self.__run_draw_datamodel_test__(graph, expected_result, colapsed_columns=True)
 
 
     def test_draw_fk_over_two_schemas(self):
@@ -107,7 +107,7 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
                 {"start":"TABLE2","end":"SCHEMA2"},
                 {"start":"T1_ID","end":"TABLE1"},
                 {"start":"T2_ID","end":"TABLE2"},
-                {"start":"T1_ID","end":"T2_ID"},
+                {"start":"T1_ID","end":"T2_ID","relation_type":"fk"},
             ]
         }
 
@@ -123,7 +123,7 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
                           "}",
                           "TABLE1::T1_ID --> TABLE2::T2_ID","@enduml"
                           ]
-        self.run_draw_datamodel_test(graph,expected_result)
+        self.__run_draw_datamodel_test__(graph, expected_result)
 
     def test_constructor_when_default_parameter_is_mutated(self):
         """
@@ -142,7 +142,7 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
         self.assertListEqual(["@startuml","left to right direction","@enduml"],result)
 
 
-    def run_draw_datamodel_test(self, graphDictionary, expectedResult,colapsed_columns = False):
+    def __run_draw_datamodel_test__(self, graphDictionary, expectedResult, colapsed_columns = False):
         datamodel_graph = system_graph.DatamodelGraph(graphDictionary)
         result = graph_visualizer.DatamodelVisualizer(datamodel_graph).draw(colapsed_columns)
         self.assertListEqual(expectedResult,result)

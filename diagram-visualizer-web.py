@@ -5,7 +5,7 @@ from diagram_visualizer_web_controller import config as system_diagram_web
 
 def init_api_specification(app):
     app.config['SWAGGER'] = {
-        'title': 'System Diagram',
+        'title': 'System Model',
         'uiversion': 3
     }
     swagger_config = Swagger.DEFAULT_CONFIG.copy()
