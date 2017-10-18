@@ -1,23 +1,33 @@
-# diagram visualizer
-This utility has the purpose to put in a graph model the dependencies of a system of all kinds (until now system lanscape, datamodel) and use it as input for plantuml to generate a corresponding diagram 
+# System Model & Visualizer - SVM
+This utility has the purpose to put in a graph model the dependencies of a system of all kinds
+(until now system lanscape, datamodel) and use it as input for plantuml to generate a corresponding diagram
 
-## Scope
-from your landscape you can extract a graph of your system or datamodel and pipe it to this utility. It will spit a plantuml markdown
+## Features
+* model your system in a graph representation
+* types of models
+** component: applications, software products
+** datamodel
+* generates diagrams of your system using plantuml markdown
+* exposes api endpoint to encourage colaboration
 
 ## Prerequisites
-python3
-plantuml
-requests module
-flask
+* python3, java
+* plantuml as a jar
+* requests module
+* flask
+* flasgger
 
 ## How to run
-python3 diagram-visualizer-cli.py
-generates plantuml markdown and/or pictures
+* python3 diagram-visualizer-cli.py
+* python3 diagram-visualizer-web.py
 
-python3 diagram-visualizer-web.py
-it exposes an endpoint
 
 ## Backlog
-put a swagger docu on the endpoint
+* document c4 diagram of this utility
+* plugin system for different sources of data: jira, aws, oracle etc
+* improve validation and http error codes of endpoint
+* enable state on this utility
+* define a schema of the graph so users know what is possible
+* use a graph database to store the graph & provide a query language
+* deployment infrastructure: docker, etc
 
-## endpoints
