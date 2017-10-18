@@ -7,9 +7,25 @@ from flask import send_file
 from flask import Blueprint
 import json
 
-system_diagram_controller = Blueprint('system-diagram', 'system-diagram')
+class web_controller_config:
+    def __init__(self,controller,swagger_config,url_prefix):
+        self.controller = controller
+        self.swagger_config = swagger_config
+        self.url_prefix = url_prefix
 
-datamodels={}
+def rule_filter(rule,matchers):
+    return len([matcher for matcher in matchers if matcher in rule.rule]) != 0
+
+config = web_controller_config(
+    controller = Blueprint('system-model', 'system-model'),
+    swagger_config = dict(endpoint = "system-model",
+                          route = "/system-model.json",
+                          rule_filter=lambda rule: rule_filter(rule,['/datamodel','/c4'])
+                          ),
+    url_prefix="/system-diagram"
+)
+
+__datamodels={}
 
 
 def _build_diagram_response(output, format):
@@ -21,13 +37,13 @@ def _build_diagram_response(output, format):
         else:
             abort(406)
 
-@system_diagram_controller.route("/format=<string:format>", methods=['POST'])
+@config.controller.route("/format=<string:format>", methods=['POST'])
 def get_product_graph(format="text"):
     inputSystemGraph = system_graph.SystemGraph(request.get_json())
     lines = graph_visualizer.ContextDiagramGraphVisualizer(inputSystemGraph).draw()
     return _build_diagram_response(lines,format)
 
-@system_diagram_controller.route("/datamodel/<string:datamodel>", methods=['POST'])
+@config.controller.route("/datamodel/<string:datamodel>", methods=['POST'])
 def add_new_datamodel(datamodel):
     """
     create a datamodel
@@ -43,11 +59,11 @@ def add_new_datamodel(datamodel):
     tags:
     - datamodel
     """
-    datamodels[datamodel]=system_graph.DatamodelGraph()
-    return datamodels[datamodel].to_json()
+    __datamodels[datamodel]=system_graph.DatamodelGraph()
+    return __datamodels[datamodel].to_json()
 
 
-@system_diagram_controller.route("/datamodel/<string:datamodel>", methods=['DELETE'])
+@config.controller.route("/datamodel/<string:datamodel>", methods=['DELETE'])
 def delete_datamodel(datamodel):
     """
     delete datamodel
@@ -63,10 +79,10 @@ def delete_datamodel(datamodel):
     tags:
     - datamodel
     """
-    datamodels.pop(datamodel)
-    return datamodels.keys()
+    __datamodels.pop(datamodel)
+    return __datamodels.keys()
 
-@system_diagram_controller.route("/datamodel/<string:datamodel>/schema/<string:schema>", methods=['POST'])
+@config.controller.route("/datamodel/<string:datamodel>/schema/<string:schema>", methods=['POST'])
 def add_new_schema(datamodel,schema):
     """
     create schema
@@ -86,10 +102,10 @@ def add_new_schema(datamodel,schema):
     tags:
     - schema
     """
-    datamodels[datamodel].add_schema(schema)
-    return datamodels[datamodel].to_json()
+    __datamodels[datamodel].add_schema(schema)
+    return __datamodels[datamodel].to_json()
 
-@system_diagram_controller.route("/datamodel/<string:datamodel>/schema/<string:schema>/table", methods=['POST'])
+@config.controller.route("/datamodel/<string:datamodel>/schema/<string:schema>/table", methods=['POST'])
 def add_table(datamodel,schema):
     """
     create table
@@ -125,12 +141,12 @@ def add_table(datamodel,schema):
     """
     table = request.get_json()
     table_name = table["table_name"]
-    graph = datamodels[datamodel] # :type: system_graph:DatamodelGraph
+    graph = __datamodels[datamodel] # :type: system_graph:DatamodelGraph
     graph.add_table(table_name,schema)
     [graph.add_column(column,table_name) for column in table["columns"]]
     return graph.to_json()
 
-@system_diagram_controller.route("/datamodel/", methods=['GET'])
+@config.controller.route("/datamodel/", methods=['GET'])
 def list_datamodels():
     """
     List datamodels
@@ -144,9 +160,9 @@ def list_datamodels():
     tags:
     - datamodel
     """
-    return json.dumps(list(datamodels.keys()))
+    return json.dumps(list(__datamodels.keys()))
 
-@system_diagram_controller.route("/datamodel/<string:datamodel>", methods=['GET'])
+@config.controller.route("/datamodel/<string:datamodel>", methods=['GET'])
 def draw_datamodel(datamodel):
     """
     Draw a datamodel
@@ -174,5 +190,5 @@ def draw_datamodel(datamodel):
     tags:
     - datamodel
     """
-    output = graph_visualizer.DatamodelVisualizer(datamodels[datamodel]).draw()
+    output = graph_visualizer.DatamodelVisualizer(__datamodels[datamodel]).draw()
     return _build_diagram_response(output,request.args.get("format"))
