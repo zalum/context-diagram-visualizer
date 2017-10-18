@@ -1,6 +1,14 @@
 import json
 
-class Graph:
+# system_model(graph)
+# datamodel
+# component_model
+# deployment_model
+# model_visualizer
+# project name:
+# system modeler & visualizer: SMV
+
+class system_model:
 
     def __init__(self,graphx = None):
         if graphx is None:
@@ -38,7 +46,7 @@ class Graph:
             edge["relation_type"] = relation_type
         self.graph["edges"].append(edge)
 
-class SystemGraph(Graph):
+class application_model(system_model):
 
     def edgeBetweenApplications(self,edge):
         for vertex in self.getVertexes():
@@ -77,7 +85,7 @@ class SystemGraph(Graph):
         return  edge["start"] if edge["end"]==vertex else edge["end"]
 
 
-class DatamodelGraph(Graph):
+class data_model(system_model):
     def isSchema(self,vertex):
         return self.is_vertex_of_type(vertex, "schema")
 

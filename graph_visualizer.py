@@ -1,4 +1,4 @@
-import system_graph
+import system_model
 
 class ContextDiagramGraphVisualizer:
   def __init__(self,systemGraph):
@@ -34,9 +34,6 @@ class ContextDiagramGraphVisualizer:
 
 class DatamodelVisualizer():
     def __init__(self,dataModelGraph):
-        """
-        :type dataModelGraph: system_graph.DatamodelGraph
-        """
         self.dataModelGraph = dataModelGraph
 
     def draw(self,colapsed_columns = False):

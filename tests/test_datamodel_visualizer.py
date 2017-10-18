@@ -1,7 +1,6 @@
 import unittest
 import graph_visualizer
-import system_graph
-
+import system_model as sm
 
 class DatamodelVisualizerTestCases(unittest.TestCase):
 
@@ -130,20 +129,20 @@ class DatamodelVisualizerTestCases(unittest.TestCase):
         http://docs.python-guide.org/en/latest/writing/gotchas/
         """
 
-        datamodel_graph = system_graph.DatamodelGraph()
+        datamodel_graph = sm.data_model()
         datamodel_graph.add_schema("SCHEMA1")
 
         result = graph_visualizer.DatamodelVisualizer(datamodel_graph).draw()
         expected_result =["@startuml","left to right direction","package \"SCHEMA1\"{","}","@enduml"]
         self.assertListEqual(expected_result,result)
 
-        datamodel_graph = system_graph.DatamodelGraph()
+        datamodel_graph = sm.data_model()
         result = graph_visualizer.DatamodelVisualizer(datamodel_graph).draw()
         self.assertListEqual(["@startuml","left to right direction","@enduml"],result)
 
 
     def __run_draw_datamodel_test__(self, graphDictionary, expectedResult, colapsed_columns = False):
-        datamodel_graph = system_graph.DatamodelGraph(graphDictionary)
+        datamodel_graph = sm.data_model(graphDictionary)
         result = graph_visualizer.DatamodelVisualizer(datamodel_graph).draw(colapsed_columns)
         self.assertListEqual(expectedResult,result)
 

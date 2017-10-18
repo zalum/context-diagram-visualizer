@@ -39,7 +39,7 @@ def _build_diagram_response(output, format):
 
 @config.controller.route("/format=<string:format>", methods=['POST'])
 def get_product_graph(format="text"):
-    inputSystemGraph = system_graph.SystemGraph(request.get_json())
+    inputSystemGraph = system_graph.application_model(request.get_json())
     lines = graph_visualizer.ContextDiagramGraphVisualizer(inputSystemGraph).draw()
     return _build_diagram_response(lines,format)
 
@@ -59,7 +59,7 @@ def add_new_datamodel(datamodel):
     tags:
     - datamodel
     """
-    __datamodels[datamodel]=system_graph.DatamodelGraph()
+    __datamodels[datamodel]=system_graph.data_model()
     return __datamodels[datamodel].to_json()
 
 
