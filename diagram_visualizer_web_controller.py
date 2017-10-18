@@ -1,6 +1,6 @@
 import graph_output
-import system_graph
-import graph_visualizer
+import system_model as sm
+import system_model_visualizer as smv
 from flask import abort
 from flask import request
 from flask import send_file
@@ -39,8 +39,8 @@ def _build_diagram_response(output, format):
 
 @config.controller.route("/format=<string:format>", methods=['POST'])
 def get_product_graph(format="text"):
-    inputSystemGraph = system_graph.application_model(request.get_json())
-    lines = graph_visualizer.ContextDiagramGraphVisualizer(inputSystemGraph).draw()
+    inputSystemGraph = sm.application_model(request.get_json())
+    lines = smv.ContextDiagramGraphVisualizer(inputSystemGraph).draw()
     return _build_diagram_response(lines,format)
 
 @config.controller.route("/datamodel/<string:datamodel>", methods=['POST'])
@@ -190,5 +190,5 @@ def draw_datamodel(datamodel):
     tags:
     - datamodel
     """
-    output = graph_visualizer.DatamodelVisualizer(__datamodels[datamodel]).draw()
+    output = smv.DatamodelVisualizer(__datamodels[datamodel]).draw()
     return _build_diagram_response(output,request.args.get("format"))

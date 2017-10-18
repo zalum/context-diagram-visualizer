@@ -1,4 +1,4 @@
-# System Model & Visualizer - SVM
+# System Model & Visualizer - SMV
 This utility has the purpose to put in a graph model the dependencies of a system of all kinds
 (until now system lanscape, datamodel) and use it as input for plantuml to generate a corresponding diagram
 

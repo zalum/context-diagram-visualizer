@@ -1,6 +1,6 @@
 import unittest
 import system_model as sm
-import graph_visualizer
+import system_model_visualizer as svm
 
 class GraphVisualizerTestCases(unittest.TestCase):
   def testDrawOneRelation(self):
@@ -51,6 +51,6 @@ class GraphVisualizerTestCases(unittest.TestCase):
 
   def __run_draw_context_diagram_test__(self, graphDictionary, expectedResult):
       systemGraph = sm.application_model(graphDictionary)
-      result = graph_visualizer.ContextDiagramGraphVisualizer(systemGraph).draw()
+      result = svm.ContextDiagramGraphVisualizer(systemGraph).draw()
       self.assertListEqual(expectedResult,result)
 

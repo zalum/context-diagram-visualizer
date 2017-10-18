@@ -1,7 +1,7 @@
 import graph_output
 import graph_input
-import system_graph
-import graph_visualizer
+import system_model
+import system_model_visualizer
 
 def drawSystemGraph():
     inputSystemGraph = system_graph.application_model(graph_input.getSystemGraph())
