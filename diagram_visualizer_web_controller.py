@@ -39,8 +39,8 @@ def _build_diagram_response(output, format):
 
 @config.controller.route("/format=<string:format>", methods=['POST'])
 def get_product_graph(format="text"):
-    inputSystemGraph = sm.application_model(request.get_json())
-    lines = smv.ContextDiagramGraphVisualizer(inputSystemGraph).draw()
+    inputSystemGraph = sm.component_model(request.get_json())
+    lines = smv.component_model_visualizer(inputSystemGraph).draw()
     return _build_diagram_response(lines,format)
 
 @config.controller.route("/datamodel/<string:datamodel>", methods=['POST'])
@@ -190,5 +190,5 @@ def draw_datamodel(datamodel):
     tags:
     - datamodel
     """
-    output = smv.DatamodelVisualizer(__datamodels[datamodel]).draw()
+    output = smv.datamodel_visualizer(__datamodels[datamodel]).draw()
     return _build_diagram_response(output,request.args.get("format"))

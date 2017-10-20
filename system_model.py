@@ -1,13 +1,5 @@
 import json
 
-# system_model(graph)
-# datamodel
-# component_model
-# deployment_model
-# model_visualizer
-# project name:
-# system modeler & visualizer: SMV
-
 class system_model:
 
     def __init__(self,graphx = None):
@@ -46,7 +38,7 @@ class system_model:
             edge["relation_type"] = relation_type
         self.graph["edges"].append(edge)
 
-class application_model(system_model):
+class component_model(system_model):
 
     def edgeBetweenApplications(self,edge):
         for vertex in self.getVertexes():

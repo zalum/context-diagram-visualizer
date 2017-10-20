@@ -5,7 +5,7 @@ This utility has the purpose to put in a graph model the dependencies of a syste
 ## Features
 * model your system in a graph representation
 * types of models
-** component: applications, software products
+** component model for application applications, software products etc
 ** datamodel
 * generates diagrams of your system using plantuml markdown
 * exposes api endpoint to encourage colaboration

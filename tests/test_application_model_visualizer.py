@@ -2,7 +2,7 @@ import unittest
 import system_model as sm
 import system_model_visualizer as svm
 
-class GraphVisualizerTestCases(unittest.TestCase):
+class component_model_visualizer_test(unittest.TestCase):
   def testDrawOneRelation(self):
     graph = {
       "vertexes":{"1":{"name":"app1","type":"application"},"2":{"name":"app2","type":"application"}},
@@ -50,7 +50,7 @@ class GraphVisualizerTestCases(unittest.TestCase):
       self.__run_draw_context_diagram_test__(graph, expectedResult)
 
   def __run_draw_context_diagram_test__(self, graphDictionary, expectedResult):
-      systemGraph = sm.application_model(graphDictionary)
-      result = svm.ContextDiagramGraphVisualizer(systemGraph).draw()
+      systemGraph = sm.component_model(graphDictionary)
+      result = svm.component_model_visualizer(systemGraph).draw()
       self.assertListEqual(expectedResult,result)
 
