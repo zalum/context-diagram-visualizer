@@ -1,4 +1,3 @@
-import system_model
 
 class component_model_visualizer:
   def __init__(self, system_model):

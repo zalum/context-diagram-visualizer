@@ -1,4 +1,3 @@
-import graph_output
 import system_model as sm
 import system_model_visualizer as smv
 from flask import abort
