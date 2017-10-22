@@ -39,10 +39,14 @@ class system_model:
             edge["relation_type"] = relation_type
         self.graph["edges"].append(edge)
 
+    def get_related_vertex(self, vertex, edge):
+        return  edge["start"] if edge["end"]==vertex else edge["end"]
+
+
     def get_children(self, parent_vertex, of_type):
         return list(
             filter(lambda child: self.is_vertex_of_type(child,of_type),
-            map(lambda edge: edge["end"] if edge["start"] == parent_vertex else edge["start"],
+            map(lambda edge: self.get_related_vertex(parent_vertex,edge),
             filter(lambda edge: parent_vertex in (edge["start"], edge["end"]), self.getEdges()))))
 
 
@@ -77,9 +81,6 @@ class component_model(system_model):
 
     def _isEdgeWithVertex(self,edge,vertex):
         return edge["start"] == vertex or edge["end"] == vertex
-
-    def _getOppositeVertex(self,vertex,edge):
-        return  edge["start"] if edge["end"]==vertex else edge["end"]
 
 class data_model(system_model):
     def isSchema(self,vertex):
