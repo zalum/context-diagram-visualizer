@@ -63,9 +63,7 @@ class component_model(system_model):
 
     def getOrphanApplications(self):
         edges = self.getEdges()
-        return [vertex for vertex in self.getVertexes() if \
-                self._isVertexInEdges(vertex,edges) is False \
-                and self.isProduct(vertex) is False]
+        return [ v for v in self.get_vertexes_of_type("application") if not self._isVertexInEdges(v,edges)]
 
     def isProduct(self,vertex):
         return self.is_vertex_of_type(vertex, "product")
