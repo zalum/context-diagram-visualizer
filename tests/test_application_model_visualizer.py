@@ -19,12 +19,12 @@ class component_model_visualizer_test(unittest.TestCase):
       expectedResult =["@startuml","left to right direction","folder app1{","[app2]","}","@enduml"]
       self.__run_draw_context_diagram_test__(graph, expectedResult)
 
-  def testDrawProudctWithOutgoingAppRelation(self):
+  def testDrawProductWithOneAppStartUnidirectionalRelation(self):
       graph = {
         "vertexes":{"1":{"name":"app1","type":"application"},"2":{"name":"product","type":"product"}},
         "edges":[{"start":"2","end":"1"}]
         }
-      expectedResult =["@startuml","left to right direction","folder product{","}","@enduml"]
+      expectedResult =["@startuml","left to right direction","folder product{","[app1]","}","@enduml"]
       self.__run_draw_context_diagram_test__(graph, expectedResult)
 
   def testProductWithEdge(self):

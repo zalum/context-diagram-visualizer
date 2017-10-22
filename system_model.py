@@ -39,6 +39,13 @@ class system_model:
             edge["relation_type"] = relation_type
         self.graph["edges"].append(edge)
 
+    def get_children(self, parent_vertex, of_type):
+        return list(
+            filter(lambda child: self.is_vertex_of_type(child,of_type),
+            map(lambda edge: edge["end"] if edge["start"] == parent_vertex else edge["start"],
+            filter(lambda edge: parent_vertex in (edge["start"], edge["end"]), self.getEdges()))))
+
+
 class component_model(system_model):
 
     def edgeBetweenApplications(self,edge):
@@ -60,8 +67,7 @@ class component_model(system_model):
         return self.graph["vertexes"][vertex]["name"]
 
     def getApplicationsInProduct(self, product):
-        productEdges = list(filter(lambda edge: self._isEdgeWithEndVertex(edge,product),self.getEdges()))
-        return list(map(lambda edge: self._getOppositeVertex(product,edge),productEdges))
+        return self.get_children(product,"application")
 
     def _isVertexInEdges(self,vertex,edges):
         for edge in edges:
@@ -71,8 +77,6 @@ class component_model(system_model):
 
     def _isEdgeWithVertex(self,edge,vertex):
         return edge["start"] == vertex or edge["end"] == vertex
-
-
 
     def _getOppositeVertex(self,vertex,edge):
         return  edge["start"] if edge["end"]==vertex else edge["end"]
@@ -107,12 +111,6 @@ class data_model(system_model):
 
     def getSchemas(self):
         return [vertex for vertex in self.getVertexes() if self.isSchema(vertex)]
-
-    def get_children(self, parent_vertex, of_type):
-        return list(
-            filter(lambda child: self.is_vertex_of_type(child,of_type),
-            map(lambda edge: edge["end"] if edge["start"] == parent_vertex else edge["start"],
-            filter(lambda edge: parent_vertex in (edge["start"], edge["end"]), self.getEdges()))))
 
     def get_tables_in_schema(self, schema):
         return self.get_children(schema,"table")
