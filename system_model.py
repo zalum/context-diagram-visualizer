@@ -10,6 +10,7 @@ class system_model:
 
     def to_json(self):
         return json.dumps(self.graph)
+
     def getVertexes(self):
         keys = list(self.graph["vertexes"].keys())
         keys.sort()
@@ -58,7 +59,7 @@ class component_model(system_model):
     def getVertexName(self,vertex):
         return self.graph["vertexes"][vertex]["name"]
 
-    def getApplicationKeysInProduct(self,product):
+    def getApplicationsInProduct(self, product):
         productEdges = list(filter(lambda edge: self._isEdgeWithEndVertex(edge,product),self.getEdges()))
         return list(map(lambda edge: self._getOppositeVertex(product,edge),productEdges))
 
@@ -75,7 +76,6 @@ class component_model(system_model):
 
     def _getOppositeVertex(self,vertex,edge):
         return  edge["start"] if edge["end"]==vertex else edge["end"]
-
 
 class data_model(system_model):
     def isSchema(self,vertex):
@@ -108,21 +108,17 @@ class data_model(system_model):
     def getSchemas(self):
         return [vertex for vertex in self.getVertexes() if self.isSchema(vertex)]
 
-    def get_tables_in_schema(self, schema):
-        return [vertex for vertex in self.getVertexes() if self._isTableInSchema(vertex,schema)]
+    def get_children(self, parent_vertex, of_type):
+        return list(
+            filter(lambda child: self.is_vertex_of_type(child,of_type),
+            map(lambda edge: edge["end"] if edge["start"] == parent_vertex else edge["start"],
+            filter(lambda edge: parent_vertex in (edge["start"], edge["end"]), self.getEdges()))))
 
-    def _isTableInSchema(self, vertex, schema):
-        if self._isTable(vertex) is False:
-            return False
-        for edge in self.getEdges():
-            if(edge["start"] == vertex and edge["end"] == schema):
-                return True
-        return False
+    def get_tables_in_schema(self, schema):
+        return self.get_children(schema,"table")
 
     def get_columns_in_table(self, table):
-        return list(filter(lambda v:self._is_column(v),
-                map(lambda e: e["start"],
-            filter(lambda edge: self._isEdgeWithEndVertex(edge,table),self.getEdges()))))
+        return self.get_children(table,"column")
 
     def get_foreign_keys(self):
         return list(

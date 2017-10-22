@@ -13,7 +13,7 @@ class component_model_visualizer:
       return lines
 
   def _drawProduct(self,product):
-      applications = self.system_model.getApplicationKeysInProduct(product)
+      applications = self.system_model.getApplicationsInProduct(product)
       drawnProudct = ["folder %s{"%self._drawProductName(product)]
       drawnProudct.extend([self._drawApplication(application) for application in applications])
       drawnProudct.append("}")

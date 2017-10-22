@@ -14,10 +14,31 @@ class data_model_visualiser_test(unittest.TestCase):
 
     def test_draw_schema_with_table(self):
         graph = {
-            "vertexes":{"SCHEMA1":{"type":"schema"},"TABLE1":{"type":"table"}},
-            "edges":[{"start":"TABLE1","end":"SCHEMA1"}]
+            "vertexes":{"SCHEMA1":{"type":"schema"},
+                        "TABLE1":{"type":"table"},
+                        "TABLE2":{"type":"table"}},
+            "edges":[{"start":"TABLE1","end":"SCHEMA1"},
+                     {"start":"TABLE2","end":"SCHEMA1"}]
         }
-        expected_result =["@startuml","left to right direction","package \"SCHEMA1\"{","class TABLE1 {","}","}","@enduml"]
+        expected_result =["@startuml","left to right direction",
+                          "package \"SCHEMA1\"{",
+                          "class TABLE1 {","}",
+                          "class TABLE2 {", "}",
+                          "}",
+                          "@enduml"]
+        self.__run_draw_datamodel_test__(graph, expected_result)
+
+    def test_start_schema_end_table_relation(self):
+        graph = {
+            "vertexes":{"SCHEMA1":{"type":"schema"},
+                        "TABLE1":{"type":"table"}},
+            "edges":[{"end":"TABLE1","start":"SCHEMA1"}]
+        }
+        expected_result =["@startuml","left to right direction",
+                          "package \"SCHEMA1\"{",
+                          "class TABLE1 {","}",
+                          "}",
+                          "@enduml"]
         self.__run_draw_datamodel_test__(graph, expected_result)
 
     def test_draw_table_with_column(self):
@@ -30,6 +51,7 @@ class data_model_visualiser_test(unittest.TestCase):
         }
         expected_result =["@startuml","left to right direction","package \"SCHEMA1\"{","class TABLE1 {","+ T1_ID","}","}","@enduml"]
         self.__run_draw_datamodel_test__(graph, expected_result)
+
 
     def test_draw_table_with_colapsed_column(self):
         graph = {
