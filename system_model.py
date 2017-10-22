@@ -87,8 +87,6 @@ class component_model(system_model):
 
 
 class data_model(system_model):
-    def isSchema(self,vertex):
-        return self.is_vertex_of_type(vertex, "schema")
 
     def add_schema(self,schema):
         self.add_vertex(schema,"schema")
