@@ -1,12 +1,13 @@
-
+import system_model as sm
 class component_model_visualizer:
-  def __init__(self, system_model):
+
+  def __init__(self, system_model: sm.component_model):
       self.system_model = system_model
 
   def draw(self):
       orphanApplications = self.system_model.getOrphanApplications()
       lines = ["@startuml","left to right direction"]
-      [lines.extend(self._drawProduct(vertex)) for vertex in self.system_model.getVertexes() if self.system_model.isProduct(vertex)]
+      [lines.extend(self._drawProduct(vertex)) for vertex in self.system_model.getProducts()]
       lines.extend([self._drawEdges(edge) for edge in self.system_model.getEdges() if self.system_model.edgeBetweenApplications(edge)])
       lines.extend([self._drawApplication(vertex) for vertex in orphanApplications])
       lines.append("@enduml")

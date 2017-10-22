@@ -82,6 +82,10 @@ class component_model(system_model):
     def _isEdgeWithVertex(self,edge,vertex):
         return edge["start"] == vertex or edge["end"] == vertex
 
+    def getProducts(self):
+        return [v for v in self.getVertexes() if self.isProduct(v)]
+
+
 class data_model(system_model):
     def isSchema(self,vertex):
         return self.is_vertex_of_type(vertex, "schema")
