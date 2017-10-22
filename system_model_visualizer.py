@@ -33,7 +33,7 @@ class component_model_visualizer:
                             self.system_model.getVertexName(edge["end"]))
 
 class datamodel_visualizer():
-    def __init__(self, system_model):
+    def __init__(self, system_model: sm.data_model):
         self.system_model = system_model
 
     def draw(self,colapsed_columns = False):

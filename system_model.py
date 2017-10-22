@@ -49,6 +49,9 @@ class system_model:
             map(lambda edge: self.get_related_vertex(parent_vertex,edge),
             filter(lambda edge: parent_vertex in (edge["start"], edge["end"]), self.getEdges()))))
 
+    def get_vertexes_of_type(self,type):
+        return [v for v in self.getVertexes() if self.is_vertex_of_type(v,type)]
+
 
 class component_model(system_model):
 
@@ -83,7 +86,7 @@ class component_model(system_model):
         return edge["start"] == vertex or edge["end"] == vertex
 
     def getProducts(self):
-        return [v for v in self.getVertexes() if self.isProduct(v)]
+        return self.get_vertexes_of_type("product")
 
 
 class data_model(system_model):
@@ -115,7 +118,7 @@ class data_model(system_model):
         return None
 
     def getSchemas(self):
-        return [vertex for vertex in self.getVertexes() if self.isSchema(vertex)]
+        return self.get_vertexes_of_type("schema")
 
     def get_tables_in_schema(self, schema):
         return self.get_children(schema,"table")
