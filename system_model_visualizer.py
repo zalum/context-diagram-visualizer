@@ -8,7 +8,7 @@ class component_model_visualizer:
       orphanApplications = self.system_model.getOrphanApplications()
       lines = ["@startuml","left to right direction"]
       [lines.extend(self._drawProduct(vertex)) for vertex in self.system_model.getProducts()]
-      lines.extend([self._drawEdges(edge) for edge in self.system_model.getEdges() if self.system_model.edgeBetweenApplications(edge)])
+      lines.extend([self._drawEdges(edge) for edge in self.system_model.get_calling_relations()])
       lines.extend([self._drawApplication(vertex) for vertex in orphanApplications])
       lines.append("@enduml")
       return lines

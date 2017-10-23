@@ -19,6 +19,9 @@ class system_model:
     def getEdges(self):
         return self.graph["edges"] if "edges" in self.graph else []
 
+    def get_edges_of_type(self, relation_type):
+        return [e for e in self.getEdges() if "relation_type" in e and e["relation_type"] == relation_type]
+
     def is_vertex_of_type(self, vertex, type):
         return self.graph["vertexes"][vertex]["type"] == type
 
@@ -55,11 +58,8 @@ class system_model:
 
 class component_model(system_model):
 
-    def edgeBetweenApplications(self,edge):
-        for vertex in self.getVertexes():
-            if self._isEdgeWithVertex(edge,vertex) and self.isProduct(vertex):
-                return False
-        return True
+    def get_calling_relations(self):
+        return self.get_edges_of_type("calls")
 
     def getOrphanApplications(self):
         return [ v for v in self.get_vertexes_of_type("application") if not self._isVertexInEdges(v)]
