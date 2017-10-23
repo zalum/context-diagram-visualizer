@@ -21,10 +21,6 @@ This utility has the purpose to put in a graph model the dependencies of a syste
 * python3 diagram-visualizer-cli.py
 * python3 diagram-visualizer-web.py
 
-##Current tasks
-* introduce relation type "contains"
-* introduce relation type "A calls B", replace get_edges_between_applicaitons implementation
-
 ## Backlog
 * document c4 diagram of this utility
 * plugin system for different sources of data: jira, aws, oracle etc

@@ -19,8 +19,12 @@ class system_model:
     def getEdges(self):
         return self.graph["edges"] if "edges" in self.graph else []
 
+    @staticmethod
+    def is_edge_of_type(edge, relation_type):
+        return "relation_type" in edge and edge["relation_type"] == relation_type
+
     def get_edges_of_type(self, relation_type):
-        return [e for e in self.getEdges() if "relation_type" in e and e["relation_type"] == relation_type]
+        return [e for e in self.getEdges() if system_model.is_edge_of_type(e, relation_type)]
 
     def is_vertex_of_type(self, vertex, type):
         return self.graph["vertexes"][vertex]["type"] == type
@@ -46,11 +50,12 @@ class system_model:
         return  edge["start"] if edge["end"]==vertex else edge["end"]
 
 
-    def get_children(self, parent_vertex, of_type):
+    def get_children(self, parent_vertex, of_type,in_relation_of=None):
         return list(
             filter(lambda child: self.is_vertex_of_type(child,of_type),
             map(lambda edge: self.get_related_vertex(parent_vertex,edge),
-            filter(lambda edge: parent_vertex in (edge["start"], edge["end"]), self.getEdges()))))
+            filter(lambda edge: in_relation_of is None or system_model.is_edge_of_type(edge, in_relation_of),
+            filter(lambda edge: parent_vertex in (edge["start"], edge["end"]), self.getEdges())))))
 
     def get_vertexes_of_type(self,type):
         return [v for v in self.getVertexes() if self.is_vertex_of_type(v,type)]
@@ -71,7 +76,7 @@ class component_model(system_model):
         return self.graph["vertexes"][vertex]["name"]
 
     def getApplicationsInProduct(self, product):
-        return self.get_children(product,"application")
+        return self.get_children(product,of_type="application",in_relation_of="contains")
 
     def _isVertexInEdges(self,vertex):
         for edge in self.getEdges():

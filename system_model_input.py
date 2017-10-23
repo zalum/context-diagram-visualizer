@@ -7,12 +7,12 @@ def getSystemGraph():
             "5":{"name": "product","type":"product"}
             },
             "edges":[
-                {"start":"1","end":"2"},
-                {"start":"2","end":"3"},
-                {"start":"3","end":"5"},
-                {"start":"2","end":"5"},
-                {"start":"3","end":"4"},
-                {"start":"4","end":"5"}
+                {"start":"1","end":"2","relation_type":"calls"},
+                {"start":"2","end":"3","relation_type":"calls"},
+                {"start":"3","end":"5","relation_type":"contains"},
+                {"start":"2","end":"5","relation_type":"contains"},
+                {"start":"3","end":"4","relation_type":"calls"},
+                {"start":"4","end":"5","relation_type":"contains"}
                 ]}
 
 def getDatamodelGraph():
