@@ -101,8 +101,6 @@ class data_model(system_model):
 
     def _isTable(self, vertex):
         return self.is_vertex_of_type(vertex, "table")
-    def _is_column(self,vertex):
-        return self.is_vertex_of_type(vertex,"column")
 
     def get_table_for_column(self,column):
         column_edges = [edge for edge in self.getEdges() if edge["start"]==column]
@@ -124,7 +122,7 @@ class data_model(system_model):
     def get_foreign_keys(self):
         return list(
             map(lambda fk: self._get_foreign_key(fk["start"], fk["end"]),
-            filter(lambda e: "relation_type" in e and e["relation_type"] == "fk", self.getEdges())))
+                self.get_edges_of_type("fk")))
 
     def _get_foreign_key(self,column1, column2):
         return {
