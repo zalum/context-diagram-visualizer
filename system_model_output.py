@@ -1,8 +1,9 @@
 import subprocess
 import io
 
-def writeAsFile(lines):
-    f = open('output.plantuml', 'w')
+
+def writeAsFile(lines, file='output.plantuml'):
+    f = open(file, 'w')
     content = writeAsText(lines)
     f.write(content)
 

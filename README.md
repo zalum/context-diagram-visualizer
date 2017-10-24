@@ -18,15 +18,16 @@ This utility has the purpose to put in a graph model the dependencies of a syste
 * flasgger
 
 ## How to run
-* python3 diagram-visualizer-cli.py
-* python3 diagram-visualizer-web.py
+* /examples contains command lines usages
+* python3 diagram-visualizer-web.py represents the endpoint
 
 ## Backlog
-* document c4 diagram of this utility
+#
 * plugin system for different sources of data: jira, aws, oracle etc
 * improve validation and http error codes of endpoint
 * enable state on this utility
-* define a schema of the graph so users know what is possible
+* define a schema of the model graph so users know what is possible
 * use a graph database to store the graph & provide a query language
-* deployment infrastructure: docker, etc
+* deployment infrastructure: docker, pyenv
+* document c4 diagram of this utility
 
