@@ -10,9 +10,10 @@ config = web_utils.web_controller_config(
     controller = Blueprint('component-model', 'component-model'),
     swagger_config = dict(endpoint = "component-model",
                           route = "/component-model.json",
-                          rule_filter=lambda rule: web_utils.rule_filter(rule,['/component'])
+                          rule_filter=lambda rule: web_utils.rule_filter(rule,['/component','/relation'])
                           ),
     url_prefix="/component-model")
+
 
 @config.controller.route("/component", methods=['POST'])
 def add_component():
@@ -21,9 +22,10 @@ def add_component():
     ---
     parameters:
       - in: body
+        name: component
         required: true
         schema:
-            type: object
+            type: string
             properties:
                 name:
                     type: string
@@ -37,9 +39,9 @@ def add_component():
     responses:
         200:
             content:
-            text/plain:
-              schema:
-                type: string
+                text/plain:
+                  schema:
+                    type: string
     tags:
     - component
     '''
@@ -61,9 +63,9 @@ def list_components():
     responses:
         200:
             content:
-            text/plain:
-              schema:
-                type: string
+                text/plain:
+                  schema:
+                    type: string
     tags:
     - component
     '''
@@ -73,6 +75,42 @@ def list_components():
 
     return json.dumps([key for key in system_model.state.get_vertexes_of_type(type)])
 
+@config.controller.route("/relation", methods=['POST'])
+def create_relation():
+    '''
+    create relation
+    ---
+    parameters:
+          - in: body
+            name: relation
+            required: true
+            schema:
+                type: object
+                properties:
+                    start:
+                        type: string
+                    end:
+                        type: string
+                    relation_type:
+                        type: string
+                        enum: ["contains","calls"]
+                examples:
+                    example:
+                        start: app1
+                        end: app2
+                        relation_type: contains
+    responses:
+        200:
+            content:
+                text/plain:
+                  schema:
+                    type: string
+    tags:
+    - component
+    '''
+    relation = request.get_json()
+    system_model.state.add_edge(start=relation["start"],end=relation["end"],relation_type=relation["relation_type"])
+    return "ok"
 
 @config.controller.route("/component/<string:component>",methods=['GET'])
 def get_component(component):
@@ -87,11 +125,15 @@ def get_component(component):
     responses:
         200:
             content:
-            text/plain:
-              schema:
-                type: string
+                text/plain:
+                  schema:
+                    type: string
     tags:
     - component
     '''
-    return json.dumps(component)
+    return json.dumps(system_model.state.find_connected_graph(component).graph)
+
+@config.controller.route("/component/<string:component>/diagram",methods=['GET'])
+def draw_component_diagram(component):
+    pass
 
