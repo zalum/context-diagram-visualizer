@@ -141,4 +141,4 @@ class data_model(system_model):
             }
         }
 
-
+state = system_model()

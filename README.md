@@ -21,8 +21,10 @@ This utility has the purpose to put in a graph model the dependencies of a syste
 * /examples contains command lines usages
 * python3 diagram-visualizer-web.py represents the endpoint
 
+## Tasks
+* remodel resources on the endpoint
+
 ## Backlog
-#
 * plugin system for different sources of data: jira, aws, oracle etc
 * improve validation and http error codes of endpoint
 * enable state on this utility
