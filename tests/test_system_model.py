@@ -18,7 +18,7 @@ class Test(unittest.TestCase):
             vertexes = {"product":{"type":"product"}},edges=[]
         ))
 
-    def test_find_one_level_connected_graph(self):
+    def test_find_connected_graph_with_one_level(self):
         graph = dict(
             vertexes = {
                 "product":{"type":"product"},
@@ -34,7 +34,7 @@ class Test(unittest.TestCase):
             edges=[{"start":"product","end":"application1","relation_type":"contains"}]
         ))
 
-    def test_find_multiple_level_connected_graph(self):
+    def test_find_connected_graph_with_multiple_levels(self):
         graph = dict(
             vertexes = {
                 "product":{"type":"product"},
@@ -57,7 +57,7 @@ class Test(unittest.TestCase):
                      {"start": "application1", "end": "application2", "relation_type": "calls"}]
         ))
 
-    def test_find_cycle_connected_graph(self):
+    def test_find_connected_graph_with_cycle(self):
         graph = dict(
             vertexes = {
                 "product":{"type":"product"},

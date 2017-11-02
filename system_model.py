@@ -62,28 +62,26 @@ class system_model:
     def get_vertexes_of_type(self,type):
         return [v for v in self.getVertexes() if self.is_vertex_of_type(v,type)]
 
-
     def find_connected_graph(self, from_vertex, connected_graph=None):
-        if connected_graph == None:
+        if connected_graph is None:
             connected_graph = system_model()
 
         if from_vertex in connected_graph.graph["vertexes"]:
             return connected_graph
         else:
+            if from_vertex not in self.graph["vertexes"]:
+                return connected_graph
             connected_graph.graph["vertexes"][from_vertex] = dict(self.graph["vertexes"][from_vertex])
 
-        adjacents = list(
-        filter(lambda adjacent: adjacent["vertex"] not in connected_graph.graph["vertexes"],
-        map(lambda edge: dict(vertex=self.get_related_vertex(vertex = from_vertex,edge = edge),edge=edge),self.get_edges(from_vertex))))
-
-        adjacent_vertexes = set(map(lambda adjacent: adjacent["vertex"],adjacents))
-        adjacent_edges = list(map(lambda adjacent: adjacent["edge"],adjacents))
-
-        for adjacent_edge in adjacent_edges:
-            connected_graph.graph["edges"].append(dict(adjacent_edge))
+        adjacent_vertexes = set()
+        for edge in self.get_edges(from_vertex):
+            adjacent_vertex = self.get_related_vertex(vertex = from_vertex,edge = edge)
+            if adjacent_vertex not in connected_graph.graph["vertexes"]:
+                connected_graph.graph["edges"].append(dict(edge))
+                adjacent_vertexes.add(adjacent_vertex)
 
         for adjacent_vertex in adjacent_vertexes:
-            self.find_connected_graph(from_vertex=adjacent_vertex,connected_graph = connected_graph)
+            connected_graph = self.find_connected_graph(from_vertex=adjacent_vertex,connected_graph = connected_graph)
 
         return connected_graph
 
