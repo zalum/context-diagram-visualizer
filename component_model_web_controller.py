@@ -73,5 +73,25 @@ def list_components():
 
     return json.dumps([key for key in system_model.state.get_vertexes_of_type(type)])
 
-def get_component
+
+@config.controller.route("/component/<string:component>",methods=['GET'])
+def get_component(component):
+    '''
+    get component
+    ---
+    parameters:
+      - in: path
+        type: string
+        name: component
+        required: true
+    responses:
+        200:
+            content:
+            text/plain:
+              schema:
+                type: string
+    tags:
+    - component
+    '''
+    return json.dumps(component)
 
