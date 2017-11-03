@@ -4,15 +4,28 @@ import web_utils
 import json
 from flask import abort
 from flask import request
-
+from flask import send_file
+from system_model_visualizer import component_model_visualizer as cmv
+import system_model_output as smo
+from system_model_state import state
 
 config = web_utils.web_controller_config(
     controller = Blueprint('component-model', 'component-model'),
     swagger_config = dict(endpoint = "component-model",
                           route = "/component-model.json",
-                          rule_filter=lambda rule: web_utils.rule_filter(rule,['/component','/relation'])
+                          rule_filter=lambda rule: web_utils.rule_filter(rule,['/component','/relation','/state'])
                           ),
     url_prefix="/component-model")
+
+
+def _build_diagram_response(diagram, format):
+    if format == "text":
+        return smo.writeAsText(diagram)
+    else:
+        if format == "image":
+            return send_file(smo.writeAsImage(diagram), mimetype="image/png")
+        else:
+            abort(406)
 
 
 @config.controller.route("/component", methods=['POST'])
@@ -46,8 +59,9 @@ def add_component():
     - component
     '''
     component = request.get_json()
-    system_model.state.add_vertex(component["name"],type=component["type"])
+    state.add_vertex(component["name"],type=component["type"])
     return "ok"
+
 
 @config.controller.route("/component", methods=['GET'])
 def list_components():
@@ -73,7 +87,8 @@ def list_components():
     if type is None:
         return abort(400,"Type cannot be null")
 
-    return json.dumps([key for key in system_model.state.get_vertexes_of_type(type)])
+    return json.dumps([key for key in state.get_vertexes_of_type(type)])
+
 
 @config.controller.route("/relation", methods=['POST'])
 def create_relation():
@@ -109,8 +124,9 @@ def create_relation():
     - component
     '''
     relation = request.get_json()
-    system_model.state.add_edge(start=relation["start"],end=relation["end"],relation_type=relation["relation_type"])
+    state.add_edge(start=relation["start"],end=relation["end"],relation_type=relation["relation_type"])
     return "ok"
+
 
 @config.controller.route("/component/<string:component>",methods=['GET'])
 def get_component(component):
@@ -131,9 +147,49 @@ def get_component(component):
     tags:
     - component
     '''
-    return json.dumps(system_model.state.find_connected_graph(component).graph)
+    return json.dumps(state.find_connected_graph(component).graph)
+
 
 @config.controller.route("/component/<string:component>/diagram",methods=['GET'])
 def draw_component_diagram(component):
-    pass
+    '''
+    get diagram
+    ---
+    parameters:
+      - in: path
+        type: string
+        name: component
+        required: true
+    responses:
+        200:
+            content:
+                image/png:
+                  schema:
+                    type: file
+                    format: binary
+    tags:
+    - component
+    '''
+    connected_graph = state.find_connected_graph(component)
+    diagram = cmv(system_model.component_model(connected_graph.graph)).draw()
+    return _build_diagram_response(diagram,"image")
 
+@config.controller.route("/state/",methods=['PUT'])
+def persist_state():
+    '''
+    persist the state to the disc
+    ---
+    responses:
+        200:
+            content:
+                text/plain:
+                  schema:
+                    type: string
+    tags:
+    - state
+    '''
+    f = open("graph.json", 'w')
+    content = json.dumps(state.graph)
+    f.write(content)
+    f.close()
+    return "ok"

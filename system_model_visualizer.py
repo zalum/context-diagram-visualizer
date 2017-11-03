@@ -5,7 +5,7 @@ class component_model_visualizer:
       self.system_model = system_model
 
   def draw(self):
-      orphanApplications = self.system_model.getOrphanApplications()
+      orphanApplications = self.system_model.get_orphan_applications()
       lines = ["@startuml","left to right direction"]
       [lines.extend(self._drawProduct(vertex)) for vertex in self.system_model.getProducts()]
       lines.extend([self._drawEdges(edge) for edge in self.system_model.get_calling_relations()])

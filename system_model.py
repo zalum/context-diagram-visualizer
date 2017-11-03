@@ -85,6 +85,17 @@ class system_model:
 
         return connected_graph
 
+    def _is_vertex_in_edges(self, vertex):
+        for edge in self.getEdges():
+            if self._is_edge_with_vertex(edge, vertex):
+                return True
+        return False
+
+    def _is_edge_with_vertex(self, edge, vertex):
+        return edge["start"] == vertex or edge["end"] == vertex
+
+    def get_orphan_vertexes(self, ofType):
+        return [v for v in self.get_vertexes_of_type(ofType) if not self._is_vertex_in_edges(v)]
 
 
 class component_model(system_model):
@@ -92,26 +103,19 @@ class component_model(system_model):
     def get_calling_relations(self):
         return self.get_edges_of_type("calls")
 
-    def getOrphanApplications(self):
-        return [ v for v in self.get_vertexes_of_type("application") if not self._isVertexInEdges(v)]
+    def get_orphan_applications(self):
+        return self.get_orphan_vertexes("application")
 
     def isProduct(self,vertex):
         return self.is_vertex_of_type(vertex, "product")
 
     def getVertexName(self,vertex):
-        return self.graph["vertexes"][vertex]["name"]
+        if "name" in self.graph["vertexes"][vertex]:
+            return self.graph["vertexes"][vertex]["name"]
+        return vertex
 
     def getApplicationsInProduct(self, product):
         return self.get_children(product,of_type="application",in_relation_of="contains")
-
-    def _isVertexInEdges(self,vertex):
-        for edge in self.getEdges():
-            if self._isEdgeWithVertex(edge,vertex):
-                return True
-        return False
-
-    def _isEdgeWithVertex(self,edge,vertex):
-        return edge["start"] == vertex or edge["end"] == vertex
 
     def getProducts(self):
         return self.get_vertexes_of_type("product")
@@ -166,5 +170,3 @@ class data_model(system_model):
                 "table":self.get_table_for_column(column2)
             }
         }
-
-state = system_model()
