@@ -82,3 +82,47 @@ class Test(unittest.TestCase):
                      {"start": "product", "end": "application2", "relation_type": "contains"},
                      {"start": "application1", "end": "application2", "relation_type": "calls"}]
         ))
+
+    def test_append(self):
+        #given
+        graph1 = dict(
+            vertexes={
+                "product": {"type": "product"},
+                "application1": {"type": "application"},
+                "application2": {"type": "application"}
+
+            },
+            edges=[{"start": "product", "end": "application1", "relation_type": "contains"},
+                   {"start": "product", "end": "application2", "relation_type": "contains"},
+                   {"start": "application1", "end": "application2", "relation_type": "calls"}]
+        )
+        graph2 = dict(
+            vertexes={
+                "application2": {"type": "application"},
+                "application3": {"type": "application"},
+
+            },
+            edges=[{"start": "application3", "end": "application2", "relation_type": "calls"}]
+        )
+
+        system_model1 = system_model.system_model(graph1)
+
+        #when
+        system_model1.append(system_model.system_model(graph2));
+
+
+        #then
+        expected = dict(
+            vertexes={
+                "product": {"type": "product"},
+                "application1": {"type": "application"},
+                "application2": {"type": "application"},
+                "application3": {"type": "application"},
+
+            },
+            edges=[{"start": "product", "end": "application1", "relation_type": "contains"},
+                   {"start": "product", "end": "application2", "relation_type": "contains"},
+                   {"start": "application1", "end": "application2", "relation_type": "calls"},
+                   {"start": "application3", "end": "application2", "relation_type": "calls"}])
+
+        self.assertDictEqual(system_model1.graph,expected)

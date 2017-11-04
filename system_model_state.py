@@ -5,7 +5,8 @@ import os
 import json
 from json import JSONDecodeError
 
-def read_state():
+
+def read_state() -> system_model:
     file_name = "graph.json"
     if os.path.isfile(file_name) is False:
         return system_model.system_model()

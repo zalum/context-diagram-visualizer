@@ -16,7 +16,10 @@ class system_model:
         keys.sort()
         return keys
 
-    def getEdges(self):
+    def has_vertex(self,vertex):
+        return vertex in self.graph["vertexes"]
+
+    def get_edges(self):
         return self.graph["edges"] if "edges" in self.graph else []
 
     @staticmethod
@@ -24,7 +27,7 @@ class system_model:
         return "relation_type" in edge and edge["relation_type"] == relation_type
 
     def get_edges_of_type(self, relation_type):
-        return [e for e in self.getEdges() if system_model.is_edge_of_type(e, relation_type)]
+        return [e for e in self.get_edges() if system_model.is_edge_of_type(e, relation_type)]
 
     def is_vertex_of_type(self, vertex, type):
         return self.graph["vertexes"][vertex]["type"] == type
@@ -49,15 +52,15 @@ class system_model:
     def get_related_vertex(self, vertex, edge):
         return  edge["start"] if edge["end"]==vertex else edge["end"]
 
-    def get_edges(self, with_vertex):
-        return list(filter(lambda edge: with_vertex in (edge["start"], edge["end"]), self.getEdges()))
+    def get_edges_of_vertex(self, with_vertex=None):
+        return list(filter(lambda edge: with_vertex in (edge["start"], edge["end"]), self.get_edges()))
 
     def get_children(self, parent_vertex, of_type=None,in_relation_of=None):
         return list(
             filter(lambda child: of_type is None or self.is_vertex_of_type(child,of_type),
-            map(lambda edge: self.get_related_vertex(parent_vertex,edge),
-            filter(lambda edge: in_relation_of is None or system_model.is_edge_of_type(edge, in_relation_of),
-            self.get_edges(parent_vertex)))))
+                   map(lambda edge: self.get_related_vertex(parent_vertex,edge),
+                       filter(lambda edge: in_relation_of is None or system_model.is_edge_of_type(edge, in_relation_of),
+                              self.get_edges_of_vertex(parent_vertex)))))
 
     def get_vertexes_of_type(self,type):
         return [v for v in self.getVertexes() if self.is_vertex_of_type(v,type)]
@@ -74,7 +77,7 @@ class system_model:
             connected_graph.graph["vertexes"][from_vertex] = dict(self.graph["vertexes"][from_vertex])
 
         adjacent_vertexes = set()
-        for edge in self.get_edges(from_vertex):
+        for edge in self.get_edges_of_vertex(from_vertex):
             adjacent_vertex = self.get_related_vertex(vertex = from_vertex,edge = edge)
             if adjacent_vertex not in connected_graph.graph["vertexes"]:
                 connected_graph.graph["edges"].append(dict(edge))
@@ -86,7 +89,7 @@ class system_model:
         return connected_graph
 
     def _is_vertex_in_edges(self, vertex):
-        for edge in self.getEdges():
+        for edge in self.get_edges():
             if self._is_edge_with_vertex(edge, vertex):
                 return True
         return False
@@ -96,6 +99,12 @@ class system_model:
 
     def get_orphan_vertexes(self, ofType):
         return [v for v in self.get_vertexes_of_type(ofType) if not self._is_vertex_in_edges(v)]
+
+    def append(self,to_append):
+        for edge in to_append.graph["edges"]:
+            self.graph["edges"].append(dict(edge))
+        for vertex in to_append.graph["vertexes"]:
+            self.graph["vertexes"][vertex] = dict(to_append.graph["vertexes"][vertex])
 
 
 class component_model(system_model):
@@ -138,7 +147,7 @@ class data_model(system_model):
         return self.is_vertex_of_type(vertex, "table")
 
     def get_table_for_column(self,column):
-        column_edges = [edge for edge in self.getEdges() if edge["start"]==column]
+        column_edges = [edge for edge in self.get_edges() if edge["start"] == column]
         for edge in column_edges:
             vertex = edge["end"]
             if self._isTable(vertex):

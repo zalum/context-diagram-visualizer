@@ -4,28 +4,17 @@ import web_utils
 import json
 from flask import abort
 from flask import request
-from flask import send_file
+from web_utils import build_diagram_response
 from system_model_visualizer import component_model_visualizer as cmv
-import system_model_output as smo
 from system_model_state import state
 
 config = web_utils.web_controller_config(
     controller = Blueprint('component-model', 'component-model'),
     swagger_config = dict(endpoint = "component-model",
-                          route = "/component-model.json",
-                          rule_filter=lambda rule: web_utils.rule_filter(rule,['/component','/relation','/state'])
+                          route = "/system-model.json",
+                          rule_filter=lambda rule: web_utils.rule_filter(rule,['/component','/relation','/state','/schema','/data-model/user'])
                           ),
     url_prefix="/component-model")
-
-
-def _build_diagram_response(diagram, format):
-    if format == "text":
-        return smo.writeAsText(diagram)
-    else:
-        if format == "image":
-            return send_file(smo.writeAsImage(diagram), mimetype="image/png")
-        else:
-            abort(406)
 
 
 @config.controller.route("/component", methods=['POST'])
@@ -172,7 +161,7 @@ def draw_component_diagram(component):
     '''
     connected_graph = state.find_connected_graph(component)
     diagram = cmv(system_model.component_model(connected_graph.graph)).draw()
-    return _build_diagram_response(diagram,"image")
+    return build_diagram_response(diagram, "image")
 
 @config.controller.route("/state/",methods=['PUT'])
 def persist_state():
