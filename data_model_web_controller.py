@@ -162,6 +162,50 @@ def add_table(schema):
     return "ok"
 
 
+@config.controller.route("/user/<string:user>/diagram", methods=['GET'])
+def draw_db_user(user):
+    """
+    get db user diagram
+    ---
+    parameters:
+      - in: path
+        required: true
+        name: user
+        type: string
+    responses:
+        200:
+            content:
+                image/png:
+                  schema:
+                    type: file
+                    format: binary
+    tags:
+    - datamodel
+    """
+    connected_graph = state.find_connected_graph(user)
+    diagram = smv.datamodel_visualizer(sm.data_model(connected_graph.graph)).draw()
+    return build_diagram_response(diagram, "image")
+
+
+@config.controller.route("/user/<string:user>", methods=['GET'])
+def get_db_user(user):
+    """
+    get db user
+    ---
+    parameters:
+      - in: path
+        required: true
+        name: user
+        type: string
+    tags:
+    - datamodel
+    responses:
+        200:
+          description: get db user
+    """
+    return json.dumps(state.find_connected_graph(user).graph)
+
+
 @config.controller.route("/relation", methods=['POST'])
 def create_relation():
     """
