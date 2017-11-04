@@ -10,10 +10,6 @@ from system_model_state import state
 
 config = web_utils.web_controller_config(
     controller = Blueprint('component-model', 'component-model'),
-    swagger_config = dict(endpoint = "component-model",
-                          route = "/system-model.json",
-                          rule_filter=lambda rule: web_utils.rule_filter(rule,['/component','/relation','/state','/schema','/data-model/user'])
-                          ),
     url_prefix="/component-model")
 
 
@@ -72,11 +68,11 @@ def list_components():
     tags:
     - component
     '''
-    type = request.args.get("type")
-    if type is None:
+    component_type = request.args.get("type")
+    if component_type is None:
         return abort(400,"Type cannot be null")
 
-    return json.dumps([key for key in state.get_vertexes_of_type(type)])
+    return json.dumps([key for key in state.get_vertexes_of_type(component_type)])
 
 
 @config.controller.route("/relation", methods=['POST'])
@@ -162,23 +158,3 @@ def draw_component_diagram(component):
     connected_graph = state.find_connected_graph(component)
     diagram = cmv(system_model.component_model(connected_graph.graph)).draw()
     return build_diagram_response(diagram, "image")
-
-@config.controller.route("/state/",methods=['PUT'])
-def persist_state():
-    '''
-    persist the state to the disc
-    ---
-    responses:
-        200:
-            content:
-                text/plain:
-                  schema:
-                    type: string
-    tags:
-    - state
-    '''
-    f = open("graph.json", 'w')
-    content = json.dumps(state.graph)
-    f.write(content)
-    f.close()
-    return "ok"

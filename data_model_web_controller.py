@@ -12,16 +12,32 @@ from system_model_state import state
 
 config = web_utils.web_controller_config(
     controller = Blueprint('datamodel', 'datamodel'),
-    swagger_config = dict(endpoint = "datamodel",
-                          route = "/system-model.json",
-                          rule_filter=lambda rule: web_utils.rule_filter(rule,['/schema','/component'])
-                          ),
     url_prefix="/data-model"
 )
 
 
+@config.controller.route("/",methods=['GET'])
+def list_database_objects():
+    """
+    list database objects
+    ---
+    parameters:
+      - in: query
+        name: type
+        type: string
+        enum: ["database-user","schema","table","column"]
+    responses:
+        200:
+          description: list database objects
+    tags:
+    - datamodel
+    """
+    database_object_type = request.args.get("type")
+    return json.dumps([key for key in state.get_vertexes_of_type(database_object_type)])
+
+
 @config.controller.route("/user/<string:user>", methods=['POST'])
-def add_new_datamodel(user):
+def add_new_user(user):
     """
     create a database-user
     ---
@@ -32,11 +48,12 @@ def add_new_datamodel(user):
       type: string
     responses:
         200:
-          description: Created a datamodel
+          description: Created a database user
     tags:
     - datamodel
     """
-    abort(501,"to be done")
+    state.add_vertex(user,"database-user")
+    return "ok"
 
 @config.controller.route("/schema/<string:schema>/diagram", methods=["get"])
 def draw_schema(schema):
@@ -142,4 +159,49 @@ def add_table(schema):
     [table_model.add_column(column,table_name) for column in table["columns"]]
     state.append(table_model)
     state.add_edge(start=schema,end=table_name,relation_type="contains")
+    return "ok"
+
+
+@config.controller.route("/relation", methods=['POST'])
+def create_relation():
+    """
+    create relation
+    ---
+    parameters:
+          - in: body
+            name: relation
+            required: true
+            schema:
+                type: object
+                properties:
+                    start:
+                        type: string
+                    end:
+                        type: string
+                    relation_type:
+                        type: string
+                        enum: ["contains","fk"]
+                examples:
+                    fk:
+                        start: column1
+                        end: column2
+                        relation_type: fk
+    responses:
+        200:
+            content:
+                text/plain:
+                  schema:
+                    type: string
+    tags:
+    - datamodel
+    """
+    relation = request.get_json()
+    if not state.has_vertex(relation["start"]):
+        return abort(404, "Vertex {} is missing".format(relation["start"]))
+    if not state.has_vertex(relation["end"]):
+        return abort(404, "Vertex {} is missing".format(relation["end"]))
+
+    state.add_edge(start=relation["start"],
+                   end=relation["end"],
+                   relation_type=relation["relation_type"])
     return "ok"
