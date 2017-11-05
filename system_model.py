@@ -1,10 +1,14 @@
 import json
 
+
+def empty_graph():
+    return {"vertexes":{},"edges":[]}
+
 class system_model:
 
     def __init__(self,graphx = None):
         if graphx is None:
-            self.graph = {"vertexes":{},"edges":[]}
+            self.graph = empty_graph()
         else:
             self.graph = graphx
 
@@ -31,9 +35,6 @@ class system_model:
 
     def is_vertex_of_type(self, vertex, type):
         return self.graph["vertexes"][vertex]["type"] == type
-
-    def _isEdgeWithEndVertex(self,edge,vertex):
-        return edge["end"] == vertex
 
     def does_vertex_exists(self,key):
         return key in self.graph["vertexes"]
@@ -67,20 +68,20 @@ class system_model:
 
     def find_connected_graph(self, from_vertex, connected_graph=None):
         if connected_graph is None:
-            connected_graph = system_model()
+            connected_graph = empty_graph()
 
-        if from_vertex in connected_graph.graph["vertexes"]:
+        if from_vertex in connected_graph["vertexes"]:
             return connected_graph
         else:
             if from_vertex not in self.graph["vertexes"]:
                 return connected_graph
-            connected_graph.graph["vertexes"][from_vertex] = dict(self.graph["vertexes"][from_vertex])
+            connected_graph["vertexes"][from_vertex] = dict(self.graph["vertexes"][from_vertex])
 
         adjacent_vertexes = set()
         for edge in self.get_edges_of_vertex(from_vertex):
             adjacent_vertex = self.get_related_vertex(vertex = from_vertex,edge = edge)
-            if adjacent_vertex not in connected_graph.graph["vertexes"]:
-                connected_graph.graph["edges"].append(dict(edge))
+            if adjacent_vertex not in connected_graph["vertexes"]:
+                connected_graph["edges"].append(dict(edge))
                 adjacent_vertexes.add(adjacent_vertex)
 
         for adjacent_vertex in adjacent_vertexes:

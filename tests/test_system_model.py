@@ -14,7 +14,7 @@ class Test(unittest.TestCase):
 
         connected_graph = system_model.system_model(graph).find_connected_graph("product")
 
-        self.assertDictEqual(connected_graph.graph,dict(
+        self.assertDictEqual(connected_graph,dict(
             vertexes = {"product":{"type":"product"}},edges=[]
         ))
 
@@ -29,7 +29,7 @@ class Test(unittest.TestCase):
 
         connected_graph = system_model.system_model(graph).find_connected_graph("product")
 
-        self.assertDictEqual(connected_graph.graph,dict(
+        self.assertDictEqual(connected_graph,dict(
             vertexes = {"product":{"type":"product"},"application1":{"type":"application"}},
             edges=[{"start":"product","end":"application1","relation_type":"contains"}]
         ))
@@ -48,7 +48,7 @@ class Test(unittest.TestCase):
 
         connected_graph = system_model.system_model(graph).find_connected_graph("product")
 
-        self.assertDictEqual(connected_graph.graph,dict(
+        self.assertDictEqual(connected_graph,dict(
             vertexes = {
                 "product":{"type":"product"},
                 "application1":{"type":"application"},
@@ -73,7 +73,7 @@ class Test(unittest.TestCase):
 
         connected_graph = system_model.system_model(graph).find_connected_graph("product")
 
-        self.assertDictEqual(connected_graph.graph,dict(
+        self.assertDictEqual(connected_graph,dict(
             vertexes = {
                 "product":{"type":"product"},
                 "application1":{"type":"application"},

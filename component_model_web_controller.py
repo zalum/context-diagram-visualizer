@@ -132,7 +132,7 @@ def get_component(component):
     tags:
     - component
     '''
-    return json.dumps(state.find_connected_graph(component).graph)
+    return json.dumps(state.find_connected_graph(component))
 
 
 @config.controller.route("/component/<string:component>/diagram",methods=['GET'])
@@ -155,6 +155,6 @@ def draw_component_diagram(component):
     tags:
     - component
     '''
-    connected_graph = state.find_connected_graph(component)
-    diagram = cmv(system_model.component_model(connected_graph.graph)).draw()
+    component_model = system_model.component_model(state.find_connected_graph(component))
+    diagram = cmv(component_model).draw()
     return build_diagram_response(diagram, "image")

@@ -71,8 +71,8 @@ def draw_schema(schema):
     tags:
     - datamodel
     '''
-    schema_datamodel = state.find_connected_graph(schema)
-    diagram = smv.datamodel_visualizer(sm.data_model(schema_datamodel.graph)).draw()
+    schema_datamodel = sm.data_model(state.find_connected_graph(schema))
+    diagram = smv.datamodel_visualizer(schema_datamodel).draw()
     return build_diagram_response(diagram,"image")
 
 @config.controller.route("/schema", methods=['POST'])
@@ -117,7 +117,7 @@ def get_schema(schema):
     - datamodel
     '''
     schema_model = state.find_connected_graph(schema)
-    return json.dumps(schema_model.graph)
+    return json.dumps(schema_model)
 
 
 @config.controller.route("/schema/<string:schema>/table", methods=['POST'])
@@ -182,8 +182,8 @@ def draw_db_user(user):
     tags:
     - datamodel
     """
-    connected_graph = state.find_connected_graph(user)
-    diagram = smv.datamodel_visualizer(sm.data_model(connected_graph.graph)).draw()
+    data_model = sm.data_model(state.find_connected_graph(user))
+    diagram = smv.datamodel_visualizer(data_model).draw()
     return build_diagram_response(diagram, "image")
 
 
@@ -203,7 +203,7 @@ def get_db_user(user):
         200:
           description: get db user
     """
-    return json.dumps(state.find_connected_graph(user).graph)
+    return json.dumps(state.find_connected_graph(user))
 
 
 @config.controller.route("/relation", methods=['POST'])
