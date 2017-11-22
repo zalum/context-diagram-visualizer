@@ -1,11 +1,16 @@
-from flask import Flask
 from flasgger import Swagger
+from flask import Flask
 
-from data_model_web_controller import config as dm_web
-from component_model_web_controller import config as cm_web
-from system_model_web_controller import config as sm_web
-from web_utils import rule_filter
+from smv.component_model_web_controller import config as cm_web
+from smv.data_model_web_controller import config as dm_web
+from smv.system_model_web_controller import config as sm_web
+from smv.web_utils import rule_filter
 
+
+def get_swagger_config():
+    return dict(endpoint="system-model",
+                route="/system-model.json",
+                rule_filter=rule_filter([cm_web.url_prefix, dm_web.url_prefix, sm_web.url_prefix]))
 
 def init_api_specification(app):
     app.config['SWAGGER'] = {
@@ -13,10 +18,7 @@ def init_api_specification(app):
         'uiversion': 3
     }
     swagger_config = Swagger.DEFAULT_CONFIG.copy()
-    swagger_config["specs"][0] = \
-        dict(endpoint="system-model",
-             route="/system-model.json",
-             rule_filter=rule_filter([cm_web.url_prefix,dm_web.url_prefix,sm_web.url_prefix]))
+    swagger_config["specs"][0] = get_swagger_config()
     swagger_config["specs_route"] = "/api-docs/"
     Swagger(app, config=swagger_config)
 

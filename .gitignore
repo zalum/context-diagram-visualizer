@@ -5,3 +5,6 @@ __pycache__/*
 *.jpg
 *.idea/*
 graph.json
+*egg-info/*
+dist/*
+build/*

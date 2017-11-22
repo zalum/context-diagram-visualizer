@@ -1,6 +1,4 @@
-import system_model_output as smo
-import system_model as sm
-import system_model_visualizer as svm
+from smv import system_model_visualizer as smv, system_model_output as smo, system_model as sm
 
 
 def get_datamodel_graph():
@@ -30,7 +28,7 @@ def get_datamodel_graph():
 def draw_datamodel():
     f = open('output-dm.png', 'wb')
     inputSystemGraph = sm.data_model(get_datamodel_graph())
-    lines = svm.datamodel_visualizer(inputSystemGraph).draw(colapsed_columns=False)
+    lines = smv.datamodel_visualizer(inputSystemGraph).draw(colapsed_columns=False)
     picture = smo.writeAsImage(lines).getvalue()
     f.write(picture)
 

@@ -1,6 +1,4 @@
-import system_model_output as smo
-import system_model as sm
-import system_model_visualizer as svm
+from smv import system_model_visualizer as svm, system_model_output as smo, system_model as sm
 
 
 def get_component_graph():

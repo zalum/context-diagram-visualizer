@@ -1,6 +1,7 @@
 import unittest
-import system_model as sm
-import system_model_visualizer as svm
+
+from smv import system_model_visualizer as svm, system_model as sm
+
 
 class component_model_visualizer_test(unittest.TestCase):
   def testDrawOneRelation(self):

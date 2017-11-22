@@ -1,4 +1,6 @@
-import system_model as sm
+from smv import system_model as sm
+
+
 class component_model_visualizer:
 
   def __init__(self, system_model: sm.component_model):

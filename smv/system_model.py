@@ -7,7 +7,7 @@ def empty_graph():
 class system_model:
 
     def __init__(self,graphx = None):
-        if graphx is None:
+        if graphx is None or len(graphx.keys()) == 0:
             self.graph = empty_graph()
         else:
             self.graph = graphx

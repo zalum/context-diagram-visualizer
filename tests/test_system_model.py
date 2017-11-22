@@ -1,5 +1,7 @@
 import unittest
-import system_model
+
+from smv import system_model
+
 
 class Test(unittest.TestCase):
 

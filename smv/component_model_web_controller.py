@@ -1,12 +1,13 @@
-from flask import Blueprint
-import system_model
-import web_utils
 import json
+
+from flask import Blueprint
 from flask import abort
 from flask import request
-from web_utils import build_diagram_response
-from system_model_visualizer import component_model_visualizer as cmv
-from system_model_state import state
+
+from smv import web_utils, system_model
+from smv.system_model_state import state
+from smv.system_model_visualizer import component_model_visualizer as cmv
+from smv.web_utils import build_diagram_response
 
 config = web_utils.web_controller_config(
     controller = Blueprint('component-model', 'component-model'),

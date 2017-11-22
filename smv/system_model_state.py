@@ -1,9 +1,10 @@
 
-import logging
-import system_model
-import os
 import json
+import logging
+import os
 from json import JSONDecodeError
+
+from smv import system_model
 
 
 def read_state() -> system_model:

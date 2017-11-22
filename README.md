@@ -9,13 +9,11 @@ This utility has the purpose to put in a graph model the dependencies of a syste
     * datamodel
 * generates diagrams of your system using plantuml markdown
 * exposes api endpoint to encourage colaboration
+* stores the model in a json file
 
 ## Prerequisites
 * python3, java
 * plantuml as a jar
-* requests module
-* flask
-* flasgger
 
 ## How to run
 * /examples contains command lines usages
@@ -27,7 +25,6 @@ This utility has the purpose to put in a graph model the dependencies of a syste
 ## Backlog
 * plugin system for different sources of data: jira, aws, oracle etc
 * improve validation and http error codes of endpoint
-* enable state on this utility
 * define a schema of the model graph so users know what is possible
 * use a graph database to store the graph & provide a query language
 * deployment infrastructure: docker, pyenv
