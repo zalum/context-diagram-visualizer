@@ -12,6 +12,7 @@ def get_swagger_config():
                 route="/system-model.json",
                 rule_filter=rule_filter([cm_web.url_prefix, dm_web.url_prefix, sm_web.url_prefix]))
 
+
 def init_api_specification(app):
     app.config['SWAGGER'] = {
         'title': 'System Model',
@@ -23,12 +24,14 @@ def init_api_specification(app):
     Swagger(app, config=swagger_config)
 
 
-app = Flask(__name__)
-app.register_blueprint(cm_web.controller, url_prefix=cm_web.url_prefix)
-app.register_blueprint(dm_web.controller, url_prefix=dm_web.url_prefix)
-app.register_blueprint(sm_web.controller, url_prefix=sm_web.url_prefix)
+def main():
+    app = Flask(__name__)
+    app.register_blueprint(cm_web.controller, url_prefix=cm_web.url_prefix)
+    app.register_blueprint(dm_web.controller, url_prefix=dm_web.url_prefix)
+    app.register_blueprint(sm_web.controller, url_prefix=sm_web.url_prefix)
+    init_api_specification(app)
+    app.run()
 
-init_api_specification(app)
 
 if __name__ == "__main__":
-    app.run()
+    main()
