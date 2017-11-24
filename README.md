@@ -21,7 +21,17 @@ This utility has the purpose to put in a graph model the dependencies of a syste
 * python3 diagram-visualizer-web.py represents the endpoint
 * todo: how to build and install
 
-## Tasks
+## C4 diagram
+
+How it looks under the hood
+    
+![c4](docs/c4.png)
+
+## Datamodel
+
+What are the supported modelling options
+
+![schema](docs/schema.png)
 
 ## Backlog
 * plugin system for different sources of data: jira, aws, oracle etc
@@ -29,5 +39,4 @@ This utility has the purpose to put in a graph model the dependencies of a syste
 * define a schema of the model graph so users know what is possible
 * use a graph database to store the graph & provide a query language
 * deployment infrastructure: docker, pyenv
-* document c4 diagram of this utility
 

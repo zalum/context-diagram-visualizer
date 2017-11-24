@@ -1,0 +1,15 @@
+@startuml
+actor A
+actor B
+
+folder svm{
+[SMV API]
+database system_model
+}
+
+[SMV API] --> system_model: write/query
+[SMV API] --> [Plant_UML]: generate diagrams
+A --> [SMV API]: document\nsystem model
+B --> [SMV API]: query model/\nget diagrams
+
+@enduml
