@@ -1,0 +1,29 @@
+@startuml
+
+class SystemComponent{
+    name
+    type: [application,product]
+}
+
+class SystemComponentRelation{
+    start
+    end
+    relationType: [contains,calls]
+}
+
+class DatamodelRelation{
+    start
+    end
+    relationType: [contains,fk]
+}
+
+class DatamodelObject{
+    name
+    type: [database_user, schema, table, column]
+}
+
+
+DatamodelObject::name-->DatamodelRelation:start/end
+SystemComponent::name-->SystemComponentRelation:start/end
+
+@enduml
