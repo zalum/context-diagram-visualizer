@@ -1,5 +1,6 @@
 import subprocess
 import io
+import os
 
 
 def writeAsFile(lines, file='output.plantuml'):
@@ -10,10 +11,11 @@ def writeAsFile(lines, file='output.plantuml'):
 
 
 def writeAsImage(lines):
-    p = subprocess.Popen(["java","-jar","-DPLANTUML_LIMIT_SIZE=16384","/data/tools/plant-uml/plantuml.1.2017.15.jar","-pipe"],
-                         stdin = subprocess.PIPE,stdout = subprocess.PIPE)
+    plant_uml_location = os.environ["PLANT_UML"]
+    p = subprocess.Popen(["java", "-jar", "-DPLANTUML_LIMIT_SIZE=16384", plant_uml_location, "-pipe"],
+                         stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     content = writeAsText(lines)
-    result = p.communicate(bytes(content,"UTF-8"))
+    result = p.communicate(bytes(content, "UTF-8"))
     return io.BytesIO(result[0])
 
 

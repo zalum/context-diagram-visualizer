@@ -12,15 +12,16 @@ This utility has the purpose to put in a graph model the dependencies of a syste
 * stores the model in a json file
 
 ## Prerequisites
-* python3, java
-* plantuml as a jar
+* python3.5 & libraries
+* java
+* plantuml.1.2017.19.jar and PLANT_UML environment variable pointing to the jar
 
 ## How to run
 * /examples contains command lines usages
 * python3 diagram-visualizer-web.py represents the endpoint
+* todo: how to build and install
 
 ## Tasks
-* remodel resources on the endpoint
 
 ## Backlog
 * plugin system for different sources of data: jira, aws, oracle etc
