@@ -2,6 +2,7 @@
 This utility has the purpose to put in a graph model the dependencies of a system of all kinds
 (until now system lanscape, datamodel) and use it as input for plantuml to generate a corresponding diagram
 
+
 ## Features
 * model your system in a graph representation
 * types of models
@@ -36,7 +37,7 @@ What are the supported modelling options
 ## Backlog
 * plugin system for different sources of data: jira, aws, oracle etc
 * improve validation and http error codes of endpoint
-* define a schema of the model graph so users know what is possible
 * use a graph database to store the graph & provide a query language
 * deployment infrastructure: docker, pyenv
+* annotate with timestamp the relations and components, to extract snapshots in time of the model
 

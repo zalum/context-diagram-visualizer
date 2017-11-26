@@ -23,7 +23,7 @@ class DatamodelObject{
 }
 
 
-DatamodelObject::name-->DatamodelRelation:start/end
-SystemComponent::name-->SystemComponentRelation:start/end
+DatamodelObject::name <-- DatamodelRelation:start/end
+SystemComponent::name <-- SystemComponentRelation:start/end
 
 @enduml
