@@ -16,8 +16,18 @@ def writeAsImage(lines):
                          stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     content = writeAsText(lines)
     result = p.communicate(bytes(content, "UTF-8"))
-    return io.BytesIO(result[0])
+    result = trim_left_png(result)
+    return io.BytesIO(result)
 
 
 def writeAsText(lines):
     return "\n".join(lines)
+
+
+def trim_left_png(png:io.BytesIO):
+    index = png.find(b'PNG')
+    index = png[0:index].rfind(b'\n')
+    return png[index+1:]
+
+
+
