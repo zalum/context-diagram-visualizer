@@ -133,6 +133,27 @@ def get_component(component):
     tags:
     - component
     '''
+    return json.dumps(state.get_vertex(component))
+
+@config.controller.route("/component/<string:component>/graph",methods=['GET'])
+def get_component_graph(component):
+    '''
+    get component graph
+    ---
+    parameters:
+      - in: path
+        type: string
+        name: component
+        required: true
+    responses:
+        200:
+            content:
+                text/plain:
+                  schema:
+                    type: string
+    tags:
+    - component
+    '''
     return json.dumps(state.find_connected_graph(component))
 
 

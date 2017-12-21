@@ -15,6 +15,9 @@ class system_model:
     def to_json(self):
         return json.dumps(self.graph)
 
+    def get_vertex(self,vertex):
+        return self.graph["vertexes"][vertex]
+
     def getVertexes(self):
         keys = list(self.graph["vertexes"].keys())
         keys.sort()
