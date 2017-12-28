@@ -4,6 +4,8 @@ import json
 def empty_graph():
     return {"vertexes":{},"edges":[]}
 
+RESPONSE_OK = object()
+
 class system_model:
 
     def __init__(self,graphx = None):
@@ -16,6 +18,8 @@ class system_model:
         return json.dumps(self.graph)
 
     def get_vertex(self,vertex):
+        if vertex not in self.graph["vertexes"]:
+            return None
         return self.graph["vertexes"][vertex]
 
     def getVertexes(self):
@@ -48,10 +52,15 @@ class system_model:
         self.graph["vertexes"][key] = {"type":type}
 
     def add_edge(self, start, end, relation_type = None):
+        if self.get_vertex(start) is None:
+            return "Start node is not in the model"
+        if self.get_vertex(end) is None:
+            return "End node is not in the model"
         edge = {"start":start, "end":end}
         if relation_type is not None:
             edge["relation_type"] = relation_type
         self.graph["edges"].append(edge)
+        return RESPONSE_OK
 
     def get_related_vertex(self, vertex, edge):
         return  edge["start"] if edge["end"]==vertex else edge["end"]

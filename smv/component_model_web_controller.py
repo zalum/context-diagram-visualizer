@@ -110,9 +110,11 @@ def create_relation():
     - component
     '''
     relation = request.get_json()
-    state.add_edge(start=relation["start"],end=relation["end"],relation_type=relation["relation_type"])
-    return "ok"
-
+    result = state.add_edge(start=relation["start"], end=relation["end"], relation_type=relation["relation_type"])
+    if result is system_model.RESPONSE_OK:
+        return "ok"
+    else:
+        abort(400,result)
 
 @config.controller.route("/component/<string:component>/direct-connections",methods=['GET'])
 def get_direct_connections(component):
