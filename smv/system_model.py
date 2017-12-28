@@ -56,7 +56,7 @@ class system_model:
     def get_related_vertex(self, vertex, edge):
         return  edge["start"] if edge["end"]==vertex else edge["end"]
 
-    def get_edges_of_vertex(self, with_vertex=None):
+    def get_edges_of_vertex(self, with_vertex):
         return list(filter(lambda edge: with_vertex in (edge["start"], edge["end"]), self.get_edges()))
 
     def get_children(self, parent_vertex, of_type=None,in_relation_of=None):
@@ -109,6 +109,15 @@ class system_model:
             self.graph["edges"].append(dict(edge))
         for vertex in to_append.graph["vertexes"]:
             self.graph["vertexes"][vertex] = dict(to_append.graph["vertexes"][vertex])
+
+    def find_direct_connections(self,vertex,vertex_type=None,relation_type=None):
+        connections = []
+        for edge in self.get_edges_of_vertex(vertex):
+            connection = self.get_related_vertex(vertex, edge)
+            if relation_type is None or system_model.is_edge_of_type(edge,relation_type):
+                if vertex_type is None or self.is_vertex_of_type(connection,vertex_type):
+                    connections.append(connection)
+        return connections
 
 
 class component_model(system_model):

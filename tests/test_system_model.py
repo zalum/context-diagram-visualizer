@@ -85,6 +85,88 @@ class Test(unittest.TestCase):
                      {"start": "application1", "end": "application2", "relation_type": "calls"}]
         ))
 
+    def test_find_direct_connections(self):
+        #given
+        model = system_model.system_model()
+        model.add_vertex("v1", "product")
+        model.add_vertex("v2", "application")
+        model.add_edge("v1","v2","contains")
+
+        #when
+        result = model.find_direct_connections("v1")
+
+        #then
+        self.assertIsNotNone(result)
+        self.assertIn("v2",result)
+
+
+    def test_find_direct_connections_of_vertex_type(self):
+        #given
+        model = system_model.system_model()
+        model.add_vertex("v1", "product")
+        model.add_vertex("v2", "application")
+        model.add_vertex("v3", "database-user")
+        model.add_vertex("v4", "application")
+        model.add_vertex("v5", "application")
+        model.add_edge("v1","v2","contains")
+        model.add_edge("v1","v4","contains")
+        model.add_edge("v1","v3","uses")
+
+        #when
+        result = model.find_direct_connections("v1","application")
+
+        #then
+        self.assertIsNotNone(result)
+        self.assertEqual(len(result),2)
+        self.assertIn("v2",result)
+        self.assertIn("v4",result)
+
+    def test_find_direct_connections_of_vertex_and_relation_type(self):
+        #given
+        model = system_model.system_model()
+        model.add_vertex("v1", "product")
+        model.add_vertex("v2", "application")
+        model.add_vertex("v3", "database-user")
+        model.add_vertex("v4", "application")
+        model.add_vertex("v5", "application")
+        model.add_edge("v1","v2","contains")
+        model.add_edge("v1","v4","contains")
+        model.add_edge("v1","v5","calls")
+        model.add_edge("v1","v3","uses")
+
+        #when
+        result = model.find_direct_connections("v1","application","contains")
+
+        #then
+        self.assertIsNotNone(result)
+        self.assertEqual(len(result),2)
+        self.assertIn("v2",result)
+        self.assertIn("v4",result)
+
+    def test_find_direct_connections_of_relation_type(self):
+        #given
+        model = system_model.system_model()
+        model.add_vertex("v1", "product")
+        model.add_vertex("v2", "application")
+        model.add_vertex("v3", "database-user")
+        model.add_vertex("v4", "application")
+        model.add_vertex("v5", "application")
+        model.add_edge("v1","v2","contains")
+        model.add_edge("v1","v4","contains")
+        model.add_edge("v1","v5","calls")
+        model.add_edge("v1","v3","contains")
+
+        #when
+        result = model.find_direct_connections("v1",relation_type="contains")
+
+        #then
+        self.assertIsNotNone(result)
+        self.assertEqual(len(result),3)
+        self.assertIn("v2",result)
+        self.assertIn("v3",result)
+        self.assertIn("v4",result)
+
+
     def test_append(self):
         #given
         graph1 = dict(

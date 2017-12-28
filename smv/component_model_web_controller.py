@@ -114,6 +114,44 @@ def create_relation():
     return "ok"
 
 
+@config.controller.route("/component/<string:component>/direct-connections",methods=['GET'])
+def get_direct_connections(component):
+    '''
+    get direct connections of component
+    ---
+    parameters:
+        - in: path
+          type: string
+          name: component
+          required: true
+        - in: query
+          type: string
+          name: type
+          required: false
+          enum: ["db-user","application","product"]
+        - in: query
+          name: relation-type
+          required: false
+          type: string
+          enum: ["contains","calls","uses"]
+    responses:
+            200:
+                content:
+                    text/plain:
+                      schema:
+                        type: string
+    tags:
+     - component
+    '''
+    vertex = state.get_vertex(component)
+    type = request.args.get("type")
+    relation_type = request.args.get("relation-type")
+    if vertex is None:
+        abort(404)
+    connections = state.find_direct_connections(component,type,relation_type)
+    return json.dumps(connections)
+
+
 @config.controller.route("/component/<string:component>",methods=['GET'])
 def get_component(component):
     '''
