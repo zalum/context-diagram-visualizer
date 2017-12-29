@@ -14,45 +14,6 @@ config = web_utils.web_controller_config(
 )
 
 
-@config.controller.route("/",methods=['GET'])
-def list_database_objects():
-    """
-    list database objects
-    ---
-    parameters:
-      - in: query
-        name: type
-        type: string
-        enum: ["database-user","schema","table","column"]
-    responses:
-        200:
-          description: list database objects
-    tags:
-    - datamodel
-    """
-    database_object_type = request.args.get("type")
-    return json.dumps([key for key in state.get_vertexes_of_type(database_object_type)])
-
-
-@config.controller.route("/user/<string:user>", methods=['POST'])
-def add_new_user(user):
-    """
-    create a database-user
-    ---
-    parameters:
-    - in: path
-      name: user
-      required: true
-      type: string
-    responses:
-        200:
-          description: Created a database user
-    tags:
-    - datamodel
-    """
-    state.add_vertex(user,"database-user")
-    return "ok"
-
 @config.controller.route("/schema/<string:schema>/diagram", methods=["get"])
 def draw_schema(schema):
     '''
@@ -73,49 +34,6 @@ def draw_schema(schema):
     diagram = smv.datamodel_visualizer(schema_datamodel).draw()
     return build_diagram_response(diagram,"image")
 
-@config.controller.route("/schema", methods=['POST'])
-def add_new_schema():
-    """
-    create schema
-    ---
-    parameters:
-    - in: body
-      name: schema
-      required: true
-      schema:
-        type: object
-        properties:
-            name:
-                type: string
-    responses:
-        200:
-          description: Created a schema
-    tags:
-    - datamodel
-    """
-    schema = request.get_json()
-    state.add_vertex(key=schema["name"],type="schema")
-    return "ok"
-
-
-@config.controller.route("/schema/<string:schema>", methods=['GET'])
-def get_schema(schema):
-    '''
-    get schema structure
-    ---
-    parameters:
-          - in: path
-            type: string
-            name: schema
-            required: true
-    responses:
-        200:
-          description: get schema structure
-    tags:
-    - datamodel
-    '''
-    schema_model = state.find_connected_graph(schema)
-    return json.dumps(schema_model)
 
 
 @config.controller.route("/schema/<string:schema>/table", methods=['POST'])
@@ -183,67 +101,3 @@ def draw_db_user(user):
     data_model = sm.data_model(state.find_connected_graph(user))
     diagram = smv.datamodel_visualizer(data_model).draw()
     return build_diagram_response(diagram, "image")
-
-
-@config.controller.route("/user/<string:user>", methods=['GET'])
-def get_db_user(user):
-    """
-    get db user
-    ---
-    parameters:
-      - in: path
-        required: true
-        name: user
-        type: string
-    tags:
-    - datamodel
-    responses:
-        200:
-          description: get db user
-    """
-    return json.dumps(state.find_connected_graph(user))
-
-
-@config.controller.route("/relation", methods=['POST'])
-def create_relation():
-    """
-    create relation
-    ---
-    parameters:
-          - in: body
-            name: relation
-            required: true
-            schema:
-                type: object
-                properties:
-                    start:
-                        type: string
-                    end:
-                        type: string
-                    relation_type:
-                        type: string
-                        enum: ["contains","fk"]
-                examples:
-                    fk:
-                        start: column1
-                        end: column2
-                        relation_type: fk
-    responses:
-        200:
-            content:
-                text/plain:
-                  schema:
-                    type: string
-    tags:
-    - datamodel
-    """
-    relation = request.get_json()
-    if not state.has_vertex(relation["start"]):
-        return abort(404, "Vertex {} is missing".format(relation["start"]))
-    if not state.has_vertex(relation["end"]):
-        return abort(404, "Vertex {} is missing".format(relation["end"]))
-
-    state.add_edge(start=relation["start"],
-                   end=relation["end"],
-                   relation_type=relation["relation_type"])
-    return "ok"
