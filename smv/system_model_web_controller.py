@@ -1,8 +1,10 @@
 import json
+import io
 
 from flask import Blueprint
 from flask import request
 from flask import abort
+from flask import send_file
 
 from smv import web_utils
 from smv.system_model_state import state
@@ -32,7 +34,7 @@ def get_node_graph(node):
     tags:
     - system
     '''
-    return json.dumps(state.find_connected_graph(node))
+    return json.dumps(state.find_connected_graph(node), indent = 2)
 
 @config.controller.route("/system-node/<string:node>",methods=['GET'])
 def get_node(node):
@@ -53,7 +55,7 @@ def get_node(node):
     tags:
     - system
     '''
-    return json.dumps(state.get_vertex(node))
+    return json.dumps(state.get_vertex(node), indent=2)
 
 
 @config.controller.route("/system-node", methods=['POST'])
@@ -186,10 +188,27 @@ def persist_state():
     - system
     """
     f = open("graph.json", 'w')
-    content = json.dumps(state.graph)
+    content = json.dumps(state.graph, indent=2)
     f.write(content)
     f.close()
     return "ok"
+
+@config.controller.route("/state/", methods=['GET'])
+def download_state():
+    """
+    get the state of the system in a file
+    ---
+    responses:
+        200:
+            content:
+                text/plain:
+                  schema:
+                    type: string
+    tags:
+    - system
+    """
+    content = json.dumps(state.graph, indent=2)
+    return send_file(io.BytesIO(bytes(content,"UTF-8")), mimetype="text/plain")
 
 
 @config.controller.route("/system-node/<string:node>/direct-connections",methods=['GET'])
