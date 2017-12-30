@@ -101,6 +101,12 @@ def list_nodes():
             name: type
             required: true
             enum: ["application","product","database-user","schema","table","column"]
+          - in: query
+            type: string
+            name: format
+            required: false
+            enum: ["id","full"]
+            default: "full"
     responses:
         200:
             content:
@@ -111,10 +117,17 @@ def list_nodes():
     - system
     '''
     node_type = request.args.get("type")
+    format = request.args.get("format")
     if node_type is None:
         return abort(400,"Type cannot be null")
-
-    return json.dumps([key for key in state.get_vertexes_of_type(node_type)])
+    nodes = state.get_vertexes_of_type(node_type)
+    if format == "full":
+        result = dict()
+        for key in nodes:
+            result[key] = state.get_vertex(key)
+        return json.dumps(result,indent = 2)
+    else:
+        return json.dumps([key for key in nodes])
 
 
 @config.controller.route("/relation", methods=['POST'])
