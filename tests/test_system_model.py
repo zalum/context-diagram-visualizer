@@ -166,7 +166,6 @@ class Test(unittest.TestCase):
         self.assertIn("v3",result)
         self.assertIn("v4",result)
 
-
     def test_append(self):
         #given
         graph1 = dict(
@@ -210,3 +209,49 @@ class Test(unittest.TestCase):
                    {"start": "application3", "end": "application2", "relation_type": "calls"}])
 
         self.assertDictEqual(system_model1.graph,expected)
+
+    def test_add_edge_duplication(self):
+        #given
+        model = system_model.system_model()
+        model.add_vertex("1","product")
+        model.add_vertex("2","application")
+        model.add_edge("1","2","fk")
+
+        #when
+        result = model.add_edge("1", "2","fk")
+
+        #then
+        self.assertNotEquals(result, system_model.RESPONSE_OK)
+        self.assertEquals(len(model.get_edges()),1)
+
+    def test_add_edge_duplication(self):
+        #given
+        model = system_model.system_model()
+        model.add_vertex("1","product")
+        model.add_vertex("2","application")
+        model.add_edge("1","2","fk")
+
+        #when
+        result = model.add_edge("1", "2","uses")
+
+        #then
+        self.assertNotEquals(result, system_model.RESPONSE_OK)
+        self.assertEquals(len(model.get_edges()),2)
+        self.assertEquals(len(model.get_edges_of_type("fk")),1)
+        self.assertEquals(len(model.get_edges_of_type("uses")),1)
+
+    def test_add_edge_with_corrupted_model(self):
+        #given
+        graph = dict(vertexes = {"1":{},"2":{}}, edges=[{"start":"1","end":"2"},{"start":"1","end":"2"}])
+
+
+        model = system_model.system_model(graph)
+
+        #when
+        result = model.add_edge("1", "2")
+
+        #then
+        self.assertNotEquals(result,system_model.RESPONSE_OK)
+        self.assertEquals(result,"more then one edge (2) found for (start=1 end=2 relation_type=None)")
+
+
