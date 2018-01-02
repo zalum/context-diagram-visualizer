@@ -10,13 +10,18 @@ def writeAsFile(lines, file='output.plantuml'):
     f.close()
 
 
-def writeAsImage(lines):
+def writeAsImage(input, input_format="lines"):
+    if input_format == "lines":
+        content = writeAsText(input)
+        content = bytes(content, "UTF-8")
+    else:
+        content = input
     plant_uml_location = os.environ["PLANT_UML"]
     p = subprocess.Popen(["java", "-jar", "-DPLANTUML_LIMIT_SIZE=16384", plant_uml_location, "-pipe"],
                          stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    content = writeAsText(lines)
-    result = p.communicate(bytes(content, "UTF-8"))
+    result = p.communicate(content)
     result = trim_left_png(result[0])
+
     return io.BytesIO(result)
 
 

@@ -1,8 +1,6 @@
-import json
-
 from flask import Blueprint
-from flask import abort
 from flask import request
+
 
 from smv import web_utils, system_model
 from smv.system_model_state import state
@@ -23,6 +21,12 @@ def draw_component_diagram(component):
         type: string
         name: component
         required: true
+      - in: query
+        type: string
+        name: format
+        enum: ["image","plantuml.md"]
+        default: ["image"]
+        required: true
     responses:
         200:
             content:
@@ -35,4 +39,4 @@ def draw_component_diagram(component):
     '''
     component_model = system_model.component_model(state.find_connected_graph(component))
     diagram = cmv(component_model).draw()
-    return build_diagram_response(diagram, "image")
+    return build_diagram_response(diagram, request.args.get("format"))

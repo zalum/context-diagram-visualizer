@@ -14,11 +14,11 @@ class web_controller_config:
         self.url_prefix = url_prefix
 
 
-def build_diagram_response(diagram, format):
-    if format == "text":
+def build_diagram_response(diagram, output_format,input_format="lines"):
+    if output_format == "plantuml.md":
         return smo.writeAsText(diagram)
     else:
-        if format == "image":
-            return send_file(smo.writeAsImage(diagram), mimetype="image/png")
+        if output_format == "image":
+            return send_file(smo.writeAsImage(diagram,input_format), mimetype="image/png")
         else:
             abort(406,'type not supported')

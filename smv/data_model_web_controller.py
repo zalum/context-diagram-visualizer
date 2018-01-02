@@ -24,6 +24,12 @@ def draw_schema(schema):
             type: string
             name: schema
             required: true
+          - in: query
+            type: string
+            name: format
+            enum: ["image","plantuml.md"]
+            default: ["image"]
+            required: true
     responses:
         200:
           description: get diagram of schema
@@ -32,7 +38,7 @@ def draw_schema(schema):
     '''
     schema_datamodel = sm.data_model(state.find_connected_graph(schema))
     diagram = smv.datamodel_visualizer(schema_datamodel).draw()
-    return build_diagram_response(diagram,"image")
+    return build_diagram_response(diagram,request.args.get("format"))
 
 
 
@@ -88,6 +94,12 @@ def draw_db_user(user):
         required: true
         name: user
         type: string
+      - in: query
+        type: string
+        name: format
+        enum: ["image","plantuml.md"]
+        default: ["image"]
+        required: true
     responses:
         200:
             content:
@@ -100,4 +112,4 @@ def draw_db_user(user):
     """
     data_model = sm.data_model(state.find_connected_graph(user))
     diagram = smv.datamodel_visualizer(data_model).draw()
-    return build_diagram_response(diagram, "image")
+    return build_diagram_response(diagram, request.args.get("format"))
