@@ -237,6 +237,32 @@ class Test(unittest.TestCase):
 
         self.assertEquals(model1.graph,expected.graph)
 
+    def test_append_edges_with_no_relation_type(self):
+        #given
+        model1 = system_model.system_model()
+        model1.add_vertex("1","product")
+        model1.add_vertex("2","product")
+        model1.add_edge("1","2","uses")
+
+        model2 = system_model.system_model()
+        model2.add_vertex("1","product")
+        model2.add_vertex("2","product")
+        model2.add_vertex("3","product")
+        model2.add_edge("1","3")
+
+        #when
+        model1.append(model2)
+
+        #then
+        expected = system_model.system_model()
+        expected.add_vertex("1", "product")
+        expected.add_vertex("2", "product")
+        expected.add_vertex("3", "product")
+        expected.add_edge("1", "2", "uses")
+        expected.add_edge("1", "3")
+
+        self.assertEquals(model1.graph,expected.graph)
+
 
 
     def test_add_edge_duplication(self):

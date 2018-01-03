@@ -127,7 +127,7 @@ class system_model:
         for vertex in to_append.graph["vertexes"]:
             self.graph["vertexes"][vertex] = dict(to_append.graph["vertexes"][vertex])
         for edge in to_append.graph["edges"]:
-            self.add_edge(edge["start"], edge["end"], edge["relation_type"])
+            self.add_edge(edge["start"], edge["end"], edge["relation_type"] if "relation_type" in edge else None)
 
     def find_direct_connections(self, vertex, vertex_type=None, relation_type=None):
         connections = []
