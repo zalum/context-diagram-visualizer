@@ -61,15 +61,15 @@ class system_model:
             return "Start node is not in the model"
         if self.get_vertex(end) is None:
             return "End node is not in the model"
-        edge = self.get_edge(start=start, end=end, relation_type=relation_type)
-        if edge is None:
-            edge = {"start": start, "end": end}
+        result = self.get_edge(start=start, end=end, relation_type=relation_type)
+        if result is None:
+            result = {"start": start, "end": end}
             if relation_type is not None:
-                edge["relation_type"] = relation_type
-            self.graph["edges"].append(edge)
+                result["relation_type"] = relation_type
+            self.graph["edges"].append(result)
         else:
-            if type(edge) != dict:
-                return edge
+            if type(result) != dict:
+                return result
         return RESPONSE_OK
 
     def get_related_vertex(self, vertex, edge):
@@ -124,10 +124,10 @@ class system_model:
         return [v for v in self.get_vertexes_of_type(ofType) if not self._is_vertex_in_edges(v)]
 
     def append(self, to_append):
-        for edge in to_append.graph["edges"]:
-            self.graph["edges"].append(dict(edge))
         for vertex in to_append.graph["vertexes"]:
             self.graph["vertexes"][vertex] = dict(to_append.graph["vertexes"][vertex])
+        for edge in to_append.graph["edges"]:
+            self.add_edge(edge["start"], edge["end"], edge["relation_type"])
 
     def find_direct_connections(self, vertex, vertex_type=None, relation_type=None):
         connections = []

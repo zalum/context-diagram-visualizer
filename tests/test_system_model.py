@@ -210,6 +210,35 @@ class Test(unittest.TestCase):
 
         self.assertDictEqual(system_model1.graph,expected)
 
+    def test_append_duplicated_edges(self):
+        #given
+        model1 = system_model.system_model()
+        model1.add_vertex("1","product")
+        model1.add_vertex("2","product")
+        model1.add_edge("1","2","uses")
+
+        model2 = system_model.system_model()
+        model2.add_vertex("1","product")
+        model2.add_vertex("2","product")
+        model2.add_vertex("3","product")
+        model2.add_edge("1","2","uses")
+        model2.add_edge("1","3","uses")
+
+        #when
+        model1.append(model2)
+
+        #then
+        expected = system_model.system_model()
+        expected.add_vertex("1", "product")
+        expected.add_vertex("2", "product")
+        expected.add_vertex("3", "product")
+        expected.add_edge("1", "2", "uses")
+        expected.add_edge("1", "3", "uses")
+
+        self.assertEquals(model1.graph,expected.graph)
+
+
+
     def test_add_edge_duplication(self):
         #given
         model = system_model.system_model()
@@ -221,7 +250,21 @@ class Test(unittest.TestCase):
         result = model.add_edge("1", "2","fk")
 
         #then
-        self.assertNotEquals(result, system_model.RESPONSE_OK)
+        self.assertEquals(result, system_model.RESPONSE_OK)
+        self.assertEquals(len(model.get_edges()),1)
+
+    def test_add_edge_duplication_with_no_relation_type(self):
+        #given
+        model = system_model.system_model()
+        model.add_vertex("1","product")
+        model.add_vertex("2","application")
+        model.add_edge("1","2")
+
+        #when
+        result = model.add_edge("1", "2")
+
+        #then
+        self.assertEquals(result, system_model.RESPONSE_OK)
         self.assertEquals(len(model.get_edges()),1)
 
     def test_add_edge_duplication(self):
@@ -235,7 +278,7 @@ class Test(unittest.TestCase):
         result = model.add_edge("1", "2","uses")
 
         #then
-        self.assertNotEquals(result, system_model.RESPONSE_OK)
+        self.assertEquals(result, system_model.RESPONSE_OK)
         self.assertEquals(len(model.get_edges()),2)
         self.assertEquals(len(model.get_edges_of_type("fk")),1)
         self.assertEquals(len(model.get_edges_of_type("uses")),1)
