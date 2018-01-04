@@ -37,6 +37,6 @@ def draw_component_diagram(component):
     tags:
     - component
     '''
-    component_model = system_model.component_model(state.find_connected_graph(component))
+    component_model = system_model.component_model(state.find_connected_graph(component).graph)
     diagram = cmv(component_model).draw()
     return build_diagram_response(diagram, request.args.get("format"))

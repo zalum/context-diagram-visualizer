@@ -34,7 +34,7 @@ def get_node_graph(node):
     tags:
     - system
     '''
-    return json.dumps(state.find_connected_graph(node), indent = 2)
+    return json.dumps(state.find_connected_graph(node).graph, indent = 2)
 
 @config.controller.route("/system-node/<string:node>",methods=['GET'])
 def get_node(node):

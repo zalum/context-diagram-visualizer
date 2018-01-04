@@ -14,11 +14,36 @@ class Test(unittest.TestCase):
             edges = []
         )
 
-        connected_graph = system_model.system_model(graph).find_connected_graph("product")
+        result = system_model.system_model(graph).find_connected_graph("product")
 
-        self.assertDictEqual(connected_graph,dict(
+        self.assertDictEqual(result.graph,dict(
             vertexes = {"product":{"type":"product"}},edges=[]
         ))
+
+    def test_copy_vertex(self):
+        #given
+        model_source = system_model.system_model()
+        model_source.add_vertex("1","application",x=1,y=2)
+        model_target = system_model.system_model()
+
+        #when
+        model_target.copy_vertex(model_source,"1")
+
+        #then
+        self.assertDictEqual(model_target.get_vertex("1"),model_source.get_vertex("1"))
+
+    def test_add_vertex(self):
+        #given
+        model = system_model.system_model()
+        properties = dict(name="xxx",other="yyy")
+
+        #when
+        model.add_vertex("1","app",**properties)
+        properties["name"] = "zzz"
+
+        #then
+        expected = dict(name="xxx",other="yyy",type = "app")
+        self.assertDictEqual(expected,model.get_vertex("1"))
 
     def test_find_connected_graph_with_one_level(self):
         graph = dict(
@@ -31,7 +56,7 @@ class Test(unittest.TestCase):
 
         connected_graph = system_model.system_model(graph).find_connected_graph("product")
 
-        self.assertDictEqual(connected_graph,dict(
+        self.assertDictEqual(connected_graph.graph,dict(
             vertexes = {"product":{"type":"product"},"application1":{"type":"application"}},
             edges=[{"start":"product","end":"application1","relation_type":"contains"}]
         ))
@@ -50,7 +75,7 @@ class Test(unittest.TestCase):
 
         connected_graph = system_model.system_model(graph).find_connected_graph("product")
 
-        self.assertDictEqual(connected_graph,dict(
+        self.assertDictEqual(connected_graph.graph,dict(
             vertexes = {
                 "product":{"type":"product"},
                 "application1":{"type":"application"},
@@ -81,7 +106,7 @@ class Test(unittest.TestCase):
         expected.add_vertex("application1","application")
         expected.add_edge("product","application1","contains")
 
-        self.assertDictEqual(expected.graph,result)
+        self.assertDictEqual(expected.graph,result.graph)
 
     def test_find_connected_graph_with_cycle(self):
         graph = dict(
@@ -97,9 +122,9 @@ class Test(unittest.TestCase):
                      {"start": "application1", "end": "application2", "relation_type": "calls"}]
         )
 
-        connected_graph = system_model.system_model(graph).find_connected_graph("product")
+        result = system_model.system_model(graph).find_connected_graph("product")
 
-        self.assertDictEqual(connected_graph,dict(
+        self.assertDictEqual(result.graph,dict(
             vertexes = {
                 "product":{"type":"product"},
                 "application1":{"type":"application"},
@@ -134,7 +159,7 @@ class Test(unittest.TestCase):
         expected.add_edge("1","2")
         expected.add_edge("2","3")
         expected.add_edge("3","4")
-        self.assertDictEqual(expected.graph,result)
+        self.assertDictEqual(expected.graph,result.graph)
 
     def test_find_direct_connections(self):
         #given

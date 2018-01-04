@@ -36,7 +36,7 @@ def draw_schema(schema):
     tags:
     - datamodel
     '''
-    schema_datamodel = sm.data_model(state.find_connected_graph(schema))
+    schema_datamodel = sm.data_model(state.find_connected_graph(schema).graph)
     diagram = smv.datamodel_visualizer(schema_datamodel).draw()
     return build_diagram_response(diagram,request.args.get("format"))
 
@@ -110,6 +110,6 @@ def draw_db_user(user):
     tags:
     - datamodel
     """
-    data_model = sm.data_model(state.find_connected_graph(user))
+    data_model = sm.data_model(state.find_connected_graph(user).graph)
     diagram = smv.datamodel_visualizer(data_model).draw()
     return build_diagram_response(diagram, request.args.get("format"))
