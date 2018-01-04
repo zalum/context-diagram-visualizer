@@ -59,6 +59,30 @@ class Test(unittest.TestCase):
                      {"start": "application1", "end": "application2", "relation_type": "calls"}]
         ))
 
+    def test_find_connected_graph_with_corrupted_edge(self):
+        #given
+        graph = dict(
+            vertexes={
+                "product": {"type": "product"},
+                "application1": {"type": "application"},
+            },
+            edges=[{"start": "product", "end": "application1", "relation_type": "contains"},
+                   {"start": "product", "end": "application2", "relation_type": "contains"}]
+        )
+
+        model = system_model.system_model(graph)
+
+        #when
+        result = model.find_connected_graph("product")
+
+        #then
+        expected = system_model.system_model()
+        expected.add_vertex("product","product")
+        expected.add_vertex("application1","application")
+        expected.add_edge("product","application1","contains")
+
+        self.assertDictEqual(expected.graph,result)
+
     def test_find_connected_graph_with_cycle(self):
         graph = dict(
             vertexes = {
@@ -84,6 +108,33 @@ class Test(unittest.TestCase):
                      {"start": "product", "end": "application2", "relation_type": "contains"},
                      {"start": "application1", "end": "application2", "relation_type": "calls"}]
         ))
+
+    def test_find_connected_graph_until_certain_level(self):
+        #given
+        model = system_model.system_model()
+        model.add_vertex("1","application")
+        model.add_vertex("2","application")
+        model.add_vertex("3","application")
+        model.add_vertex("4","application")
+        model.add_vertex("5","application")
+        model.add_edge("1","2")
+        model.add_edge("2","3")
+        model.add_edge("3","4")
+        model.add_edge("4","5")
+
+        #when
+        result = model.find_connected_graph("1",3)
+
+        #then
+        expected = system_model.system_model()
+        expected.add_vertex("1","application")
+        expected.add_vertex("2","application")
+        expected.add_vertex("3","application")
+        expected.add_vertex("4","application")
+        expected.add_edge("1","2")
+        expected.add_edge("2","3")
+        expected.add_edge("3","4")
+        self.assertDictEqual(expected.graph,result)
 
     def test_find_direct_connections(self):
         #given
@@ -235,7 +286,7 @@ class Test(unittest.TestCase):
         expected.add_edge("1", "2", "uses")
         expected.add_edge("1", "3", "uses")
 
-        self.assertEquals(model1.graph,expected.graph)
+        self.assertEquals(expected.graph,expected.graph)
 
     def test_append_edges_with_no_relation_type(self):
         #given
