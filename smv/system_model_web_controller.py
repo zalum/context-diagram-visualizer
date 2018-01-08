@@ -25,6 +25,10 @@ def get_node_graph(node):
         type: string
         name: node
         required: true
+      - in: query
+        type: number
+        name: level
+        required: false
     responses:
         200:
             content:
@@ -34,7 +38,10 @@ def get_node_graph(node):
     tags:
     - system
     '''
-    return json.dumps(state.find_connected_graph(node).graph, indent = 2)
+    level = request.args.get("level")
+    if level is not None:
+        level = int(level)
+    return json.dumps(state.find_connected_graph(node,level).graph, indent = 2)
 
 @config.controller.route("/system-node/<string:node>",methods=['GET'])
 def get_node(node):

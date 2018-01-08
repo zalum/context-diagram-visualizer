@@ -110,6 +110,6 @@ def draw_db_user(user):
     tags:
     - datamodel
     """
-    data_model = sm.data_model(state.find_connected_graph(user).graph)
+    data_model = sm.data_model(state.find_connected_graph(user,level=1).graph)
     diagram = smv.datamodel_visualizer(data_model).draw()
     return build_diagram_response(diagram, request.args.get("format"))

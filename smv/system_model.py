@@ -8,6 +8,28 @@ def empty_graph():
 RESPONSE_OK = object()
 
 
+def matching_edge(model:'system_model',criteria, current_level, edge):
+    if criteria is None:
+        return True
+    if current_level not in criteria:
+        return True
+    criteria_on_level = criteria[current_level]
+
+    if "accepted_vertex_types" in criteria_on_level:
+        vertex_types = [model.get_vertex(edge["start"])["type"], model.get_vertex(edge["end"])["type"]]
+        for vertex_types_to_match in criteria_on_level["accepted_vertex_types"]:
+            if vertex_types_to_match in vertex_types:
+                return True
+        return False
+
+    if "accepted_relation_types" in criteria_on_level:
+        for accepted_relation_type in criteria_on_level["accepted_relation_types"]:
+            if accepted_relation_type == edge["relation_type"]:
+                return True
+        return False
+    return True
+
+
 class system_model:
     def __init__(self, graphx=None):
         if graphx is None or len(graphx.keys()) == 0:
@@ -94,7 +116,7 @@ class system_model:
         type = vertex_value.pop("type")
         self.add_vertex(vertex, type, **vertex_value)
 
-    def find_connected_graph(self, from_vertex, level=None, connected_model=None, current_level=0):
+    def find_connected_graph(self, from_vertex, criteria = None, level=None, connected_model=None, current_level=0):
         if connected_model is None:
             connected_model = system_model()
             connected_model.copy_vertex(self,from_vertex)
@@ -104,15 +126,21 @@ class system_model:
 
         adjacent_vertexes = set()
         for edge in self.get_edges_of_vertex(from_vertex):
+            if matching_edge(self,criteria,current_level,edge) is False:
+                continue
             adjacent_vertex = self.get_related_vertex(vertex=from_vertex, edge=edge)
-            if adjacent_vertex in self.graph["vertexes"]:
-                if connected_model.get_vertex(adjacent_vertex) is None:
-                    connected_model.copy_vertex(self,adjacent_vertex)
-                    adjacent_vertexes.add(adjacent_vertex)
-                connected_model.add_edge(**edge)
+            if adjacent_vertex not in self.graph["vertexes"]:
+                continue
+            if connected_model.get_vertex(adjacent_vertex) is None:
+                connected_model.copy_vertex(self,adjacent_vertex)
+                adjacent_vertexes.add(adjacent_vertex)
+            connected_model.add_edge(**edge)
 
         for adjacent_vertex in adjacent_vertexes:
-            connected_model = self.find_connected_graph(from_vertex=adjacent_vertex, level=level, connected_model=connected_model,
+            connected_model = self.find_connected_graph(from_vertex=adjacent_vertex,
+                                                        criteria=criteria,
+                                                        level=level,
+                                                        connected_model=connected_model,
                                                         current_level=current_level+1)
 
         return connected_model
