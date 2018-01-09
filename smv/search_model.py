@@ -54,7 +54,8 @@ def matching_edge(criteria:search_criteria, model:system_model, current_level, e
         return False
     return True
 
-def find_connected_graph(source_model:system_model, from_vertex, criteria = None, level=None, connected_model=None, current_level=0):
+
+def find_connected_graph(source_model: system_model, from_vertex, criteria = None, level=None, connected_model=None, current_level=0):
     if connected_model is None:
         connected_model = system_model()
         connected_model.copy_vertex(source_model, from_vertex)

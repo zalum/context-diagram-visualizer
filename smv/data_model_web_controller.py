@@ -5,6 +5,7 @@ from flask import abort
 from flask import request
 
 from smv import web_utils, system_model_visualizer as smv, system_model as sm
+from smv.search_model import find_connected_graph
 from smv.system_model_state import state
 from smv.web_utils import build_diagram_response
 
@@ -36,7 +37,7 @@ def draw_schema(schema):
     tags:
     - datamodel
     '''
-    schema_datamodel = sm.data_model(state.find_connected_graph(schema).graph)
+    schema_datamodel = sm.data_model(find_connected_graph(state,schema).graph)
     diagram = smv.datamodel_visualizer(schema_datamodel).draw()
     return build_diagram_response(diagram,request.args.get("format"))
 
