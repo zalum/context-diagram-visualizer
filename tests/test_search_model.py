@@ -1,4 +1,5 @@
 from smv.system_model import system_model
+from smv.search_model import search_criteria, find_connected_graph
 from unittest import TestCase
 
 
@@ -17,7 +18,7 @@ class Test(TestCase):
         model.add_edge("4","5")
 
         #when
-        result = model.find_connected_graph("1",level=3)
+        result = find_connected_graph(model,"1",level=3)
 
         #then
         expected = system_model()
@@ -39,7 +40,7 @@ class Test(TestCase):
             edges=[]
         )
 
-        result = system_model(graph).find_connected_graph("product")
+        result = find_connected_graph(system_model(graph),"product")
 
         self.assert_models_are_equal(system_model(dict(
             vertexes={"product": {"type": "product"}}, edges=[]
@@ -54,7 +55,7 @@ class Test(TestCase):
             edges = [{"start":"product","end":"application1","relation_type":"contains"}]
         )
 
-        connected_graph = system_model(graph).find_connected_graph("product")
+        connected_graph = find_connected_graph(system_model(graph),"product")
 
         self.assert_models_are_equal(system_model(dict(
             vertexes = {"product":{"type":"product"},"application1":{"type":"application"}},
@@ -73,7 +74,7 @@ class Test(TestCase):
                      {"start": "application1", "end": "application2", "relation_type": "calls"}]
         )
 
-        connected_graph = system_model(graph).find_connected_graph("product")
+        connected_graph = find_connected_graph(system_model(graph),"product")
         self.assert_models_are_equal(system_model(dict(
             vertexes = {
                 "product":{"type":"product"},
@@ -97,7 +98,7 @@ class Test(TestCase):
         model = system_model(graph)
 
         #when
-        result = model.find_connected_graph("product")
+        result = find_connected_graph(model,"product")
 
         #then
         expected = system_model()
@@ -115,10 +116,10 @@ class Test(TestCase):
         model.add_edge("user","table1","uses")
         model.add_edge("user","schema","uses")
 
-        criteria = {}
+        criteria = search_criteria()
 
         #when
-        result = model.find_connected_graph("user",criteria)
+        result = find_connected_graph(model,"user",criteria)
 
         #then
         expected = system_model()
@@ -143,7 +144,7 @@ class Test(TestCase):
                      {"start": "application1", "end": "application2", "relation_type": "calls"}]
         )
 
-        result = system_model(graph).find_connected_graph("product")
+        result = find_connected_graph(system_model(graph),"product")
 
         self.assert_models_are_equal(system_model(dict(
             vertexes = {
@@ -164,10 +165,10 @@ class Test(TestCase):
         model.add_edge("user","table1","uses")
         model.add_edge("user","schema","uses")
 
-        criteria = {0:{"accepted_vertex_types":["table"]}}
+        criteria = search_criteria().with_include_vertex_types(0, ["table"])
 
         #when
-        result = model.find_connected_graph("user",criteria=criteria)
+        result = find_connected_graph(model,"user", criteria=criteria)
 
         #then
         expected = system_model()
@@ -187,12 +188,10 @@ class Test(TestCase):
         model.add_edge("user","table1","uses")
         model.add_edge("user","schema","uses")
         model.add_edge("user","xxx","uses")
-
-
-        criteria = {0:{"accepted_vertex_types":["table","schema"]}}
+        criteria = search_criteria().with_include_vertex_types(0,["table","schema"])
 
         #when
-        result = model.find_connected_graph("user",criteria=criteria)
+        result = find_connected_graph(model,"user",criteria=criteria)
 
         #then
         expected = system_model()
@@ -213,10 +212,10 @@ class Test(TestCase):
         model.add_edge("user","table1","uses")
         model.add_edge("user","schema","xxx")
 
-        criteria = {0:{"accepted_relation_types":["uses"]}}
+        criteria = search_criteria().with_include_relation_types(0,["uses"])
 
         #when
-        result = model.find_connected_graph("user",criteria=criteria)
+        result = find_connected_graph(model,"user",criteria=criteria)
 
         #then
         expected = system_model()
@@ -244,14 +243,12 @@ class Test(TestCase):
         model.add_edge("column1","table1","contains")
         model.add_edge("column2","column1","fk")
         #when
-        criteria = {
-            0: {"accepted_vertex_types": ["table"]},
-            1: {"accepted_vertex_types": ["schema","column"]},
-            2: {"accepted_relation_types": ["fk"]}
-        }
+        criteria = search_criteria().with_include_vertex_types(0, ["table"]).\
+            with_include_vertex_types(1, ["schema","column"]).\
+            with_include_relation_types(2, ["fk"])
 
         #then
-        result = model.find_connected_graph("user", criteria=criteria)
+        result = find_connected_graph(model,"user", criteria=criteria)
         expected_model = system_model()
         expected_model.add_vertex("user", "user")
         expected_model.add_vertex("table1", "table")

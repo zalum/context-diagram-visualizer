@@ -110,6 +110,11 @@ def draw_db_user(user):
     tags:
     - datamodel
     """
-    data_model = sm.data_model(state.find_connected_graph(user,level=1).graph)
+    criteria = {
+        0: {"accepted_vertex_types": ["table"]},
+        1: {"accepted_vertex_types": ["schema", "column"]},
+        2: {"accepted_relation_types": ["fk"]}
+    }
+    data_model = sm.data_model(state.find_connected_graph(user, level=3, criteria=criteria).graph)
     diagram = smv.datamodel_visualizer(data_model).draw()
     return build_diagram_response(diagram, request.args.get("format"))
