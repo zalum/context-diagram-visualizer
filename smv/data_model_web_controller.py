@@ -6,6 +6,7 @@ from flask import request
 
 from smv import web_utils, system_model_visualizer as smv, system_model as sm
 from smv.search_model import find_connected_graph
+from smv.search_model import search_criteria
 from smv.system_model_state import state
 from smv.web_utils import build_diagram_response
 
@@ -37,7 +38,13 @@ def draw_schema(schema):
     tags:
     - datamodel
     '''
-    schema_datamodel = sm.data_model(find_connected_graph(state,schema).graph)
+    criteria = search_criteria().with_include_vertex_types(0, ["table"]). \
+        with_include_vertex_types(1, ["column"]). \
+        with_include_relation_types(2, ["fk"]). \
+        with_include_vertex_types(3, ["table"]).\
+        with_include_vertex_types(4, ["schema"])
+
+    schema_datamodel = sm.data_model(find_connected_graph(state,schema,criteria=criteria,level=5).graph)
     diagram = smv.datamodel_visualizer(schema_datamodel).draw()
     return build_diagram_response(diagram,request.args.get("format"))
 
@@ -111,11 +118,11 @@ def draw_db_user(user):
     tags:
     - datamodel
     """
-    criteria = {
-        0: {"accepted_vertex_types": ["table"]},
-        1: {"accepted_vertex_types": ["schema", "column"]},
-        2: {"accepted_relation_types": ["fk"]}
-    }
-    data_model = sm.data_model(state.find_connected_graph(user, level=3, criteria=criteria).graph)
+    criteria = search_criteria().with_include_vertex_types(0,["table"]).\
+        with_include_vertex_types(1, ["schema", "column"]). \
+        with_include_relation_types(2, ["fk"]).\
+        with_include_vertex_types(3, ["table"])
+
+    data_model = sm.data_model(find_connected_graph(state,user, level=4, criteria=criteria).graph)
     diagram = smv.datamodel_visualizer(data_model).draw()
-    return build_diagram_response(diagram, request.args.get("format"))
+    return build_diagram_response(diagram, request.args.get("format") if "format" in request.args else "image")
