@@ -9,7 +9,7 @@ class search_criteria():
             self.levels_criteria[level] = {"include_vertex_types": [], "include_relation_types":[]}
         return self.levels_criteria[level]
 
-    def with_include_vertex_types(self, level, vertex_types)->'search_criteria':
+    def with_include_vertex_types(self, level, vertex_types:[])->'search_criteria':
         level_search_criteria = self.level_search_criteria(level)
         for vertex_type in vertex_types:
             level_search_criteria["include_vertex_types"].append(vertex_type)

@@ -9,6 +9,7 @@ from flask import send_file
 from smv import web_utils
 from smv.system_model_state import state
 from smv.system_model import RESPONSE_OK
+from smv.search_model import find_connected_graph
 
 config = web_utils.web_controller_config(
     controller=Blueprint('system-model', 'system-model'),
@@ -32,7 +33,7 @@ def get_node_graph(node):
     responses:
         200:
             content:
-                text/plain:
+                application/json:
                   schema:
                     type: string
     tags:
@@ -41,7 +42,7 @@ def get_node_graph(node):
     level = request.args.get("level")
     if level is not None:
         level = int(level)
-    return json.dumps(state.find_connected_graph(node,level).graph, indent = 2)
+    return json.dumps(find_connected_graph(state,node,level=level).graph, indent = 2)
 
 @config.controller.route("/system-node/<string:node>",methods=['GET'])
 def get_node(node):
@@ -56,7 +57,7 @@ def get_node(node):
     responses:
         200:
             content:
-                text/plain:
+                application/json:
                   schema:
                     type: string
     tags:
@@ -119,7 +120,7 @@ def list_nodes():
     responses:
         200:
             content:
-                text/plain:
+                application/json:
                   schema:
                     type: string
     tags:

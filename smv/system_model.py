@@ -106,7 +106,7 @@ class system_model:
     def get_orphan_vertexes(self, ofType):
         return [v for v in self.get_vertexes_of_type(ofType) if not self._is_vertex_in_edges(v)]
 
-    def append(self, to_append):
+    def append(self, to_append:'system_model'):
         for vertex in to_append.graph["vertexes"]:
             self.graph["vertexes"][vertex] = dict(to_append.graph["vertexes"][vertex])
         for edge in to_append.graph["edges"]:

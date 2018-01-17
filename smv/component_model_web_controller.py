@@ -2,9 +2,7 @@ from flask import Blueprint
 from flask import request
 
 
-from smv import web_utils, system_model
-from smv.search_model import find_connected_graph
-from smv.system_model_state import state
+from smv import web_utils, c4_diagram
 from smv.system_model_visualizer import component_model_visualizer as cmv
 from smv.web_utils import build_diagram_response
 
@@ -38,6 +36,7 @@ def draw_component_diagram(component):
     tags:
     - component
     '''
-    component_model = system_model.component_model(find_connected_graph(state,component).graph)
-    diagram = cmv(component_model).draw()
+
+    model = c4_diagram.search(component)
+    diagram = cmv(model).draw()
     return build_diagram_response(diagram, request.args.get("format"))
