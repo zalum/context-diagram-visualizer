@@ -1,6 +1,6 @@
 import unittest
 
-from smv import system_model
+from smv.core.model import system_model
 
 
 class Test(unittest.TestCase):
@@ -266,7 +266,7 @@ class Test(unittest.TestCase):
         result = model.add_edge("1", "2")
 
         #then
-        self.assertNotEquals(result,system_model.RESPONSE_OK)
+        self.assertNotEquals(result, system_model.RESPONSE_OK)
         self.assertEquals(result,"more then one edge (2) found for (start=1 end=2 relation_type=None)")
 
 

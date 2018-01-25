@@ -1,6 +1,7 @@
-from smv.system_model import system_model
-from smv.search_model import search_criteria, find_connected_graph
 from unittest import TestCase
+
+from smv.core.model.system_model import system_model
+from smv.search_model import search_criteria, find_connected_graph
 
 
 class Test(TestCase):

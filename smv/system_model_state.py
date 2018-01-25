@@ -4,7 +4,7 @@ import logging
 import os
 from json import JSONDecodeError
 
-from smv import system_model
+from smv.core.model import system_model
 
 
 def read_state() -> system_model:
@@ -24,4 +24,6 @@ def read_state() -> system_model:
 
 
 state = read_state()
+
+
 

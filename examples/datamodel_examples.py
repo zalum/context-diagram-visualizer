@@ -1,4 +1,5 @@
-from smv import system_model_visualizer as smv, system_model_output as smo, system_model as sm
+from smv import system_model_visualizer as smv, system_model_output as smo
+from smv.core.model import system_model as sm
 
 
 def get_datamodel_graph():

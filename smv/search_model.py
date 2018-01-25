@@ -1,4 +1,4 @@
-from  smv.system_model import system_model
+from  smv.core.model.system_model import system_model
 
 class search_criteria():
     def __init__(self):

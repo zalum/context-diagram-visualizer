@@ -1,5 +1,5 @@
+import smv.core.model.system_model as sm
 from smv.search_model import search_criteria, find_connected_graph
-import smv.system_model as sm
 from smv.system_model_state import state
 
 

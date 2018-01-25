@@ -1,6 +1,7 @@
 import unittest
 
-from smv import system_model_visualizer as svm, system_model as sm
+from smv import system_model_visualizer as svm
+from smv.core.model import system_model as sm
 
 
 class component_model_visualizer_test(unittest.TestCase):

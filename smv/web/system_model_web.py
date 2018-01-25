@@ -1,10 +1,10 @@
 from flasgger import Swagger
 from flask import Flask
 
-from smv.component_model_web_controller import config as cm_web
-from smv.data_model_web_controller import config as dm_web
-from smv.system_model_web_controller import config as sm_web
-from smv.plantuml_web_controller import config as plantuml_web
+from smv.web.component_model_web_controller import config as cm_web
+from smv.web.data_model_web_controller import config as dm_web
+from smv.web.plantuml_web_controller import config as plantuml_web
+from smv.web.system_model_web_controller import config as sm_web
 from smv.web_utils import rule_filter
 
 

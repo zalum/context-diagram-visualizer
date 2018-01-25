@@ -1,15 +1,16 @@
-import json
 import io
+import json
 
 from flask import Blueprint
-from flask import request
 from flask import abort
+from flask import request
 from flask import send_file
 
 from smv import web_utils
-from smv.system_model_state import state
-from smv.system_model import RESPONSE_OK
+from smv.core.model.system_model import RESPONSE_OK
 from smv.search_model import find_connected_graph
+from smv.system_model_state import state
+import smv.core.actions as actions
 
 config = web_utils.web_controller_config(
     controller=Blueprint('system-model', 'system-model'),
@@ -97,7 +98,7 @@ def add_system_node():
     - system
     '''
     node = request.get_json()
-    state.add_vertex(node["name"],type=node["type"])
+    actions.add_system_node(node["name"],type=node["type"])
     return "ok"
 
 @config.controller.route("/system-node", methods=['GET'])

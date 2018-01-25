@@ -1,13 +1,12 @@
-import json
-
 from flask import Blueprint
 from flask import abort
 from flask import request
 
-from smv import web_utils, system_model_visualizer as smv, system_model as sm
+import smv.datamodel_diagram as datamodel_diagram
+from smv import web_utils, system_model_visualizer as smv
+from smv.core.model import system_model as sm
 from smv.system_model_state import state
 from smv.web_utils import build_diagram_response
-import smv.datamodel_diagram as datamodel_diagram
 
 config = web_utils.web_controller_config(
     controller = Blueprint('datamodel', 'datamodel'),

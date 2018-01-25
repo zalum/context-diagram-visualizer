@@ -1,4 +1,4 @@
-from smv import system_model as sm
+from smv.core.model import system_model as sm
 
 
 class component_model_visualizer:
