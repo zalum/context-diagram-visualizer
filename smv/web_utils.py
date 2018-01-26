@@ -15,7 +15,7 @@ class web_controller_config:
 
 
 def build_diagram_response(diagram, output_format,input_format="lines"):
-    if output_format == "plantuml.md":
+    if output_format == "plantuml":
         return smo.writeAsText(diagram)
     else:
         if output_format == "image":

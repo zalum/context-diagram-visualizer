@@ -23,7 +23,7 @@ def draw_component_diagram(component):
       - in: query
         type: string
         name: format
-        enum: ["image","plantuml.md"]
+        enum: ["image","plantuml"]
         default: ["image"]
         required: true
     responses:

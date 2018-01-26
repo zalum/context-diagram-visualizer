@@ -7,6 +7,7 @@ def empty_graph():
 
 RESPONSE_OK = object()
 
+
 class system_model:
     def __init__(self, graphx=None):
         if graphx is None or len(graphx.keys()) == 0:
@@ -14,8 +15,8 @@ class system_model:
         else:
             self.graph = graphx
 
-    def to_json(self):
-        return json.dumps(self.graph)
+    def to_string(self):
+        return json.dumps(self.graph,indent=2)
 
     def get_vertex(self, vertex):
         if vertex not in self.graph["vertexes"]:
