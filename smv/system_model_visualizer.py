@@ -54,7 +54,11 @@ class datamodel_visualizer():
         return drawn_schema
 
     def _draw_table(self, table,colapsed_columns=False):
-        drawn_table = ["class %s {"%table]
+        table_vertex = self.system_model.get_vertex(table)
+        if "name" in table_vertex:
+            drawn_table = ["class \"{}\" as {} {{".format(table_vertex["name"],table)]
+        else:
+            drawn_table = ["class {} {".format(table)]
         columns = self.system_model.get_columns_in_table(table)
         if colapsed_columns == False:
             [drawn_table.extend(self._draw_column(column)) for column in columns]

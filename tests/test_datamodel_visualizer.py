@@ -1,6 +1,7 @@
 import unittest
 
 from smv import system_model_visualizer as svm, system_model as sm
+from smv.system_model import data_model
 
 
 class data_model_visualiser_test(unittest.TestCase):
@@ -146,6 +147,26 @@ class data_model_visualiser_test(unittest.TestCase):
                           "TABLE1::T1_ID --> TABLE2::T2_ID","@enduml"
                           ]
         self.__run_draw_datamodel_test__(graph, expected_result)
+
+    def test_table_with_id(self):
+        # given
+        datamodel = data_model()
+        datamodel.add_vertex("table_1",type="table",name="table 1")
+        datamodel.add_vertex("schema1",type="schema")
+        datamodel.add_edge("schema1","table_1","contains")
+
+
+        #then
+        expected_result = ["@startuml",
+                           "left to right direction",
+                           "package \"schema1\"{",
+                           "class \"table 1\" as table_1 {",
+                           "}",
+                           "}",
+                           "@enduml"]
+
+        self.__run_draw_datamodel_test__(datamodel.graph, expected_result)
+
 
     def test_constructor_when_default_parameter_is_mutated(self):
         """
