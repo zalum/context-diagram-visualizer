@@ -3,19 +3,19 @@ from smv import system_model_visualizer as svm, system_model_output as smo, syst
 
 def get_component_graph():
     return {"vertexes":{
-            "1":{"name":"precedingapp","type":"application"},
-            "2":{"name": "app1","type":"application"},
-            "3":{"name":"app2","type":"application"},
-            "4":{"name":"app3","type":"application"},
-            "5":{"name": "product","type":"product"}
+            "precedingapp":{"name":"precedingapp","type":"application"},
+            "app1":{"name": "app1","type":"application"},
+            "app2":{"name":"app2","type":"application"},
+            "app3":{"name":"app3","type":"application"},
+            "product":{"name": "product","type":"product"}
             },
             "edges":[
-                {"start":"1","end":"2","relation_type":"calls"},
-                {"start":"2","end":"3","relation_type":"calls"},
-                {"start":"3","end":"5","relation_type":"contains"},
-                {"start":"2","end":"5","relation_type":"contains"},
-                {"start":"3","end":"4","relation_type":"calls"},
-                {"start":"4","end":"5","relation_type":"contains"}
+                {"start":"precedingapp","end":"app1","relation_type":"calls"},
+                {"start":"app1","end":"app2","relation_type":"calls"},
+                {"start":"app2","end":"product","relation_type":"contains"},
+                {"start":"app1","end":"product","relation_type":"contains"},
+                {"start":"app2","end":"app3","relation_type":"calls"},
+                {"start":"app3","end":"product","relation_type":"contains"}
                 ]}
 
 

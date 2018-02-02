@@ -4,6 +4,18 @@ from unittest import TestCase
 
 
 class Test(TestCase):
+
+    def test_find_connected_graph_with_missing_from(self):
+        # given
+        model = system_model()
+        model.add_vertex("1", "application")
+
+        # when
+        result = find_connected_graph(model, "2", level=3)
+
+        #then
+        self.assert_models_are_equal(system_model(), result)
+
     def test_find_connected_graph_until_certain_level(self):
         #given
         model = system_model()

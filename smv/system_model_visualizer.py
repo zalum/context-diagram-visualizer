@@ -40,15 +40,15 @@ class datamodel_visualizer():
 
     def draw(self,colapsed_columns = False):
         lines = ["@startuml","left to right direction"]
-        [lines.extend(self._drawSchema(schema,colapsed_columns)) for schema in self.system_model.getSchemas()]
+        [lines.extend(self._draw_database_user(schema, colapsed_columns)) for schema in self.system_model.get_database_users()]
         [lines.extend(self._draw_foreign_key(fk,colapsed_columns)) for fk in self.system_model.get_foreign_keys()]
         lines.append("@enduml")
         return lines
 
 
-    def _drawSchema(self, schema,colapsed_columns = False):
-        tables = self.system_model.get_tables_in_schema(schema)
-        drawn_schema = ["package \"%s\"{"%schema]
+    def _draw_database_user(self, database_user, colapsed_columns = False):
+        tables = self.system_model.get_tables_in_database_user(database_user)
+        drawn_schema = ["package \"%s\"{" % database_user]
         [drawn_schema.extend(self._draw_table(table,colapsed_columns)) for table in tables]
         drawn_schema.append("}")
         return drawn_schema
@@ -58,7 +58,7 @@ class datamodel_visualizer():
         if "name" in table_vertex:
             drawn_table = ["class \"{}\" as {} {{".format(table_vertex["name"],table)]
         else:
-            drawn_table = ["class {} {".format(table)]
+            drawn_table = ["class {} {{".format(table)]
         columns = self.system_model.get_columns_in_table(table)
         if colapsed_columns == False:
             [drawn_table.extend(self._draw_column(column)) for column in columns]
