@@ -32,6 +32,7 @@ class search_criteria():
     def include_relation_types(self,level)->[]:
         return self.level_search_criteria(level)["include_relation_types"]
 
+
 def matching_edge(criteria:search_criteria, model:system_model, current_level, edge):
     if criteria is None:
         return True
@@ -58,6 +59,8 @@ def matching_edge(criteria:search_criteria, model:system_model, current_level, e
 def find_connected_graph(source_model: system_model, from_vertex, criteria = None, level=None, connected_model=None, current_level=0):
     if connected_model is None:
         connected_model = system_model()
+        if not source_model.has_vertex(from_vertex):
+            return connected_model
         connected_model.copy_vertex(source_model, from_vertex)
 
     if level is not None and current_level == level:

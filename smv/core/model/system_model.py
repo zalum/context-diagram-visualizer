@@ -7,6 +7,7 @@ def empty_graph():
 
 RESPONSE_OK = object()
 
+
 class system_model:
     def __init__(self, graphx=None):
         if graphx is None or len(graphx.keys()) == 0:
@@ -14,8 +15,8 @@ class system_model:
         else:
             self.graph = graphx
 
-    def to_json(self):
-        return json.dumps(self.graph)
+    def to_string(self):
+        return json.dumps(self.graph,indent=2)
 
     def get_vertex(self, vertex):
         if vertex not in self.graph["vertexes"]:
@@ -106,6 +107,10 @@ class system_model:
     def get_orphan_vertexes(self, ofType):
         return [v for v in self.get_vertexes_of_type(ofType) if not self._is_vertex_in_edges(v)]
 
+    def set_model(self,new_model:'system_model'):
+        self.graph = empty_graph()
+        self.append(new_model)
+
     def append(self, to_append:'system_model'):
         for vertex in to_append.graph["vertexes"]:
             self.graph["vertexes"][vertex] = dict(to_append.graph["vertexes"][vertex])
@@ -181,8 +186,11 @@ class data_model(system_model):
     def getSchemas(self):
         return self.get_vertexes_of_type("schema")
 
-    def get_tables_in_schema(self, schema):
-        return self.get_children(schema, "table")
+    def get_database_users(self):
+        return self.get_vertexes_of_type("database-user")
+
+    def get_tables_in_database_user(self, database_user):
+        return self.get_children(database_user, "table", "contains")
 
     def get_columns_in_table(self, table):
         return self.get_children(table, "column")

@@ -4,6 +4,21 @@ from smv.core.model import system_model
 
 
 class Test(unittest.TestCase):
+
+    def test_constructor_when_default_parameter_is_mutated(self):
+        """
+        http://docs.python-guide.org/en/latest/writing/gotchas/
+        """
+        #given
+        model = system_model.system_model()
+        model.add_vertex("SCHEMA1","database-user")
+
+        #when
+        model = system_model.system_model()
+
+        #then
+        self.assertDictEqual(model.graph,system_model.empty_graph())
+
     def test_copy_vertex(self):
         #given
         model_source = system_model.system_model()

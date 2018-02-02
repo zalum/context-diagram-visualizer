@@ -1,11 +1,11 @@
 @startuml
 
-class SystemComponent{
+class "Component" as component{
     name
     type: [application,product]
 }
 
-class SystemComponentRelation{
+class "Component Relation" as componentrelation{
     start
     end
     relationType: [contains,calls]
@@ -14,16 +14,16 @@ class SystemComponentRelation{
 class DatamodelRelation{
     start
     end
-    relationType: [contains,fk]
+    relationType: [contains,fk, uses]
 }
 
 class DatamodelObject{
     name
-    type: [database_user, schema, table, column]
+    type: [database_user, table, column]
 }
 
 
 DatamodelObject::name <-- DatamodelRelation:start/end
-SystemComponent::name <-- SystemComponentRelation:start/end
+component::name <-- componentrelation:start/end
 
 @enduml

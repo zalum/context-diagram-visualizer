@@ -14,34 +14,6 @@ config = web_utils.web_controller_config(
 )
 
 
-@config.controller.route("/schema/<string:schema>/diagram", methods=["get"])
-def draw_schema(schema):
-    '''
-    get diagram of schema
-    ---
-    parameters:
-          - in: path
-            type: string
-            name: schema
-            required: true
-          - in: query
-            type: string
-            name: format
-            enum: ["image","plantuml.md"]
-            default: ["image"]
-            required: true
-    responses:
-        200:
-          description: get diagram of schema
-    tags:
-    - datamodel
-    '''
-    schema_datamodel = datamodel_diagram.search_schema(schema)
-    diagram = smv.datamodel_visualizer(schema_datamodel).draw()
-    return build_diagram_response(diagram,request.args.get("format"))
-
-
-
 @config.controller.route("/schema/<string:schema>/table", methods=['POST'])
 def add_table(schema):
     """
@@ -97,7 +69,7 @@ def draw_db_user(user):
       - in: query
         type: string
         name: format
-        enum: ["image","plantuml.md"]
+        enum: ["image","plantuml","graph"]
         default: ["image"]
         required: true
     responses:
@@ -110,6 +82,10 @@ def draw_db_user(user):
     tags:
     - datamodel
     """
+    output_format = request.args.get("format") if "format" in request.args else "image"
     data_model = datamodel_diagram.search_database_user(user)
+    if output_format == "graph":
+        return data_model.to_string()
+
     diagram = smv.datamodel_visualizer(data_model).draw()
-    return build_diagram_response(diagram, request.args.get("format") if "format" in request.args else "image")
+    return build_diagram_response(diagram, output_format)
