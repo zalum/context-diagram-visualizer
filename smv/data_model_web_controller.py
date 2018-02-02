@@ -1,5 +1,3 @@
-import json
-
 from flask import Blueprint
 from flask import abort
 from flask import request
@@ -13,34 +11,6 @@ config = web_utils.web_controller_config(
     controller = Blueprint('datamodel', 'datamodel'),
     url_prefix="/data-model"
 )
-
-
-@config.controller.route("/schema/<string:schema>/diagram", methods=["get"])
-def draw_schema(schema):
-    '''
-    get diagram of schema
-    ---
-    parameters:
-          - in: path
-            type: string
-            name: schema
-            required: true
-          - in: query
-            type: string
-            name: format
-            enum: ["image","plantuml"]
-            default: ["image"]
-            required: true
-    responses:
-        200:
-          description: get diagram of schema
-    tags:
-    - datamodel
-    '''
-    schema_datamodel = datamodel_diagram.search_schema(schema)
-    diagram = smv.datamodel_visualizer(schema_datamodel).draw()
-    output_format = request.args.get("format")
-    return build_diagram_response(diagram, output_format)
 
 
 @config.controller.route("/schema/<string:schema>/table", methods=['POST'])
