@@ -9,7 +9,8 @@ from flask import send_file
 from smv import web_utils
 from smv.core.model.system_model import RESPONSE_OK
 from smv.search_model import find_connected_graph
-from smv.system_model_state import state
+from smv.core.model import system_models_repository
+
 import smv.core.actions as actions
 
 config = web_utils.web_controller_config(
@@ -43,6 +44,7 @@ def get_node_graph(node):
     level = request.args.get("level")
     if level is not None:
         level = int(level)
+    state = system_models_repository.get_full_system_model()
     return find_connected_graph(state,node,level=level).to_string()
 
 @config.controller.route("/system-node/<string:node>",methods=['GET'])
@@ -64,6 +66,7 @@ def get_node(node):
     tags:
     - system
     '''
+    state = system_models_repository.get_full_system_model()
     return json.dumps(state.get_vertex(node), indent=2)
 
 
@@ -98,7 +101,7 @@ def add_system_node():
     - system
     '''
     node = request.get_json()
-    actions.add_system_node(node["name"],type=node["type"])
+    actions.add_system_node(node["name"], system_node_type=node["type"])
     return "ok"
 
 @config.controller.route("/system-node", methods=['GET'])
@@ -131,6 +134,7 @@ def list_nodes():
     format = request.args.get("format")
     if node_type is None:
         return abort(400,"Type cannot be null")
+    state = system_models_repository.get_full_system_model()
     nodes = state.get_vertexes_of_type(node_type)
     if format == "full":
         result = dict()
@@ -175,6 +179,7 @@ def create_relation():
     - system
     '''
     relation = request.get_json()
+    state = system_models_repository.get_full_system_model()
     result = state.add_edge(start=relation["start"], end=relation["end"], relation_type=relation["relation_type"])
     if result is RESPONSE_OK:
         return "ok"
@@ -197,6 +202,7 @@ def persist_state():
     - system
     """
     f = open("graph.json", 'w')
+    state = system_models_repository.get_full_system_model()
     content = state.to_string()
     f.write(content)
     f.close()
@@ -216,6 +222,7 @@ def download_state():
     tags:
     - system
     """
+    state = system_models_repository.get_full_system_model()
     content = state.to_string()
     return send_file(io.BytesIO(bytes(content,"UTF-8")), mimetype="text/plain")
 
@@ -249,6 +256,7 @@ def get_direct_connections(node):
     tags:
      - system
     '''
+    state = system_models_repository.get_full_system_model()
     vertex = state.get_vertex(node)
     type = request.args.get("type")
     relation_type = request.args.get("relation-type")

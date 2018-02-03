@@ -4,7 +4,6 @@ import json
 def empty_graph():
     return {"vertexes": {}, "edges": []}
 
-
 RESPONSE_OK = object()
 
 

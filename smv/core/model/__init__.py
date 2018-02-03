@@ -1,0 +1,3 @@
+from smv.core.infrastructure.file_system_model_repository import FileSystemModelsRepository
+
+system_models_repository = FileSystemModelsRepository()

@@ -1,5 +1,5 @@
-from smv.system_model_state import state
+from smv.core.model import system_models_repository
 
 
-def add_system_node(id,type):
-    state.add_vertex(id, type=type)
+def add_system_node(system_node_id, system_node_type):
+    system_models_repository.add_vertex(system_node_id, system_node_type=system_node_type)

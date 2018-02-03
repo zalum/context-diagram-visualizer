@@ -5,7 +5,7 @@ from flask import request
 import smv.datamodel_diagram as datamodel_diagram
 from smv import web_utils, system_model_visualizer as smv
 from smv.core.model import system_model as sm
-from smv.system_model_state import state
+from smv.core.model import system_models_repository
 from smv.web_utils import build_diagram_response
 
 config = web_utils.web_controller_config(
@@ -45,6 +45,7 @@ def add_table(schema):
           description: Created a table
     """
     table = request.get_json()
+    state = system_models_repository.get_full_system_model()
     if state.has_vertex(schema) is False:
         return abort(404,"Schema {} does not exist".format(schema))
     table_name = table["name"]
