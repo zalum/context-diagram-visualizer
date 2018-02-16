@@ -11,38 +11,38 @@ class Test(unittest.TestCase):
         """
         http://docs.python-guide.org/en/latest/writing/gotchas/
         """
-        #given
+        # given
         model = system_model.system_model()
-        model.add_vertex("SCHEMA1","database-user")
+        model.add_system_node("SCHEMA1", "database-user")
 
-        #when
+        # when
         model = system_model.system_model()
 
-        #then
+        # then
         self.assertDictEqual(model.graph,system_model.empty_graph())
 
     def test_copy_vertex(self):
-        #given
+        # given
         model_source = system_model.system_model()
-        model_source.add_vertex("1","application",x=1,y=2)
+        model_source.add_system_node("1", "application", x=1, y=2)
         model_target = system_model.system_model()
 
-        #when
+        # when
         model_target.copy_vertex(model_source,"1")
 
-        #then
+        # then
         self.assertDictEqual(model_target.get_vertex("1"),model_source.get_vertex("1"))
 
     def test_add_vertex(self):
-        #given
+        # given
         model = system_model.system_model()
         properties = dict(name="xxx",other="yyy")
 
-        #when
-        response = model.add_vertex("1","app",**properties)
+        # when
+        response = model.add_system_node("1", "app", **properties)
         properties["name"] = "zzz"
 
-        #then
+        # then
         self.assertEquals(response.return_code, RESPONSE_OK)
         properties["type"] = "app"
         properties["name"] = "xxx"
@@ -53,10 +53,10 @@ class Test(unittest.TestCase):
     def test_add_vertex_with_existing_node(self):
         # given
         model = system_model.system_model()
-        model.add_vertex("1",type="application")
+        model.add_system_node("1", type="application")
 
         # when
-        result = model.add_vertex("1",type="application")
+        result = model.add_system_node("1", type="application")
 
         # then
         self.assertEquals(result.return_code,RESPONSE_ERROR)
@@ -64,80 +64,80 @@ class Test(unittest.TestCase):
 
 
     def test_find_direct_connections(self):
-        #given
+        # given
         model = system_model.system_model()
-        model.add_vertex("v1", "product")
-        model.add_vertex("v2", "application")
+        model.add_system_node("v1", "product")
+        model.add_system_node("v2", "application")
         model.add_edge("v1","v2","contains")
 
-        #when
+        # when
         result = model.find_direct_connections("v1")
 
-        #then
+        # then
         self.assertIsNotNone(result)
         self.assertIn("v2",result)
 
 
     def test_find_direct_connections_of_vertex_type(self):
-        #given
+        # given
         model = system_model.system_model()
-        model.add_vertex("v1", "product")
-        model.add_vertex("v2", "application")
-        model.add_vertex("v3", "database-user")
-        model.add_vertex("v4", "application")
-        model.add_vertex("v5", "application")
+        model.add_system_node("v1", "product")
+        model.add_system_node("v2", "application")
+        model.add_system_node("v3", "database-user")
+        model.add_system_node("v4", "application")
+        model.add_system_node("v5", "application")
         model.add_edge("v1","v2","contains")
         model.add_edge("v1","v4","contains")
         model.add_edge("v1","v3","uses")
 
-        #when
+        # when
         result = model.find_direct_connections("v1","application")
 
-        #then
+        # then
         self.assertIsNotNone(result)
         self.assertEqual(len(result),2)
         self.assertIn("v2",result)
         self.assertIn("v4",result)
 
     def test_find_direct_connections_of_vertex_and_relation_type(self):
-        #given
+        # given
         model = system_model.system_model()
-        model.add_vertex("v1", "product")
-        model.add_vertex("v2", "application")
-        model.add_vertex("v3", "database-user")
-        model.add_vertex("v4", "application")
-        model.add_vertex("v5", "application")
+        model.add_system_node("v1", "product")
+        model.add_system_node("v2", "application")
+        model.add_system_node("v3", "database-user")
+        model.add_system_node("v4", "application")
+        model.add_system_node("v5", "application")
         model.add_edge("v1","v2","contains")
         model.add_edge("v1","v4","contains")
         model.add_edge("v1","v5","calls")
         model.add_edge("v1","v3","uses")
 
-        #when
+        # when
         result = model.find_direct_connections("v1","application","contains")
 
-        #then
+        # then
         self.assertIsNotNone(result)
         self.assertEqual(len(result),2)
         self.assertIn("v2",result)
         self.assertIn("v4",result)
 
     def test_find_direct_connections_of_relation_type(self):
-        #given
+        # given
         model = system_model.system_model()
-        model.add_vertex("v1", "product")
-        model.add_vertex("v2", "application")
-        model.add_vertex("v3", "database-user")
-        model.add_vertex("v4", "application")
-        model.add_vertex("v5", "application")
+        model.add_system_node("v1", "product")
+        model.add_system_node("v2", "application")
+        model.add_system_node("v3", "database-user")
+        model.add_system_node("v4", "application")
+        model.add_system_node("v5", "application")
         model.add_edge("v1","v2","contains")
         model.add_edge("v1","v4","contains")
         model.add_edge("v1","v5","calls")
         model.add_edge("v1","v3","contains")
 
-        #when
+        # when
         result = model.find_direct_connections("v1",relation_type="contains")
 
-        #then
+        # then
         self.assertIsNotNone(result)
         self.assertEqual(len(result),3)
         self.assertIn("v2",result)
@@ -145,7 +145,7 @@ class Test(unittest.TestCase):
         self.assertIn("v4",result)
 
     def test_append(self):
-        #given
+        # given
         graph1 = dict(
             vertexes={
                 "product": {"type": "product"},
@@ -168,11 +168,11 @@ class Test(unittest.TestCase):
 
         system_model1 = system_model.system_model(graph1)
 
-        #when
+        # when
         system_model1.append(system_model.system_model(graph2));
 
 
-        #then
+        # then
         expected = dict(
             vertexes={
                 "product": {"type": "product"},
@@ -189,116 +189,156 @@ class Test(unittest.TestCase):
         self.assertDictEqual(system_model1.graph,expected)
 
     def test_append_duplicated_edges(self):
-        #given
+        # given
         model1 = system_model.system_model()
-        model1.add_vertex("1","product")
-        model1.add_vertex("2","product")
+        model1.add_system_node("1", "product")
+        model1.add_system_node("2", "product")
         model1.add_edge("1","2","uses")
 
         model2 = system_model.system_model()
-        model2.add_vertex("1","product")
-        model2.add_vertex("2","product")
-        model2.add_vertex("3","product")
+        model2.add_system_node("1", "product")
+        model2.add_system_node("2", "product")
+        model2.add_system_node("3", "product")
         model2.add_edge("1","2","uses")
         model2.add_edge("1","3","uses")
 
-        #when
+        # when
         model1.append(model2)
 
-        #then
+        # then
         expected = system_model.system_model()
-        expected.add_vertex("1", "product")
-        expected.add_vertex("2", "product")
-        expected.add_vertex("3", "product")
+        expected.add_system_node("1", "product")
+        expected.add_system_node("2", "product")
+        expected.add_system_node("3", "product")
         expected.add_edge("1", "2", "uses")
         expected.add_edge("1", "3", "uses")
 
         self.assertEquals(expected.graph,expected.graph)
 
     def test_append_edges_with_no_relation_type(self):
-        #given
+        # given
         model1 = system_model.system_model()
-        model1.add_vertex("1","product")
-        model1.add_vertex("2","product")
+        model1.add_system_node("1", "product")
+        model1.add_system_node("2", "product")
         model1.add_edge("1","2","uses")
 
         model2 = system_model.system_model()
-        model2.add_vertex("1","product")
-        model2.add_vertex("2","product")
-        model2.add_vertex("3","product")
+        model2.add_system_node("1", "product")
+        model2.add_system_node("2", "product")
+        model2.add_system_node("3", "product")
         model2.add_edge("1","3")
 
-        #when
+        # when
         model1.append(model2)
 
-        #then
+        # then
         expected = system_model.system_model()
-        expected.add_vertex("1", "product")
-        expected.add_vertex("2", "product")
-        expected.add_vertex("3", "product")
+        expected.add_system_node("1", "product")
+        expected.add_system_node("2", "product")
+        expected.add_system_node("3", "product")
         expected.add_edge("1", "2", "uses")
         expected.add_edge("1", "3")
 
         self.assertEquals(model1.graph,expected.graph)
 
+    def test_add_relation_with_missing_node(self):
+        # given
+        model = system_model.system_model()
+        model.add_system_node("1", "product")
+
+        # when
+        result = model.add_edge("1", "2", "fk")
+
+        # then
+        self.assertEquals(result.return_code, RESPONSE_ERROR)
+        self.assertEquals(result.content, "End node '2' is not in the model")
 
 
     def test_add_edge_duplication(self):
-        #given
+        # given
         model = system_model.system_model()
-        model.add_vertex("1","product")
-        model.add_vertex("2","application")
+        model.add_system_node("1", "product")
+        model.add_system_node("2", "application")
         model.add_edge("1","2","fk")
 
-        #when
+        # when
         result = model.add_edge("1", "2","fk")
 
-        #then
-        self.assertEquals(result, system_model.RESPONSE_OK)
+        # then
+        self.assertEquals(result.return_code, RESPONSE_ERROR)
         self.assertEquals(len(model.get_edges()),1)
 
     def test_add_edge_duplication_with_no_relation_type(self):
-        #given
+        # given
         model = system_model.system_model()
-        model.add_vertex("1","product")
-        model.add_vertex("2","application")
+        model.add_system_node("1", "product")
+        model.add_system_node("2", "application")
         model.add_edge("1","2")
 
-        #when
+        # when
         result = model.add_edge("1", "2")
 
-        #then
-        self.assertEquals(result, system_model.RESPONSE_OK)
+        # then
+        self.assertEquals(result.return_code, RESPONSE_ERROR)
         self.assertEquals(len(model.get_edges()),1)
 
-    def test_add_edge_duplication(self):
-        #given
+    def test_add_edge_duplication_with_different_relation_type(self):
+        # given
         model = system_model.system_model()
-        model.add_vertex("1","product")
-        model.add_vertex("2","application")
+        model.add_system_node("1", "product")
+        model.add_system_node("2", "application")
         model.add_edge("1","2","fk")
 
-        #when
+        # when
         result = model.add_edge("1", "2","uses")
 
-        #then
-        self.assertEquals(result, system_model.RESPONSE_OK)
+        # then
+        self.assertEquals(result.return_code, RESPONSE_OK)
         self.assertEquals(len(model.get_edges()),2)
         self.assertEquals(len(model.get_edges_of_type("fk")),1)
         self.assertEquals(len(model.get_edges_of_type("uses")),1)
 
     def test_add_edge_with_corrupted_model(self):
-        #given
+        # given
         graph = dict(vertexes = {"1":{},"2":{}}, edges=[{"start":"1","end":"2"},{"start":"1","end":"2"}])
 
 
         model = system_model.system_model(graph)
 
-        #when
+        # when
         result = model.add_edge("1", "2")
 
-        #then
-        self.assertNotEquals(result, system_model.RESPONSE_OK)
-        self.assertEquals(result,"more then one edge (2) found for (start=1 end=2 relation_type=None)")
+        # then
+        self.assertEquals(result.return_code, RESPONSE_ERROR)
+        self.assertEquals(result.content,"more then one edge (2) found for (start=1 end=2 relation_type=None)")
+
+    def test_remove_edge(self):
+        # given
+        model = system_model.system_model()
+        model.add_system_node("1", "app")
+        model.add_system_node("2", "app")
+        model.add_edge(start="1",end="2",relation_type="some_1")
+        model.add_edge(start="1",end="2",relation_type="some_2")
+
+        # when
+        response = model.remove_edge(start="1", end="2", relation_type="some_1")
+
+        # then
+        self.assertEquals(response.return_code, RESPONSE_OK)
+        self.assertEquals(len(model.get_edges()),1)
+
+    def test_remove_missing_edge(self):
+        # given
+        model = system_model.system_model()
+        model.add_system_node("1", "app")
+        model.add_system_node("2", "app")
+        model.add_edge(start="1",end="2",relation_type="some_2")
+
+        # when
+        response = model.remove_edge(start="1", end="2", relation_type="some_1")
+
+        # then
+        self.assertEquals(response.return_code, RESPONSE_ERROR)
+        self.assertEquals(len(model.get_edges()),1)
 
 

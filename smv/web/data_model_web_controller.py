@@ -50,7 +50,7 @@ def add_table(schema):
         return abort(404,"Schema {} does not exist".format(schema))
     table_name = table["name"]
     table_model = sm.data_model()
-    table_model.add_vertex(table_name,"table")
+    table_model.add_system_node(table_name, "table")
     [table_model.add_column(column,table_name) for column in table["columns"]]
     state.append(table_model)
     state.add_edge(start=schema,end=table_name,relation_type="contains")

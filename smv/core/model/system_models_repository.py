@@ -9,6 +9,9 @@ class SystemModelsRepository(object):
     def get_full_system_model(self)-> system_model:
         pass
 
+    def set_model(self, system_mode):
+        pass
+
 
 
 

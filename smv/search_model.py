@@ -71,7 +71,7 @@ def find_connected_graph(source_model: system_model, from_vertex, criteria = Non
         if matching_edge(criteria, source_model, current_level, edge) is False:
             continue
         adjacent_vertex = source_model.get_related_vertex(vertex=from_vertex, edge=edge)
-        if adjacent_vertex not in source_model.graph["vertexes"]:
+        if source_model.has_vertex(adjacent_vertex) is False:
             continue
         if connected_model.get_vertex(adjacent_vertex) is None:
             connected_model.copy_vertex(source_model, adjacent_vertex)

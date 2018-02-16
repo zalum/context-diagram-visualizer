@@ -9,7 +9,7 @@ class Test(TestCase):
     def test_find_connected_graph_with_missing_from(self):
         # given
         model = system_model()
-        model.add_vertex("1", "application")
+        model.add_system_node("1", "application")
 
         # when
         result = find_connected_graph(model, "2", level=3)
@@ -20,11 +20,11 @@ class Test(TestCase):
     def test_find_connected_graph_until_certain_level(self):
         #given
         model = system_model()
-        model.add_vertex("1","application")
-        model.add_vertex("2","application")
-        model.add_vertex("3","application")
-        model.add_vertex("4","application")
-        model.add_vertex("5","application")
+        model.add_system_node("1", "application")
+        model.add_system_node("2", "application")
+        model.add_system_node("3", "application")
+        model.add_system_node("4", "application")
+        model.add_system_node("5", "application")
         model.add_edge("1","2")
         model.add_edge("2","3")
         model.add_edge("3","4")
@@ -35,10 +35,10 @@ class Test(TestCase):
 
         #then
         expected = system_model()
-        expected.add_vertex("1","application")
-        expected.add_vertex("2","application")
-        expected.add_vertex("3","application")
-        expected.add_vertex("4","application")
+        expected.add_system_node("1", "application")
+        expected.add_system_node("2", "application")
+        expected.add_system_node("3", "application")
+        expected.add_system_node("4", "application")
         expected.add_edge("1","2")
         expected.add_edge("2","3")
         expected.add_edge("3","4")
@@ -115,17 +115,17 @@ class Test(TestCase):
 
         #then
         expected = system_model()
-        expected.add_vertex("product","product")
-        expected.add_vertex("application1","application")
+        expected.add_system_node("product", "product")
+        expected.add_system_node("application1", "application")
         expected.add_edge("product","application1","contains")
         self.assert_models_are_equal(expected,result)
 
     def test_find_connected_graph_with_empty_criteria(self):
         #given
         model = system_model()
-        model.add_vertex("user","user")
-        model.add_vertex("table1","table")
-        model.add_vertex("schema","schema")
+        model.add_system_node("user", "user")
+        model.add_system_node("table1", "table")
+        model.add_system_node("schema", "schema")
         model.add_edge("user","table1","uses")
         model.add_edge("user","schema","uses")
 
@@ -136,9 +136,9 @@ class Test(TestCase):
 
         #then
         expected = system_model()
-        expected.add_vertex("user", "user")
-        expected.add_vertex("table1", "table")
-        expected.add_vertex("schema", "schema")
+        expected.add_system_node("user", "user")
+        expected.add_system_node("table1", "table")
+        expected.add_system_node("schema", "schema")
         expected.add_edge("user", "table1", "uses")
         expected.add_edge("user", "schema", "uses")
         self.assert_models_are_equal(expected, result)
@@ -172,9 +172,9 @@ class Test(TestCase):
     def test_search_criteria_by_vertex_type(self):
         #given
         model = system_model()
-        model.add_vertex("user","user")
-        model.add_vertex("table1","table")
-        model.add_vertex("schema","schema")
+        model.add_system_node("user", "user")
+        model.add_system_node("table1", "table")
+        model.add_system_node("schema", "schema")
         model.add_edge("user","table1","uses")
         model.add_edge("user","schema","uses")
 
@@ -185,8 +185,8 @@ class Test(TestCase):
 
         #then
         expected = system_model()
-        expected.add_vertex("user", "user")
-        expected.add_vertex("table1", "table")
+        expected.add_system_node("user", "user")
+        expected.add_system_node("table1", "table")
         expected.add_edge("user", "table1", "uses")
         self.assertIsNotNone(result)
         self.assert_models_are_equal(expected, result)
@@ -194,10 +194,10 @@ class Test(TestCase):
     def test_search_criteria_by_multiple_vertex_types(self):
         #given
         model = system_model()
-        model.add_vertex("user","user")
-        model.add_vertex("table1","table")
-        model.add_vertex("schema","schema")
-        model.add_vertex("xxx","xxx")
+        model.add_system_node("user", "user")
+        model.add_system_node("table1", "table")
+        model.add_system_node("schema", "schema")
+        model.add_system_node("xxx", "xxx")
         model.add_edge("user","table1","uses")
         model.add_edge("user","schema","uses")
         model.add_edge("user","xxx","uses")
@@ -208,9 +208,9 @@ class Test(TestCase):
 
         #then
         expected = system_model()
-        expected.add_vertex("user", "user")
-        expected.add_vertex("table1", "table")
-        expected.add_vertex("schema", "schema")
+        expected.add_system_node("user", "user")
+        expected.add_system_node("table1", "table")
+        expected.add_system_node("schema", "schema")
         expected.add_edge("user", "table1", "uses")
         expected.add_edge("user", "schema", "uses")
         self.assertIsNotNone(result)
@@ -219,9 +219,9 @@ class Test(TestCase):
     def test_search_criteria_by_relation_type(self):
         #given
         model = system_model()
-        model.add_vertex("user","user")
-        model.add_vertex("table1","table")
-        model.add_vertex("schema","schema")
+        model.add_system_node("user", "user")
+        model.add_system_node("table1", "table")
+        model.add_system_node("schema", "schema")
         model.add_edge("user","table1","uses")
         model.add_edge("user","schema","xxx")
 
@@ -232,8 +232,8 @@ class Test(TestCase):
 
         #then
         expected = system_model()
-        expected.add_vertex("user", "user")
-        expected.add_vertex("table1", "table")
+        expected.add_system_node("user", "user")
+        expected.add_system_node("table1", "table")
         expected.add_edge("user", "table1", "uses")
         self.assertIsNotNone(result)
         self.assert_models_are_equal(expected,result)
@@ -241,13 +241,13 @@ class Test(TestCase):
     def test_search_criteria_multilevel(self):
         #given
         model = system_model()
-        model.add_vertex("user","user")
-        model.add_vertex("table1","table")
-        model.add_vertex("table2","table")
-        model.add_vertex("table3","table")
-        model.add_vertex("column1","column")
-        model.add_vertex("schema","schema")
-        model.add_vertex("column2","column")
+        model.add_system_node("user", "user")
+        model.add_system_node("table1", "table")
+        model.add_system_node("table2", "table")
+        model.add_system_node("table3", "table")
+        model.add_system_node("column1", "column")
+        model.add_system_node("schema", "schema")
+        model.add_system_node("column2", "column")
         model.add_edge("user","table1","uses")
         model.add_edge("schema","table1","contains")
         model.add_edge("schema","table2","contains")
@@ -263,12 +263,12 @@ class Test(TestCase):
         #then
         result = find_connected_graph(model,"user", criteria=criteria)
         expected_model = system_model()
-        expected_model.add_vertex("user", "user")
-        expected_model.add_vertex("table1", "table")
-        expected_model.add_vertex("table2", "table")
-        expected_model.add_vertex("column1", "column")
-        expected_model.add_vertex("schema", "schema")
-        expected_model.add_vertex("column2", "column")
+        expected_model.add_system_node("user", "user")
+        expected_model.add_system_node("table1", "table")
+        expected_model.add_system_node("table2", "table")
+        expected_model.add_system_node("column1", "column")
+        expected_model.add_system_node("schema", "schema")
+        expected_model.add_system_node("column2", "column")
         expected_model.add_edge("user", "table1", "uses")
         expected_model.add_edge("schema", "table1", "contains")
         expected_model.add_edge("schema", "table2", "contains")

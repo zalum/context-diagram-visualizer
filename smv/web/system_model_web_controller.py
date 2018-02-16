@@ -7,7 +7,7 @@ from flask import request
 from flask import send_file
 
 from smv import web_utils
-from smv.core.model.system_model import RESPONSE_OK
+from smv.core.model.system_model import RESPONSE_OK_deprecated
 from smv.search_model import find_connected_graph
 from smv.core.model import system_models_repository
 
@@ -181,7 +181,7 @@ def create_relation():
     relation = request.get_json()
     state = system_models_repository.get_full_system_model()
     result = state.add_edge(start=relation["start"], end=relation["end"], relation_type=relation["relation_type"])
-    if result is RESPONSE_OK:
+    if result is RESPONSE_OK_deprecated:
         return "ok"
     else:
         abort(400,result)

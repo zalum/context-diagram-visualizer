@@ -2,7 +2,7 @@ import unittest
 
 
 from smv import system_model_visualizer as svm
-from smv.core.model.system_model import data_model, system_model as sm
+import smv.core.model.system_model as sm
 
 
 
@@ -117,11 +117,11 @@ class data_model_visualiser_test(unittest.TestCase):
 
     def test_draw_database_user_uses_tables(self):
         # given
-        model = data_model()
-        model.add_vertex("user1","database-user")
-        model.add_vertex("schema","database-user")
-        model.add_vertex("table","table")
-        model.add_vertex("c1","column")
+        model = sm.data_model()
+        model.add_system_node("user1", "database-user")
+        model.add_system_node("schema", "database-user")
+        model.add_system_node("table", "table")
+        model.add_system_node("c1", "column")
         model.add_edge("user1","table","uses")
         model.add_edge("schema","table","contains")
         model.add_edge("c1","table","contains")
@@ -180,9 +180,9 @@ class data_model_visualiser_test(unittest.TestCase):
 
     def test_table_with_id(self):
         # given
-        datamodel = data_model()
-        datamodel.add_vertex("table_1", type="table",name="table 1")
-        datamodel.add_vertex("schema1", type="database-user")
+        datamodel = sm.data_model()
+        datamodel.add_system_node("table_1", type="table", name="table 1")
+        datamodel.add_system_node("schema1", type="database-user")
         datamodel.add_edge("schema1","table_1","contains")
 
 

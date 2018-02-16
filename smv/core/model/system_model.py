@@ -1,10 +1,12 @@
 import json
 from smv.core import Response
+from smv.core import RESPONSE_OK
+from smv.core import RESPONSE_ERROR
 
 def empty_graph():
     return {"vertexes": {}, "edges": []}
 
-RESPONSE_OK = object()
+RESPONSE_OK_deprecated = object()
 
 
 class system_model:
@@ -50,7 +52,7 @@ class system_model:
     def does_vertex_exists(self, key):
         return key in self.graph["vertexes"]
 
-    def add_vertex(self, key, type, **kwargs):
+    def add_system_node(self, key, type, **kwargs):
         if key in self.graph["vertexes"]:
             return Response.error("System Node '{}' already exists".format(key))
         self.graph["vertexes"][key] = kwargs
@@ -59,19 +61,19 @@ class system_model:
 
     def add_edge(self, start, end, relation_type=None):
         if self.get_vertex(start) is None:
-            return "Start node is not in the model"
+            return Response.error("Start node '{}' is not in the model".format(start))
         if self.get_vertex(end) is None:
-            return "End node is not in the model"
+            return Response.error("End node '{}' is not in the model".format(end))
         result = self.get_edge(start=start, end=end, relation_type=relation_type)
-        if result is None:
+        if result.return_code == RESPONSE_OK:
+            return Response.error("edge already exists")
+        if result.content == "not found":
             result = {"start": start, "end": end}
             if relation_type is not None:
                 result["relation_type"] = relation_type
             self.graph["edges"].append(result)
-        else:
-            if type(result) != dict:
-                return result
-        return RESPONSE_OK
+            return Response.success()
+        return Response.error(result.content)
 
     def get_related_vertex(self, vertex, edge):
         return edge["start"] if edge["end"] == vertex else edge["end"]
@@ -92,7 +94,7 @@ class system_model:
     def copy_vertex(self,from_model: 'system_model', vertex):
         vertex_value = dict(from_model.get_vertex(vertex))
         type = vertex_value.pop("type")
-        self.add_vertex(vertex, type, **vertex_value)
+        self.add_system_node(vertex, type, **vertex_value)
 
 
     def _is_vertex_in_edges(self, vertex):
@@ -131,11 +133,18 @@ class system_model:
             filter(lambda edge: system_model.is_edge_of_type(edge, relation_type),
                    filter(lambda edge: start == edge["start"] and end == edge["end"], self.get_edges())))
         if edges is None or len(edges) == 0:
-            return None
+            return Response.error("not found")
         if len(edges) > 1:
-            return "more then one edge ({}) found for (start={} end={} relation_type={})". \
-                format(len(edges), start, end, relation_type)
-        return edges[0]
+            return Response.error("more then one edge ({}) found for (start={} end={} relation_type={})". \
+                format(len(edges), start, end, relation_type))
+        return Response.success(edges[0])
+
+    def remove_edge(self, start, end, relation_type):
+        result = self.get_edge(start, end, relation_type)
+        if result.return_code == RESPONSE_ERROR:
+            return result
+        self.graph["edges"].remove(result.content)
+        return Response.success()
 
 
 class component_model(system_model):
@@ -162,14 +171,14 @@ class component_model(system_model):
 
 class data_model(system_model):
     def add_schema(self, schema):
-        self.add_vertex(schema, "schema")
+        self.add_system_node(schema, "schema")
 
     def add_column(self, column, table):
-        self.add_vertex(column, "column")
+        self.add_system_node(column, "column")
         self.add_edge(column, table)
 
     def add_table(self, table, schema):
-        self.add_vertex(table, "table")
+        self.add_system_node(table, "table")
         self.add_edge(table, schema)
 
     def _isTable(self, vertex):
