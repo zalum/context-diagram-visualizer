@@ -2,6 +2,8 @@ import unittest
 
 from smv.core.model import system_model
 
+from smv.core import *
+
 
 class Test(unittest.TestCase):
 
@@ -37,13 +39,28 @@ class Test(unittest.TestCase):
         properties = dict(name="xxx",other="yyy")
 
         #when
-        model.add_vertex("1","app",**properties)
+        response = model.add_vertex("1","app",**properties)
         properties["name"] = "zzz"
 
         #then
+        self.assertEquals(response.return_code, RESPONSE_OK)
+        properties["type"] = "app"
+        properties["name"] = "xxx"
+        self.assertEquals(response.content, {"1":properties})
         expected = dict(name="xxx",other="yyy",type = "app")
         self.assertDictEqual(expected,model.get_vertex("1"))
 
+    def test_add_vertex_with_existing_node(self):
+        # given
+        model = system_model.system_model()
+        model.add_vertex("1",type="application")
+
+        # when
+        result = model.add_vertex("1",type="application")
+
+        # then
+        self.assertEquals(result.return_code,RESPONSE_ERROR)
+        self.assertEquals(result.content,"System Node '1' already exists")
 
 
     def test_find_direct_connections(self):

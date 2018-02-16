@@ -101,8 +101,8 @@ def add_system_node():
     - system
     '''
     node = request.get_json()
-    actions.add_system_node(node["name"], system_node_type=node["type"])
-    return "ok"
+    response = actions.add_system_node(node["name"], system_node_type=node["type"])
+    return web_utils.build_response(response)
 
 @config.controller.route("/system-node", methods=['GET'])
 def list_nodes():

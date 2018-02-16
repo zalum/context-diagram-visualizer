@@ -31,4 +31,4 @@ class FileSystemModelsRepository(SystemModelsRepository):
         return self.state
 
     def add_vertex(self, system_node_id, system_node_type):
-        self.state.add_vertex(system_node_id,system_node_type)
+        return self.state.add_vertex(system_node_id,system_node_type)

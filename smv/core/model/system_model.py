@@ -1,5 +1,5 @@
 import json
-
+from smv.core import Response
 
 def empty_graph():
     return {"vertexes": {}, "edges": []}
@@ -52,9 +52,10 @@ class system_model:
 
     def add_vertex(self, key, type, **kwargs):
         if key in self.graph["vertexes"]:
-            return
+            return Response.error("System Node '{}' already exists".format(key))
         self.graph["vertexes"][key] = kwargs
         self.graph["vertexes"][key]["type"] = type
+        return Response.success({key: self.get_vertex(key)})
 
     def add_edge(self, start, end, relation_type=None):
         if self.get_vertex(start) is None:

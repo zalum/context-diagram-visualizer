@@ -1,5 +1,6 @@
 from flasgger import Swagger
 from flask import Flask
+from werkzeug.utils import redirect
 
 from smv.web.component_model_web_controller import config as cm_web
 from smv.web.data_model_web_controller import config as dm_web
@@ -27,13 +28,14 @@ def init_api_specification(app):
 
 def main():
     app = Flask(__name__)
+    app.add_url_rule(rule="/", view_func=lambda: redirect("/api-docs"))
     app.register_blueprint(cm_web.controller, url_prefix=cm_web.url_prefix)
     app.register_blueprint(dm_web.controller, url_prefix=dm_web.url_prefix)
     app.register_blueprint(sm_web.controller, url_prefix=sm_web.url_prefix)
     app.register_blueprint(sm_web.controller, url_prefix=sm_web.url_prefix)
     app.register_blueprint(plantuml_web.controller, url_prefix=plantuml_web.url_prefix)
     init_api_specification(app)
-    app.run()
+    app.run(port=8080,debug=False,host="0.0.0.0")
 
 
 if __name__ == "__main__":

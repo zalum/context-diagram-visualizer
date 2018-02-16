@@ -1,7 +1,20 @@
 from flask import abort
 from flask import send_file
+import json
 
 from smv import system_model_output as smo
+from smv.core import *
+
+
+def build_response(response:Response):
+    if response.return_code == RESPONSE_OK:
+        if type(response.content) == dict:
+            return json.dumps(response.content, indent=2)
+        else:
+            return response.content
+    else:
+        if response.return_code == RESPONSE_ERROR:
+            return abort(400, response.content)
 
 
 def rule_filter(matchers):
