@@ -123,7 +123,7 @@ class DatamodelDiagramTest(unittest.TestCase):
 
     def assert_models_are_equal(self, model1: data_model, model2: data_model):
         self.assertDictEqual(model1.graph["vertexes"],model2.graph["vertexes"])
-        self.assertSetEqual(set(hash(frozenset(edge.items())) for edge in model1.graph["edges"]),
-                            set(hash(frozenset(edge.items())) for edge in model2.graph["edges"]))
+        self.assertSetEqual(set(hash(frozenset(edge.items())) for edge in model1.get_relations()),
+                            set(hash(frozenset(edge.items())) for edge in model2.get_relations()))
 
 

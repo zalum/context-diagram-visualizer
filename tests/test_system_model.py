@@ -266,7 +266,7 @@ class Test(unittest.TestCase):
 
         # then
         self.assertEquals(result.return_code, RESPONSE_ERROR)
-        self.assertEquals(len(model.get_edges()),1)
+        self.assertEquals(len(model.get_relations()), 1)
 
     def test_add_edge_duplication_with_no_relation_type(self):
         # given
@@ -280,7 +280,7 @@ class Test(unittest.TestCase):
 
         # then
         self.assertEquals(result.return_code, RESPONSE_ERROR)
-        self.assertEquals(len(model.get_edges()),1)
+        self.assertEquals(len(model.get_relations()), 1)
 
     def test_add_edge_duplication_with_different_relation_type(self):
         # given
@@ -294,7 +294,7 @@ class Test(unittest.TestCase):
 
         # then
         self.assertEquals(result.return_code, RESPONSE_OK)
-        self.assertEquals(len(model.get_edges()),2)
+        self.assertEquals(len(model.get_relations()), 2)
         self.assertEquals(len(model.get_edges_of_type("fk")),1)
         self.assertEquals(len(model.get_edges_of_type("uses")),1)
 
@@ -325,7 +325,7 @@ class Test(unittest.TestCase):
 
         # then
         self.assertEquals(response.return_code, RESPONSE_OK)
-        self.assertEquals(len(model.get_edges()),1)
+        self.assertEquals(len(model.get_relations()), 1)
 
     def test_remove_missing_edge(self):
         # given
@@ -339,6 +339,6 @@ class Test(unittest.TestCase):
 
         # then
         self.assertEquals(response.return_code, RESPONSE_ERROR)
-        self.assertEquals(len(model.get_edges()),1)
+        self.assertEquals(len(model.get_relations()), 1)
 
 

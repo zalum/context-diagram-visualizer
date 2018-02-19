@@ -32,7 +32,7 @@ class system_model:
     def has_vertex(self, vertex):
         return vertex in self.graph["vertexes"]
 
-    def get_edges(self):
+    def get_relations(self):
         return self.graph["edges"] if "edges" in self.graph else []
 
     @staticmethod
@@ -44,7 +44,7 @@ class system_model:
         return False
 
     def get_edges_of_type(self, relation_type):
-        return [e for e in self.get_edges() if system_model.is_edge_of_type(e, relation_type)]
+        return [e for e in self.get_relations() if system_model.is_edge_of_type(e, relation_type)]
 
     def is_vertex_of_type(self, vertex, type):
         return self.graph["vertexes"][vertex]["type"] == type
@@ -79,7 +79,7 @@ class system_model:
         return edge["start"] if edge["end"] == vertex else edge["end"]
 
     def get_edges_of_vertex(self, with_vertex):
-        return list(filter(lambda edge: with_vertex in (edge["start"], edge["end"]), self.get_edges()))
+        return list(filter(lambda edge: with_vertex in (edge["start"], edge["end"]), self.get_relations()))
 
     def get_children(self, parent_vertex, of_type=None, in_relation_of=None):
         return list(
@@ -98,7 +98,7 @@ class system_model:
 
 
     def _is_vertex_in_edges(self, vertex):
-        for edge in self.get_edges():
+        for edge in self.get_relations():
             if self._is_edge_with_vertex(edge, vertex):
                 return True
         return False
@@ -131,7 +131,7 @@ class system_model:
     def get_edge(self, start, end, relation_type):
         edges = list(
             filter(lambda edge: system_model.is_edge_of_type(edge, relation_type),
-                   filter(lambda edge: start == edge["start"] and end == edge["end"], self.get_edges())))
+                   filter(lambda edge: start == edge["start"] and end == edge["end"], self.get_relations())))
         if edges is None or len(edges) == 0:
             return Response.error("not found")
         if len(edges) > 1:
@@ -185,7 +185,7 @@ class data_model(system_model):
         return self.is_vertex_of_type(vertex, "table")
 
     def get_table_for_column(self, column):
-        column_edges = [edge for edge in self.get_edges() if edge["start"] == column]
+        column_edges = [edge for edge in self.get_relations() if edge["start"] == column]
         for edge in column_edges:
             vertex = edge["end"]
             if self._isTable(vertex):

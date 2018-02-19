@@ -5,54 +5,51 @@ from smv.core.model import system_model as sm
 
 
 class component_model_visualizer_test(unittest.TestCase):
-  def testDrawOneRelation(self):
-    graph = {
-      "vertexes":{"1":{"name":"app1","type":"application"},"2":{"name":"app2","type":"application"}},
-      "edges":[{"start":"1","end":"2","relation_type":"calls"}]
-      }
-    expectedResult =["@startuml","left to right direction","[app1]-->[app2]","@enduml"]
-    self.__run_draw_context_diagram_test__(graph, expectedResult)
+    def testDrawOneRelation(self):
+        model = sm.component_model()
+        model.add_system_node("1",type = "application",name = "app1")
+        model.add_system_node( "2",type = "application",name = "app2")
+        model.add_edge(start="1",end="2",relation_type="calls")
+        expectedResult =["@startuml","left to right direction","[app1]-->[app2]","@enduml"]
+        self.__run_draw_context_diagram_test__(model, expectedResult)
 
-  def testDrawProductWithOneApp(self):
-      graph = {
-        "vertexes":{"1":{"name":"app1","type":"product"},"2":{"name":"app2","type":"application"}},
-        "edges":[{"start":"2","end":"1","relation_type":"contains"}]
-        }
-      expectedResult =["@startuml","left to right direction","folder app1{","[app2]","}","@enduml"]
-      self.__run_draw_context_diagram_test__(graph, expectedResult)
+    def testDrawProductWithOneApp(self):
+        model = sm.component_model()
+        model.add_system_node("1",type = "product",name = "app1")
+        model.add_system_node("2",type = "application",name = "app2")
+        model.add_edge(start="2",end="1",relation_type="contains")
+        expectedResult =["@startuml","left to right direction","folder app1{","[app2]","}","@enduml"]
+        self.__run_draw_context_diagram_test__(model, expectedResult)
 
-  def testDrawProductWithOneAppWithUnidirectionalRelation(self):
-      graph = {
-        "vertexes":{"1":{"name":"app1","type":"application"},"2":{"name":"product","type":"product"}},
-        "edges":[{"start":"2","end":"1","relation_type":"contains"}]
-        }
-      expectedResult =["@startuml","left to right direction","folder product{","[app1]","}","@enduml"]
-      self.__run_draw_context_diagram_test__(graph, expectedResult)
+    def testDrawProductWithOneAppWithUnidirectionalRelation(self):
+        model = sm.component_model()
+        model.add_system_node("1",type = "application",name = "app1")
+        model.add_system_node("2",type = "product",name = "product")
+        model.add_edge(start="2",end="1",relation_type="contains")
+        expectedResult =["@startuml","left to right direction","folder product{","[app1]","}","@enduml"]
+        self.__run_draw_context_diagram_test__(model, expectedResult)
 
-  def testProductWithDependencyToApp(self):
-       graph = {
-         "vertexes":{"1":{"name":"app1","type":"application"},
-                     "2":{"name":"product","type":"product"},
-                     "3":{"name":"app2","type":"application"}},
-         "edges":[{"start":"1","end":"2","relation_type":"contains"},
-                  {"start":"1","end":"3","relation_type":"calls"}]
-         }
-       expectedResult =["@startuml","left to right direction","folder product{","[app1]","}","[app1]-->[app2]","@enduml"]
-       self.__run_draw_context_diagram_test__(graph, expectedResult)
+    def testProductWithDependencyToApp(self):
+        model = sm.component_model()
+        model.add_system_node("1",type = "application",name = "app1")
+        model.add_system_node("2",type = "product",name = "product")
+        model.add_system_node("3",type = "application",name = "app2")
+        model.add_edge(start="1",end="2",relation_type="contains")
+        model.add_edge(start="1",end="3",relation_type="calls")
+        expectedResult =["@startuml","left to right direction","folder product{","[app1]","}","[app1]-->[app2]","@enduml"]
+        self.__run_draw_context_diagram_test__(model, expectedResult)
 
-  def testNameEscaping(self):
-      graph = {
-          "vertexes":{"1":{"name":"app 1","type":"application"},
-                      "2":{"name":"product 1","type":"product"},
-                      "3":{"name":"app 2","type":"application"}},
-          "edges":[{"start":"1","end":"2","relation_type":"contains"},
-                   {"start":"1","end":"3","relation_type":"calls"}]
-      }
-      expectedResult =["@startuml","left to right direction","folder product_1{","[app 1]","}","[app 1]-->[app 2]","@enduml"]
-      self.__run_draw_context_diagram_test__(graph, expectedResult)
+    def testNameEscaping(self):
+        model = sm.component_model()
+        model.add_system_node("1",type = "application",name = "app 1")
+        model.add_system_node("2",type = "product",name = "product 1")
+        model.add_system_node("3",type = "application",name = "app 2")
+        model.add_edge(start="1",end="2",relation_type="contains")
+        model.add_edge(start="1",end="3",relation_type="calls")
+        expectedResult =["@startuml","left to right direction","folder product_1{","[app 1]","}","[app 1]-->[app 2]","@enduml"]
+        self.__run_draw_context_diagram_test__(model, expectedResult)
 
-  def __run_draw_context_diagram_test__(self, graphDictionary, expectedResult):
-      systemGraph = sm.component_model(graphDictionary)
-      result = svm.component_model_visualizer(systemGraph).draw()
-      self.assertListEqual(expectedResult,result)
+    def __run_draw_context_diagram_test__(self, model, expectedResult):
+        result = svm.component_model_visualizer(model).draw()
+        self.assertListEqual(expectedResult,result)
 
