@@ -67,7 +67,7 @@ def get_node(node):
     - system
     '''
     state = system_models_repository.get_full_system_model()
-    return json.dumps(state.get_vertex(node), indent=2)
+    return json.dumps(state.get_system_node(node), indent=2)
 
 
 @config.controller.route("/system-node", methods=['POST'])
@@ -135,11 +135,11 @@ def list_nodes():
     if node_type is None:
         return abort(400,"Type cannot be null")
     state = system_models_repository.get_full_system_model()
-    nodes = state.get_vertexes_of_type(node_type)
+    nodes = state.get_system_nodes_of_type(node_type)
     if format == "full":
         result = dict()
         for key in nodes:
-            result[key] = state.get_vertex(key)
+            result[key] = state.get_system_node(key)
         return json.dumps(result,indent = 2)
     else:
         return json.dumps([key for key in nodes])
@@ -180,7 +180,7 @@ def create_relation():
     '''
     relation = request.get_json()
     state = system_models_repository.get_full_system_model()
-    result = state.add_edge(start=relation["start"], end=relation["end"], relation_type=relation["relation_type"])
+    result = state.add_relation(start=relation["start"], end=relation["end"], relation_type=relation["relation_type"])
     if result is RESPONSE_OK_deprecated:
         return "ok"
     else:
@@ -257,7 +257,7 @@ def get_direct_connections(node):
      - system
     '''
     state = system_models_repository.get_full_system_model()
-    vertex = state.get_vertex(node)
+    vertex = state.get_system_node(node)
     type = request.args.get("type")
     relation_type = request.args.get("relation-type")
     if vertex is None:

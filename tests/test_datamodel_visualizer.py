@@ -20,8 +20,8 @@ class DataModelVisualiserTest(unittest.TestCase):
         model.add_system_node("SCHEMA1",type="database-user")
         model.add_system_node("TABLE1",type="table")
         model.add_system_node("TABLE2",type="table")
-        model.add_edge(start="TABLE1",end="SCHEMA1",relation_type="contains")
-        model.add_edge(start="TABLE2",end="SCHEMA1",relation_type="contains")
+        model.add_relation(start="TABLE1", end="SCHEMA1", relation_type="contains")
+        model.add_relation(start="TABLE2", end="SCHEMA1", relation_type="contains")
         
         expected_result =["@startuml","left to right direction",
                           "package \"SCHEMA1\"{",
@@ -35,7 +35,7 @@ class DataModelVisualiserTest(unittest.TestCase):
         model = sm.data_model()
         model.add_system_node("SCHEMA1",type="database-user")
         model.add_system_node("TABLE1",type="table")
-        model.add_edge("SCHEMA1","TABLE1","contains")                    
+        model.add_relation("SCHEMA1", "TABLE1", "contains")
         expected_result =["@startuml","left to right direction",
                           "package \"SCHEMA1\"{",
                           "class TABLE1 {","}",
@@ -48,8 +48,8 @@ class DataModelVisualiserTest(unittest.TestCase):
         model.add_system_node("SCHEMA1",type="database-user")
         model.add_system_node("TABLE1",type="table")
         model.add_system_node("T1_ID",type="column")       
-        model.add_edge(start="TABLE1",end="SCHEMA1",relation_type="contains")
-        model.add_edge(start="T1_ID",end="TABLE1")
+        model.add_relation(start="TABLE1", end="SCHEMA1", relation_type="contains")
+        model.add_relation(start="T1_ID", end="TABLE1")
         
         expected_result =["@startuml","left to right direction","package \"SCHEMA1\"{","class TABLE1 {","+ T1_ID","}","}","@enduml"]
         self.__run_draw_datamodel_test__(model, expected_result)
@@ -59,8 +59,8 @@ class DataModelVisualiserTest(unittest.TestCase):
         model.add_system_node("SCHEMA1",type="database-user")
         model.add_system_node("TABLE1",type="table")
         model.add_system_node("T1_ID",type="column")
-        model.add_edge(start="TABLE1",end="SCHEMA1",relation_type="contains")
-        model.add_edge(start="T1_ID",end="TABLE1")
+        model.add_relation(start="TABLE1", end="SCHEMA1", relation_type="contains")
+        model.add_relation(start="T1_ID", end="TABLE1")
         expected_result =["@startuml","left to right direction","package \"SCHEMA1\"{","class TABLE1 {","}","}","@enduml"]
         self.__run_draw_datamodel_test__(model, expected_result, True)
 
@@ -71,11 +71,11 @@ class DataModelVisualiserTest(unittest.TestCase):
         model.add_system_node("TABLE2", type="table")
         model.add_system_node("T1_ID", type="column")
         model.add_system_node("T2_ID", type="column")
-        model.add_edge(start="TABLE1",end="SCHEMA1",relation_type="contains")
-        model.add_edge(start="TABLE2",end="SCHEMA1",relation_type="contains")
-        model.add_edge(start="T1_ID",end="TABLE1")
-        model.add_edge(start="T2_ID",end="TABLE2")
-        model.add_edge(start="T1_ID",end="T2_ID",relation_type="fk")
+        model.add_relation(start="TABLE1", end="SCHEMA1", relation_type="contains")
+        model.add_relation(start="TABLE2", end="SCHEMA1", relation_type="contains")
+        model.add_relation(start="T1_ID", end="TABLE1")
+        model.add_relation(start="T2_ID", end="TABLE2")
+        model.add_relation(start="T1_ID", end="T2_ID", relation_type="fk")
 
         expected_result = ["@startuml","left to right direction","package \"SCHEMA1\"{",
                          "class TABLE1 {",
@@ -97,11 +97,11 @@ class DataModelVisualiserTest(unittest.TestCase):
         model.add_system_node("TABLE2", type="table")
         model.add_system_node("T1_ID", type="column")
         model.add_system_node("T2_ID", type="column")
-        model.add_edge(start="TABLE1", end="SCHEMA1",relation_type="contains")
-        model.add_edge(start="TABLE2", end="SCHEMA1",relation_type="contains")
-        model.add_edge(start="T1_ID", end="TABLE1")
-        model.add_edge(start="T2_ID", end="TABLE2")
-        model.add_edge(start="T1_ID", end="T2_ID",relation_type="fk")
+        model.add_relation(start="TABLE1", end="SCHEMA1", relation_type="contains")
+        model.add_relation(start="TABLE2", end="SCHEMA1", relation_type="contains")
+        model.add_relation(start="T1_ID", end="TABLE1")
+        model.add_relation(start="T2_ID", end="TABLE2")
+        model.add_relation(start="T1_ID", end="T2_ID", relation_type="fk")
 
         expected_result = ["@startuml","left to right direction","package \"SCHEMA1\"{",
                            "class TABLE1 {",
@@ -121,9 +121,9 @@ class DataModelVisualiserTest(unittest.TestCase):
         model.add_system_node("schema", "database-user")
         model.add_system_node("table", "table")
         model.add_system_node("c1", "column")
-        model.add_edge("user1","table","uses")
-        model.add_edge("schema","table","contains")
-        model.add_edge("c1","table","contains")
+        model.add_relation("user1", "table", "uses")
+        model.add_relation("schema", "table", "contains")
+        model.add_relation("c1", "table", "contains")
 
         # then
         expected = self.transform_in_lines("""
@@ -154,11 +154,11 @@ class DataModelVisualiserTest(unittest.TestCase):
         model.add_system_node("TABLE2",type="table")
         model.add_system_node("T1_ID",type="column")
         model.add_system_node("T2_ID",type="column")
-        model.add_edge(start="TABLE1",end="SCHEMA1",relation_type="contains")
-        model.add_edge(start="TABLE2",end="SCHEMA2",relation_type="contains")
-        model.add_edge(start="T1_ID",end="TABLE1")
-        model.add_edge(start="T2_ID",end="TABLE2")
-        model.add_edge(start="T1_ID",end="T2_ID",relation_type="fk")
+        model.add_relation(start="TABLE1", end="SCHEMA1", relation_type="contains")
+        model.add_relation(start="TABLE2", end="SCHEMA2", relation_type="contains")
+        model.add_relation(start="T1_ID", end="TABLE1")
+        model.add_relation(start="T2_ID", end="TABLE2")
+        model.add_relation(start="T1_ID", end="T2_ID", relation_type="fk")
 
         expected_result = ["@startuml","left to right direction","package \"SCHEMA1\"{",
                           "class TABLE1 {",
@@ -179,7 +179,7 @@ class DataModelVisualiserTest(unittest.TestCase):
         datamodel = sm.data_model()
         datamodel.add_system_node("table_1", type="table", name="table 1")
         datamodel.add_system_node("schema1", type="database-user")
-        datamodel.add_edge("schema1","table_1","contains")
+        datamodel.add_relation("schema1", "table_1", "contains")
 
 
         # then

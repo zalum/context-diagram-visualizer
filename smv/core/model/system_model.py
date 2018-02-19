@@ -4,9 +4,13 @@ from smv.core import RESPONSE_OK
 from smv.core import RESPONSE_ERROR
 
 def empty_graph():
-    return {"vertexes": {}, "edges": []}
+    return {SYSTEM_NODES: {}, RELATIONS: []}
 
 RESPONSE_OK_deprecated = object()
+SYSTEM_NODES = "system_nodes"
+RELATIONS = "relations"
+SYSTEM_NODE_TYPE = "type"
+RELATION_TYPE = "relation_type"
 
 
 class system_model:
@@ -19,118 +23,114 @@ class system_model:
     def to_string(self):
         return json.dumps(self.graph,indent=2)
 
-    def get_vertex(self, vertex):
-        if vertex not in self.graph["vertexes"]:
+    def get_system_node(self, system_node):
+        if system_node not in self.graph[SYSTEM_NODES]:
             return None
-        return self.graph["vertexes"][vertex]
+        return self.graph[SYSTEM_NODES][system_node]
 
-    def getVertexes(self):
-        keys = list(self.graph["vertexes"].keys())
+    def get_system_nodes(self):
+        keys = list(self.graph[SYSTEM_NODES].keys())
         keys.sort()
         return keys
 
-    def has_vertex(self, vertex):
-        return vertex in self.graph["vertexes"]
+    def get_system_nodes_of_type(self, type):
+        return [v for v in self.get_system_nodes() if self.is_system_node_of_type(v, type)]
+
+    def has_system_node(self, system_node):
+        return system_node in self.graph[SYSTEM_NODES]
 
     def get_relations(self):
-        return self.graph["edges"] if "edges" in self.graph else []
+        return self.graph[RELATIONS] if RELATIONS in self.graph else []
 
     @staticmethod
-    def is_edge_of_type(edge, relation_type):
+    def is_relation_of_type(edge, relation_type):
         if relation_type is None and "relation_type" not in edge:
             return True
         if "relation_type" in edge and edge["relation_type"] == relation_type:
             return True
         return False
 
-    def get_edges_of_type(self, relation_type):
-        return [e for e in self.get_relations() if system_model.is_edge_of_type(e, relation_type)]
+    def get_relations_of_type(self, relation_type):
+        return [e for e in self.get_relations() if system_model.is_relation_of_type(e, relation_type)]
 
-    def is_vertex_of_type(self, vertex, type):
-        return self.graph["vertexes"][vertex]["type"] == type
-
-    def does_vertex_exists(self, key):
-        return key in self.graph["vertexes"]
+    def is_system_node_of_type(self, system_node, type):
+        return self.graph[SYSTEM_NODES][system_node]["type"] == type
 
     def add_system_node(self, key, type, **kwargs):
-        if key in self.graph["vertexes"]:
+        if key in self.graph[SYSTEM_NODES]:
             return Response.error("System Node '{}' already exists".format(key))
-        self.graph["vertexes"][key] = kwargs
-        self.graph["vertexes"][key]["type"] = type
-        return Response.success({key: self.get_vertex(key)})
+        self.graph[SYSTEM_NODES][key] = kwargs
+        self.graph[SYSTEM_NODES][key]["type"] = type
+        return Response.success({key: self.get_system_node(key)})
 
-    def add_edge(self, start, end, relation_type=None):
-        if self.get_vertex(start) is None:
+    def add_relation(self, start, end, relation_type=None):
+        if self.get_system_node(start) is None:
             return Response.error("Start node '{}' is not in the model".format(start))
-        if self.get_vertex(end) is None:
+        if self.get_system_node(end) is None:
             return Response.error("End node '{}' is not in the model".format(end))
-        result = self.get_edge(start=start, end=end, relation_type=relation_type)
+        result = self.get_relation(start=start, end=end, relation_type=relation_type)
         if result.return_code == RESPONSE_OK:
             return Response.error("edge already exists")
         if result.content == "not found":
             result = {"start": start, "end": end}
             if relation_type is not None:
                 result["relation_type"] = relation_type
-            self.graph["edges"].append(result)
+            self.graph[RELATIONS].append(result)
             return Response.success()
         return Response.error(result.content)
 
-    def get_related_vertex(self, vertex, edge):
-        return edge["start"] if edge["end"] == vertex else edge["end"]
+    def get_related_system_node(self, system_node, edge):
+        return edge["start"] if edge["end"] == system_node else edge["end"]
 
-    def get_edges_of_vertex(self, with_vertex):
-        return list(filter(lambda edge: with_vertex in (edge["start"], edge["end"]), self.get_relations()))
+    def get_relations_of_system_node(self, with_system_node):
+        return list(filter(lambda edge: with_system_node in (edge["start"], edge["end"]), self.get_relations()))
 
-    def get_children(self, parent_vertex, of_type=None, in_relation_of=None):
+    def get_children(self, parent_system_node, of_type=None, in_relation_of=None):
         return list(
-            filter(lambda child: of_type is None or self.is_vertex_of_type(child, of_type),
-                   map(lambda edge: self.get_related_vertex(parent_vertex, edge),
-                       filter(lambda edge: in_relation_of is None or system_model.is_edge_of_type(edge, in_relation_of),
-                              self.get_edges_of_vertex(parent_vertex)))))
+            filter(lambda child: of_type is None or self.is_system_node_of_type(child, of_type),
+                   map(lambda edge: self.get_related_system_node(parent_system_node, edge),
+                       filter(lambda edge: in_relation_of is None or system_model.is_relation_of_type(edge, in_relation_of),
+                              self.get_relations_of_system_node(parent_system_node)))))
 
-    def get_vertexes_of_type(self, type):
-        return [v for v in self.getVertexes() if self.is_vertex_of_type(v, type)]
-
-    def copy_vertex(self,from_model: 'system_model', vertex):
-        vertex_value = dict(from_model.get_vertex(vertex))
+    def copy_system_node(self, from_model: 'system_model', system_node):
+        vertex_value = dict(from_model.get_system_node(system_node))
         type = vertex_value.pop("type")
-        self.add_system_node(vertex, type, **vertex_value)
+        self.add_system_node(system_node, type, **vertex_value)
 
-
-    def _is_vertex_in_edges(self, vertex):
+    def _is_system_node_in_relations(self, system_node):
         for edge in self.get_relations():
-            if self._is_edge_with_vertex(edge, vertex):
+            if self._is_relation_with_system_node(edge, system_node):
                 return True
         return False
 
-    def _is_edge_with_vertex(self, edge, vertex):
-        return edge["start"] == vertex or edge["end"] == vertex
+    def _is_relation_with_system_node(self, relation, system_node):
+        return relation["start"] == system_node or relation["end"] == system_node
 
-    def get_orphan_vertexes(self, ofType):
-        return [v for v in self.get_vertexes_of_type(ofType) if not self._is_vertex_in_edges(v)]
+    def get_orphan_system_nodes(self, ofType):
+        return [v for v in self.get_system_nodes_of_type(ofType) if not self._is_system_node_in_relations(v)]
 
     def set_model(self,new_model:'system_model'):
         self.graph = empty_graph()
         self.append(new_model)
 
     def append(self, to_append:'system_model'):
-        for vertex in to_append.graph["vertexes"]:
-            self.graph["vertexes"][vertex] = dict(to_append.graph["vertexes"][vertex])
-        for edge in to_append.graph["edges"]:
-            self.add_edge(edge["start"], edge["end"], edge["relation_type"] if "relation_type" in edge else None)
+        for vertex in to_append.graph[SYSTEM_NODES]:
+            self.graph[SYSTEM_NODES][vertex] = dict(to_append.graph[SYSTEM_NODES][vertex])
+        for edge in to_append.graph[RELATIONS]:
+            self.add_relation(edge["start"], edge["end"], edge["relation_type"] if "relation_type" in edge else None)
 
-    def find_direct_connections(self, vertex, vertex_type=None, relation_type=None):
+    def find_direct_connections(self, system_node, system_node_type=None, relation_type=None):
         connections = []
-        for edge in self.get_edges_of_vertex(vertex):
-            connection = self.get_related_vertex(vertex, edge)
-            if relation_type is None or system_model.is_edge_of_type(edge, relation_type):
-                if vertex_type is None or self.is_vertex_of_type(connection, vertex_type):
+        for edge in self.get_relations_of_system_node(system_node):
+            connection = self.get_related_system_node(system_node, edge)
+            if relation_type is None or system_model.is_relation_of_type(edge, relation_type):
+                if system_node_type is None or self.is_system_node_of_type(connection, system_node_type):
                     connections.append(connection)
         return connections
 
-    def get_edge(self, start, end, relation_type):
+    def get_relation(self, start, end, relation_type):
         edges = list(
-            filter(lambda edge: system_model.is_edge_of_type(edge, relation_type),
+            filter(lambda edge: system_model.is_relation_of_type(edge, relation_type),
                    filter(lambda edge: start == edge["start"] and end == edge["end"], self.get_relations())))
         if edges is None or len(edges) == 0:
             return Response.error("not found")
@@ -139,34 +139,34 @@ class system_model:
                 format(len(edges), start, end, relation_type))
         return Response.success(edges[0])
 
-    def remove_edge(self, start, end, relation_type):
-        result = self.get_edge(start, end, relation_type)
+    def remove_relation(self, start, end, relation_type):
+        result = self.get_relation(start, end, relation_type)
         if result.return_code == RESPONSE_ERROR:
             return result
-        self.graph["edges"].remove(result.content)
+        self.graph[RELATIONS].remove(result.content)
         return Response.success()
 
 
 class component_model(system_model):
     def get_calling_relations(self):
-        return self.get_edges_of_type("calls")
+        return self.get_relations_of_type("calls")
 
     def get_orphan_applications(self):
-        return self.get_orphan_vertexes("application")
+        return self.get_orphan_system_nodes("application")
 
-    def isProduct(self, vertex):
-        return self.is_vertex_of_type(vertex, "product")
+    def is_product(self, system_node):
+        return self.is_system_node_of_type(system_node, "product")
 
-    def getVertexName(self, vertex):
-        if "name" in self.graph["vertexes"][vertex]:
-            return self.graph["vertexes"][vertex]["name"]
-        return vertex
+    def get_component_name(self, system_node):
+        if "name" in self.graph[SYSTEM_NODES][system_node]:
+            return self.graph[SYSTEM_NODES][system_node]["name"]
+        return system_node
 
-    def getApplicationsInProduct(self, product):
+    def get_applications_in_product(self, product):
         return self.get_children(product, of_type="application", in_relation_of="contains")
 
     def getProducts(self):
-        return self.get_vertexes_of_type("product")
+        return self.get_system_nodes_of_type("product")
 
 
 class data_model(system_model):
@@ -175,28 +175,25 @@ class data_model(system_model):
 
     def add_column(self, column, table):
         self.add_system_node(column, "column")
-        self.add_edge(column, table)
+        self.add_relation(column, table)
 
     def add_table(self, table, schema):
         self.add_system_node(table, "table")
-        self.add_edge(table, schema)
+        self.add_relation(table, schema)
 
-    def _isTable(self, vertex):
-        return self.is_vertex_of_type(vertex, "table")
+    def _is_table(self, system_node):
+        return self.is_system_node_of_type(system_node, "table")
 
     def get_table_for_column(self, column):
         column_edges = [edge for edge in self.get_relations() if edge["start"] == column]
         for edge in column_edges:
-            vertex = edge["end"]
-            if self._isTable(vertex):
-                return vertex
+            system_node = edge["end"]
+            if self._is_table(system_node):
+                return system_node
         return None
 
-    def getSchemas(self):
-        return self.get_vertexes_of_type("schema")
-
     def get_database_users(self):
-        return self.get_vertexes_of_type("database-user")
+        return self.get_system_nodes_of_type("database-user")
 
     def get_tables_in_database_user(self, database_user):
         return self.get_children(database_user, "table", "contains")
@@ -207,7 +204,7 @@ class data_model(system_model):
     def get_foreign_keys(self):
         return list(
             map(lambda fk: self._get_foreign_key(fk["start"], fk["end"]),
-                self.get_edges_of_type("fk")))
+                self.get_relations_of_type("fk")))
 
     def _get_foreign_key(self, column1, column2):
         return {

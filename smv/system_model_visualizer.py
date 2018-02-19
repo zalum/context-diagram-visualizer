@@ -16,23 +16,23 @@ class component_model_visualizer:
       return lines
 
   def _drawProduct(self,product):
-      applications = self.system_model.getApplicationsInProduct(product)
+      applications = self.system_model.get_applications_in_product(product)
       drawnProudct = ["folder %s{"%self._drawProductName(product)]
       drawnProudct.extend([self._drawApplication(application) for application in applications])
       drawnProudct.append("}")
       return drawnProudct
 
   def _drawApplication(self, application):
-      return self._drawApplicationByName(self.system_model.getVertexName(application))
+      return self._drawApplicationByName(self.system_model.get_component_name(application))
   def _drawProductName(self,product):
-      return self.system_model.getVertexName(product).replace(" ", "_")
+      return self.system_model.get_component_name(product).replace(" ", "_")
   def _drawApplicationByVertex(self,vertex):
-      return self._drawApplicationByName(self.system_model.getVertexName(vertex))
+      return self._drawApplicationByName(self.system_model.get_component_name(vertex))
   def _drawApplicationByName(self,name):
       return "[%s]"%name
   def _drawEdges(self,edge):
-      return "[%s]-->[%s]"%(self.system_model.getVertexName(edge["start"]),\
-                            self.system_model.getVertexName(edge["end"]))
+      return "[%s]-->[%s]"%(self.system_model.get_component_name(edge["start"]),\
+                            self.system_model.get_component_name(edge["end"]))
 
 class datamodel_visualizer():
     def __init__(self, system_model: sm.data_model):
@@ -54,7 +54,7 @@ class datamodel_visualizer():
         return drawn_schema
 
     def _draw_table(self, table,colapsed_columns=False):
-        table_vertex = self.system_model.get_vertex(table)
+        table_vertex = self.system_model.get_system_node(table)
         if "name" in table_vertex:
             drawn_table = ["class \"{}\" as {} {{".format(table_vertex["name"],table)]
         else:

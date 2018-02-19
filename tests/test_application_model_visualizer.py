@@ -9,7 +9,7 @@ class component_model_visualizer_test(unittest.TestCase):
         model = sm.component_model()
         model.add_system_node("1",type = "application",name = "app1")
         model.add_system_node( "2",type = "application",name = "app2")
-        model.add_edge(start="1",end="2",relation_type="calls")
+        model.add_relation(start="1", end="2", relation_type="calls")
         expectedResult =["@startuml","left to right direction","[app1]-->[app2]","@enduml"]
         self.__run_draw_context_diagram_test__(model, expectedResult)
 
@@ -17,7 +17,7 @@ class component_model_visualizer_test(unittest.TestCase):
         model = sm.component_model()
         model.add_system_node("1",type = "product",name = "app1")
         model.add_system_node("2",type = "application",name = "app2")
-        model.add_edge(start="2",end="1",relation_type="contains")
+        model.add_relation(start="2", end="1", relation_type="contains")
         expectedResult =["@startuml","left to right direction","folder app1{","[app2]","}","@enduml"]
         self.__run_draw_context_diagram_test__(model, expectedResult)
 
@@ -25,7 +25,7 @@ class component_model_visualizer_test(unittest.TestCase):
         model = sm.component_model()
         model.add_system_node("1",type = "application",name = "app1")
         model.add_system_node("2",type = "product",name = "product")
-        model.add_edge(start="2",end="1",relation_type="contains")
+        model.add_relation(start="2", end="1", relation_type="contains")
         expectedResult =["@startuml","left to right direction","folder product{","[app1]","}","@enduml"]
         self.__run_draw_context_diagram_test__(model, expectedResult)
 
@@ -34,8 +34,8 @@ class component_model_visualizer_test(unittest.TestCase):
         model.add_system_node("1",type = "application",name = "app1")
         model.add_system_node("2",type = "product",name = "product")
         model.add_system_node("3",type = "application",name = "app2")
-        model.add_edge(start="1",end="2",relation_type="contains")
-        model.add_edge(start="1",end="3",relation_type="calls")
+        model.add_relation(start="1", end="2", relation_type="contains")
+        model.add_relation(start="1", end="3", relation_type="calls")
         expectedResult =["@startuml","left to right direction","folder product{","[app1]","}","[app1]-->[app2]","@enduml"]
         self.__run_draw_context_diagram_test__(model, expectedResult)
 
@@ -44,8 +44,8 @@ class component_model_visualizer_test(unittest.TestCase):
         model.add_system_node("1",type = "application",name = "app 1")
         model.add_system_node("2",type = "product",name = "product 1")
         model.add_system_node("3",type = "application",name = "app 2")
-        model.add_edge(start="1",end="2",relation_type="contains")
-        model.add_edge(start="1",end="3",relation_type="calls")
+        model.add_relation(start="1", end="2", relation_type="contains")
+        model.add_relation(start="1", end="3", relation_type="calls")
         expectedResult =["@startuml","left to right direction","folder product_1{","[app 1]","}","[app 1]-->[app 2]","@enduml"]
         self.__run_draw_context_diagram_test__(model, expectedResult)
 
