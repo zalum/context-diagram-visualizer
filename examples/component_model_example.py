@@ -3,14 +3,14 @@ from smv.core.model import system_model as sm
 
 
 def get_component_graph():
-    return {"vertexes":{
+    return {"system-nodes":{
             "precedingapp":{"name":"precedingapp","type":"application"},
             "app1":{"name": "app1","type":"application"},
             "app2":{"name":"app2","type":"application"},
             "app3":{"name":"app3","type":"application"},
             "product":{"name": "product","type":"product"}
             },
-            "edges":[
+            "relations":[
                 {"start":"precedingapp","end":"app1","relation_type":"calls"},
                 {"start":"app1","end":"app2","relation_type":"calls"},
                 {"start":"app2","end":"product","relation_type":"contains"},

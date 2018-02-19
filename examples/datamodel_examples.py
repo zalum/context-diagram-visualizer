@@ -4,7 +4,7 @@ from smv.core.model import system_model as sm
 
 def get_datamodel_graph():
     return {
-        "vertexes":{
+        "system-nodes":{
         "TABLE1":{"type":"table"},
         "TABLE2":{"type":"table"},
         "SCHEMA1":{"type":"schema"},
@@ -14,7 +14,7 @@ def get_datamodel_graph():
         "T2_ID":{"type":"column"},
         "T2_PROPERTY1":{"type":"column"}
         },
-        "edges":[
+        "relations":[
             {"start":"T1_ID","end":"TABLE1"},
             {"start":"T1_PROPERTY1","end":"TABLE1"},
             {"start":"T1_T2_FK","end":"TABLE1"},

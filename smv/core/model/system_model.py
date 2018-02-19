@@ -7,10 +7,10 @@ def empty_graph():
     return {SYSTEM_NODES: {}, RELATIONS: []}
 
 RESPONSE_OK_deprecated = object()
-SYSTEM_NODES = "system_nodes"
+SYSTEM_NODES = "system-nodes"
 RELATIONS = "relations"
 SYSTEM_NODE_TYPE = "type"
-RELATION_TYPE = "relation_type"
+RELATION_TYPE = "relation-type"
 
 
 class system_model:
