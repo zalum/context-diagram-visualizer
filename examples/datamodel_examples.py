@@ -26,11 +26,41 @@ def get_datamodel_graph():
     ]}
 
 
+def get_dynamo_datamodel_graph():
+    datamodel = {
+  "system-nodes":{
+      "ns_order-export-prod":{"type":"database-user"},
+      "order-export-prod_PurchaseOrderEvents":{"type":"table"},
+      "order-export-prod_PurchaseOrderEvents_Positions":{"type":"table"},
+      "key":{"type":"column"},
+      "timestamp":{"type":"column"},
+      "purchaseOrderEventType":{"type":"column"},
+      "purchaseOrderId":{"type":"column"},
+      "articleSupplierId":{"type":"column"}
+  },
+  "relations":[
+      {"start":"ns_order-export-prod","end":"order-export-prod_PurchaseOrderEvents","relation_type":"contains"},
+      {"start":"ns_order-export-prod","end":"order-export-prod_PurchaseOrderEvents_Positions","relation_type":"contains"},
+      {"start":"order-export-prod_PurchaseOrderEvents","end":"key","relation_type":"contains"},
+      {"start":"order-export-prod_PurchaseOrderEvents","end":"timestamp","relation_type":"contains"},
+      {"start":"order-export-prod_PurchaseOrderEvents","end":"purchaseOrderEventType","relation_type":"contains"},
+      {"start":"order-export-prod_PurchaseOrderEvents","end":"purchaseOrderId","relation_type":"contains"},
+      {"start":"order-export-prod_PurchaseOrderEvents_Positions","end":"articleSupplierId","relation_type":"contains"},
+      {"start":"order-export-prod_PurchaseOrderEvents_Positions",
+       "end":"order-export-prod_PurchaseOrderEvents",
+       "relation_type":"composition"}
+  ]
+}
+
+    return datamodel
+
+
 def draw_datamodel():
     f = open('output-dm.png', 'wb')
-    inputSystemGraph = sm.data_model(get_datamodel_graph())
+    inputSystemGraph = sm.data_model(get_dynamo_datamodel_graph())
     lines = smv.datamodel_visualizer(inputSystemGraph).draw(colapsed_columns=False)
     picture = smo.writeAsImage(lines).getvalue()
     f.write(picture)
+
 
 draw_datamodel()

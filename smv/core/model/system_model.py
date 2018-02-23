@@ -3,6 +3,7 @@ from smv.core import Response
 from smv.core import RESPONSE_OK
 from smv.core import RESPONSE_ERROR
 
+
 def empty_graph():
     return {SYSTEM_NODES: {}, RELATIONS: []}
 
@@ -11,6 +12,24 @@ SYSTEM_NODES = "system-nodes"
 RELATIONS = "relations"
 SYSTEM_NODE_TYPE = "type"
 RELATION_TYPE = "relation-type"
+
+class DatamodelRelationTypes():
+    fk = "fk"
+    composition = "composition"
+    contains = "contains"
+    owns = "owns"
+    uses = "uses"
+
+class RelationTypes():
+    datamodel = DatamodelRelationTypes
+
+class DatamodelNodeTypes:
+    table = "table"
+    column = "column"
+    database_user = "database-user"
+
+class SystemNodesTypes():
+    datamodel = DatamodelNodeTypes
 
 
 class system_model:
@@ -181,14 +200,14 @@ class data_model(system_model):
         self.add_system_node(table, "table")
         self.add_relation(table, schema)
 
-    def _is_table(self, system_node):
+    def is_table(self, system_node):
         return self.is_system_node_of_type(system_node, "table")
 
     def get_table_for_column(self, column):
         column_edges = [edge for edge in self.get_relations() if edge["start"] == column]
         for edge in column_edges:
             system_node = edge["end"]
-            if self._is_table(system_node):
+            if self.is_table(system_node):
                 return system_node
         return None
 
@@ -199,7 +218,7 @@ class data_model(system_model):
         return self.get_children(database_user, "table", "contains")
 
     def get_columns_in_table(self, table):
-        return self.get_children(table, "column")
+        return self.get_children(table, "column",in_relation_of=RelationTypes.datamodel.contains)
 
     def get_foreign_keys(self):
         return list(
@@ -217,3 +236,4 @@ class data_model(system_model):
                 "table": self.get_table_for_column(column2)
             }
         }
+

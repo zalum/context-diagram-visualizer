@@ -49,7 +49,7 @@ class DataModelVisualiserTest(unittest.TestCase):
         model.add_system_node("TABLE1",type="table")
         model.add_system_node("T1_ID",type="column")       
         model.add_relation(start="TABLE1", end="SCHEMA1", relation_type="contains")
-        model.add_relation(start="T1_ID", end="TABLE1")
+        model.add_relation(start="T1_ID", end="TABLE1", relation_type="contains")
         
         expected_result =["@startuml","left to right direction","package \"SCHEMA1\"{","class TABLE1 {","+ T1_ID","}","}","@enduml"]
         self.__run_draw_datamodel_test__(model, expected_result)
@@ -60,7 +60,7 @@ class DataModelVisualiserTest(unittest.TestCase):
         model.add_system_node("TABLE1",type="table")
         model.add_system_node("T1_ID",type="column")
         model.add_relation(start="TABLE1", end="SCHEMA1", relation_type="contains")
-        model.add_relation(start="T1_ID", end="TABLE1")
+        model.add_relation(start="T1_ID", end="TABLE1", relation_type="contains")
         expected_result =["@startuml","left to right direction","package \"SCHEMA1\"{","class TABLE1 {","}","}","@enduml"]
         self.__run_draw_datamodel_test__(model, expected_result, True)
 
@@ -73,8 +73,8 @@ class DataModelVisualiserTest(unittest.TestCase):
         model.add_system_node("T2_ID", type="column")
         model.add_relation(start="TABLE1", end="SCHEMA1", relation_type="contains")
         model.add_relation(start="TABLE2", end="SCHEMA1", relation_type="contains")
-        model.add_relation(start="T1_ID", end="TABLE1")
-        model.add_relation(start="T2_ID", end="TABLE2")
+        model.add_relation(start="T1_ID", end="TABLE1", relation_type="contains")
+        model.add_relation(start="T2_ID", end="TABLE2", relation_type="contains")
         model.add_relation(start="T1_ID", end="T2_ID", relation_type="fk")
 
         expected_result = ["@startuml","left to right direction","package \"SCHEMA1\"{",
@@ -156,8 +156,8 @@ class DataModelVisualiserTest(unittest.TestCase):
         model.add_system_node("T2_ID",type="column")
         model.add_relation(start="TABLE1", end="SCHEMA1", relation_type="contains")
         model.add_relation(start="TABLE2", end="SCHEMA2", relation_type="contains")
-        model.add_relation(start="T1_ID", end="TABLE1")
-        model.add_relation(start="T2_ID", end="TABLE2")
+        model.add_relation(start="T1_ID", end="TABLE1", relation_type="contains")
+        model.add_relation(start="T2_ID", end="TABLE2", relation_type="contains")
         model.add_relation(start="T1_ID", end="T2_ID", relation_type="fk")
 
         expected_result = ["@startuml","left to right direction","package \"SCHEMA1\"{",
@@ -173,6 +173,90 @@ class DataModelVisualiserTest(unittest.TestCase):
                           "TABLE1::T1_ID --> TABLE2::T2_ID","@enduml"
                           ]
         self.__run_draw_datamodel_test__(model, expected_result)
+
+    def test_composition_relation_on_column(self):
+        # given
+        datamodel = sm.data_model()
+        datamodel.add_system_node("aggregate_root", type="table")
+        datamodel.add_system_node("user", type="database-user")
+        datamodel.add_system_node("part", type="table")
+        datamodel.add_system_node("parts", type="column")
+        datamodel.add_relation(start="aggregate_root", end="user", relation_type="contains")
+        datamodel.add_relation(start="part", end="user", relation_type="contains")
+        datamodel.add_relation(start="parts", end="aggregate_root", relation_type="contains")
+        datamodel.add_relation(start="part", end="parts", relation_type="composition")
+
+        # then
+        expected_result = self.transform_in_lines("""
+        @startuml
+        left to right direction
+        package "user"{
+        class aggregate_root {
+        + parts
+        }
+        class part {
+        }
+        }
+        part --* aggregate_root::parts
+        @enduml
+        """)
+
+        self.__run_draw_datamodel_test__(datamodel, expected_result)
+
+    def test_composition_relation_on_colapsed_column(self):
+        # given
+        datamodel = sm.data_model()
+        datamodel.add_system_node("aggregate_root", type="table")
+        datamodel.add_system_node("user", type="database-user")
+        datamodel.add_system_node("part", type="table")
+        datamodel.add_system_node("parts", type="column")
+        datamodel.add_relation(start="aggregate_root", end="user", relation_type="contains")
+        datamodel.add_relation(start="part", end="user", relation_type="contains")
+        datamodel.add_relation(start="parts", end="aggregate_root", relation_type="contains")
+        datamodel.add_relation(start="part", end="parts", relation_type="composition")
+
+        # then
+        expected_result = self.transform_in_lines("""
+        @startuml
+        left to right direction
+        package "user"{
+        class aggregate_root {
+        }
+        class part {
+        }
+        }
+        part --* aggregate_root
+        @enduml
+        """)
+
+        self.__run_draw_datamodel_test__(datamodel, expected_result,colapsed_columns=True)
+
+    def test_composition_relation_on_table(self):
+        # given
+        datamodel = sm.data_model()
+        datamodel.add_system_node("aggregate_root", type="table")
+        datamodel.add_system_node("user", type="database-user")
+        datamodel.add_system_node("part", type="table")
+        datamodel.add_relation(start="aggregate_root", end="user", relation_type="contains")
+        datamodel.add_relation(start="part", end="user", relation_type="contains")
+        datamodel.add_relation(start="part", end="aggregate_root", relation_type="composition")
+
+        # then
+        expected_result = self.transform_in_lines("""
+        @startuml
+        left to right direction
+        package "user"{
+        class aggregate_root {
+        }
+        class part {
+        }
+        }
+        part --* aggregate_root
+        @enduml
+        """)
+
+        self.__run_draw_datamodel_test__(datamodel, expected_result)
+
 
     def test_table_with_id(self):
         # given

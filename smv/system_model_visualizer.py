@@ -40,11 +40,18 @@ class datamodel_visualizer():
 
     def draw(self,colapsed_columns = False):
         lines = ["@startuml","left to right direction"]
-        [lines.extend(self._draw_database_user(schema, colapsed_columns)) for schema in self.system_model.get_database_users()]
-        [lines.extend(self._draw_foreign_key(fk,colapsed_columns)) for fk in self.system_model.get_foreign_keys()]
+        self.draw_database_users(colapsed_columns, lines)
+        self.draw_foreign_keys(colapsed_columns, lines)
+        self._draw_composition_relations(colapsed_columns, lines)
         lines.append("@enduml")
         return lines
 
+    def draw_foreign_keys(self, colapsed_columns, lines):
+        [lines.extend(self._draw_foreign_key(fk, colapsed_columns)) for fk in self.system_model.get_foreign_keys()]
+
+    def draw_database_users(self, colapsed_columns, lines):
+        [lines.extend(self._draw_database_user(schema, colapsed_columns)) for schema in
+         self.system_model.get_database_users()]
 
     def _draw_database_user(self, database_user, colapsed_columns = False):
         tables = self.system_model.get_tables_in_database_user(database_user)
@@ -86,4 +93,29 @@ class datamodel_visualizer():
         if colapsed_columns == True:
             return self._draw_foreign_key_between_tables(fk)
         return self._draw_foreign_key_between_columns(fk)
+
+    def _draw_node_for_relation(self, system_node, collapsed_columns):
+        if self.system_model.is_system_node_of_type(system_node, sm.SystemNodesTypes.datamodel.column):
+            end_table = self.system_model.get_table_for_column(system_node)
+            if collapsed_columns:
+                return end_table
+            else:
+                return "{}::{}".format(end_table, system_node)
+        else:
+            return system_node
+
+
+    def _draw_composition_relations(self, collapsed_columns, lines):
+        relations = self.system_model.get_relations_of_type(sm.RelationTypes.datamodel.composition)
+        for relation in relations:
+            self._draw_composition_relation(collapsed_columns, relation, lines)
+
+    def _draw_composition_relation(self, collapsed_columns, relation, lines):
+        start_node = relation["start"]
+        end_node = relation["end"]
+        start_node_name = self._draw_node_for_relation(start_node, collapsed_columns)
+        end_node_name = self._draw_node_for_relation(end_node, collapsed_columns)
+        lines.append("{} --* {}".format(start_node_name, end_node_name))
+
+
 
