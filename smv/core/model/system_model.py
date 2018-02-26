@@ -98,7 +98,8 @@ class system_model:
             return Response.success()
         return Response.error(result.content)
 
-    def get_related_system_node(self, system_node, edge):
+    @staticmethod
+    def get_related_system_node(system_node, edge):
         return edge["start"] if edge["end"] == system_node else edge["end"]
 
     def get_relations_of_system_node(self, with_system_node):
@@ -204,9 +205,10 @@ class data_model(system_model):
         return self.is_system_node_of_type(system_node, "table")
 
     def get_table_for_column(self, column):
-        column_edges = [edge for edge in self.get_relations() if edge["start"] == column]
+        column_edges = [edge for edge in self.get_relations_of_type(relation_type=RelationTypes.datamodel.contains)
+                        if column in (edge["start"], edge["end"])]
         for edge in column_edges:
-            system_node = edge["end"]
+            system_node = self.get_related_system_node(column, edge)
             if self.is_table(system_node):
                 return system_node
         return None

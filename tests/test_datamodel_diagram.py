@@ -5,8 +5,8 @@ from smv.core.model import system_models_repository
 
 import unittest
 
-class DatamodelDiagramTest(unittest.TestCase):
 
+class DatamodelDiagramTest(unittest.TestCase):
     def test_search_tables_and_users(self):
         # given
         input_model = data_model()
@@ -32,7 +32,7 @@ class DatamodelDiagramTest(unittest.TestCase):
         # when
         result = diagram.search_database_user("user1")
 
-        #then
+        # then
         expected = data_model()
         expected.add_system_node("user1", "database-user")
         expected.add_system_node("user2", "database-user")
@@ -41,7 +41,7 @@ class DatamodelDiagramTest(unittest.TestCase):
         expected.add_relation("user1", "table1", "contains")
         expected.add_relation("user1", "table2", "uses")
         expected.add_relation("user2", "table2", "contains")
-        self.assert_models_are_equal(expected,result)
+        self.assert_models_are_equal(expected, result)
 
     def test_search_tables_with_columns_and_fk_and_users(self):
         # given
@@ -71,7 +71,7 @@ class DatamodelDiagramTest(unittest.TestCase):
         # when
         result = diagram.search_database_user("user1")
 
-        #then
+        # then
         expected = data_model()
         expected.add_system_node("user1", "database-user")
         expected.add_system_node("user2", "database-user")
@@ -88,7 +88,28 @@ class DatamodelDiagramTest(unittest.TestCase):
         expected.add_relation("table2", "col2", "contains")
         expected.add_relation("table3", "col3", "contains")
         expected.add_relation("col1", "col3", "fk")
-        self.assert_models_are_equal(expected,result)
+        self.assert_models_are_equal(expected, result)
+
+    def test_search_composition_relation(self):
+        # given
+        input_model = data_model()
+        input_model.add_system_node("user", "database-user")
+        input_model.add_system_node("table", "table")
+        input_model.add_system_node("part", "table")
+        input_model.add_system_node("parts", "column")
+        input_model.add_system_node("column_part", "column")
+        input_model.add_relation("user", "table", "contains")
+        input_model.add_relation("user", "part", "contains")
+        input_model.add_relation("table", "parts", "contains")
+        input_model.add_relation("part", "parts", "composition")
+        input_model.add_relation("column_part", "part", "contains")
+        system_models_repository.set_model(input_model)
+
+        # when
+        result = diagram.search_database_user("user")
+
+        # then
+        self.assert_models_are_equal(input_model, result)
 
     @unittest.skip("because search criteria does not support matching edge&relation combinations")
     def test_search_tables_excluding_not_targeted_users(self):
@@ -109,7 +130,7 @@ class DatamodelDiagramTest(unittest.TestCase):
         # when
         result = diagram.search_database_user("user1")
 
-        #then
+        # then
         expected = data_model()
         expected.add_system_node("user1", "database-user")
         expected.add_system_node("user2", "database-user")
@@ -119,12 +140,9 @@ class DatamodelDiagramTest(unittest.TestCase):
         expected.add_relation("user1", "table1", "uses")
         expected.add_relation("user2", "table1", "contains")
         expected.add_relation("col1", "table1", "contains")
-        self.assert_models_are_equal(expected,result)
-
+        self.assert_models_are_equal(expected, result)
 
     def assert_models_are_equal(self, model1: data_model, model2: data_model):
-        self.assertDictEqual(model1.graph[SYSTEM_NODES],model2.graph[SYSTEM_NODES])
+        self.assertDictEqual(model1.graph[SYSTEM_NODES], model2.graph[SYSTEM_NODES])
         self.assertSetEqual(set(hash(frozenset(edge.items())) for edge in model1.get_relations()),
                             set(hash(frozenset(edge.items())) for edge in model2.get_relations()))
-
-

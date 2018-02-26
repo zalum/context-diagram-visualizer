@@ -24,6 +24,10 @@ def _read_state() -> system_model:
 
 
 class FileSystemModelsRepository(SystemModelsRepository):
+
+    def append_system_model(self, model: system_model):
+        self.state.append(model)
+
     def __init__(self):
         self.state = _read_state()
 

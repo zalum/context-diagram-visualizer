@@ -12,6 +12,9 @@ class SystemModelsRepository(object):
     def set_model(self, system_mode):
         pass
 
+    def append_system_model(self,system_model):
+        pass
+
 
 
 

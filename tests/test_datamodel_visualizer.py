@@ -99,8 +99,8 @@ class DataModelVisualiserTest(unittest.TestCase):
         model.add_system_node("T2_ID", type="column")
         model.add_relation(start="TABLE1", end="SCHEMA1", relation_type="contains")
         model.add_relation(start="TABLE2", end="SCHEMA1", relation_type="contains")
-        model.add_relation(start="T1_ID", end="TABLE1")
-        model.add_relation(start="T2_ID", end="TABLE2")
+        model.add_relation(start="T1_ID", end="TABLE1", relation_type="contains")
+        model.add_relation(start="T2_ID", end="TABLE2",relation_type="contains")
         model.add_relation(start="T1_ID", end="T2_ID", relation_type="fk")
 
         expected_result = ["@startuml","left to right direction","package \"SCHEMA1\"{",
@@ -185,6 +185,35 @@ class DataModelVisualiserTest(unittest.TestCase):
         datamodel.add_relation(start="part", end="user", relation_type="contains")
         datamodel.add_relation(start="parts", end="aggregate_root", relation_type="contains")
         datamodel.add_relation(start="part", end="parts", relation_type="composition")
+
+        # then
+        expected_result = self.transform_in_lines("""
+        @startuml
+        left to right direction
+        package "user"{
+        class aggregate_root {
+        + parts
+        }
+        class part {
+        }
+        }
+        part --* aggregate_root::parts
+        @enduml
+        """)
+
+        self.__run_draw_datamodel_test__(datamodel, expected_result)
+
+    def test_composition_relation_with_inverse_relation_direction(self):
+        # given
+        datamodel = sm.data_model()
+        datamodel.add_system_node("aggregate_root", type="table")
+        datamodel.add_system_node("user", type="database-user")
+        datamodel.add_system_node("part", type="table")
+        datamodel.add_system_node("parts", type="column")
+        datamodel.add_relation(start="aggregate_root", end="user", relation_type="contains")
+        datamodel.add_relation(start="part", end="parts", relation_type="composition")
+        datamodel.add_relation(start="part", end="user", relation_type="contains")
+        datamodel.add_relation(end="parts", start="aggregate_root", relation_type="contains")
 
         # then
         expected_result = self.transform_in_lines("""

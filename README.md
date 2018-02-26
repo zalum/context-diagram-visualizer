@@ -39,5 +39,6 @@ What are the supported modelling options
 * improve validation and http error codes of endpoint
 * use a graph database to store the graph & provide a query language
 * deployment infrastructure: docker, pyenv
+* make a different between table id and name, and allow special caracters in the table name
 * annotate with timestamp the relations and components, to extract snapshots in time of the model
 
