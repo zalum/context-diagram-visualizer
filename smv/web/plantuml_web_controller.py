@@ -1,7 +1,8 @@
 from flask import request
 from flask import Blueprint
-from smv.web_utils import build_diagram_response
+from smv.web_utils import build_response
 from smv.web_utils import web_controller_config
+from smv.core.actions import render_datamodel_diagram_from_plantuml
 
 config = web_controller_config(
     controller = Blueprint('plantuml', 'plantuml'),
@@ -21,12 +22,16 @@ def draw_plant_uml():
             type: string
     responses:
         200:
+            description: Ok
             content:
                 image/png:
                   schema:
-                    type: file
+                    type: string
                     format: binary
     tags:
     - plantuml
     '''
-    return build_diagram_response(request.data,output_format="image",input_format="block")
+    markdown = request.data.decode().split("\n")
+    output_format = "image"
+    result = render_datamodel_diagram_from_plantuml(markdown,output_format)
+    return build_response(result, output_format)

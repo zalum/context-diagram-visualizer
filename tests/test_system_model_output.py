@@ -1,6 +1,6 @@
-import smv.system_model_output as smo
 from unittest import TestCase
-import io
+
+import smv.core.infrastructure.system_model_output as smo
 
 
 class Test(TestCase):

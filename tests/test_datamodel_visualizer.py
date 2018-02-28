@@ -1,9 +1,7 @@
 import unittest
 
-
-from smv import system_model_visualizer as svm
 import smv.core.model.system_model as sm
-
+from smv.core.model import system_model_visualizer as svm
 
 
 class DataModelVisualiserTest(unittest.TestCase):

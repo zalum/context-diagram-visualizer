@@ -10,7 +10,7 @@ def writeAsFile(lines, file='output.plantuml'):
     f.close()
 
 
-def writeAsImage(input, input_format="lines"):
+def render_image(input, input_format="lines"):
     if input_format == "lines":
         content = writeAsText(input)
         content = bytes(content, "UTF-8")
@@ -25,14 +25,17 @@ def writeAsImage(input, input_format="lines"):
     return io.BytesIO(result)
 
 
-def writeAsText(lines):
-    return "\n".join(lines)
-
-
 def trim_left_png(png:bytes):
     index = png.find(b'PNG')
     index = png[0:index].rfind(b'\n')
     return png[index+1:]
+
+
+def writeAsText(lines):
+    return "\n".join(lines)
+
+
+
 
 
 

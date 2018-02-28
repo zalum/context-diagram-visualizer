@@ -23,3 +23,16 @@ class Response(object):
         response.content = response_content
         response.return_code = RESPONSE_ERROR
         return response
+
+    def is_error(self):
+        return self.return_code == RESPONSE_ERROR
+
+
+class SupportedOutputFormats:
+    image = "image"
+    text = "text"
+    json = "json"
+
+    @staticmethod
+    def is_in(value):
+        return value in (SupportedOutputFormats.image,SupportedOutputFormats.text,SupportedOutputFormats.json)

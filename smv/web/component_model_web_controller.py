@@ -1,10 +1,9 @@
 from flask import Blueprint
 from flask import request
 
-
-from smv import web_utils, c4_diagram
-from smv.system_model_visualizer import component_model_visualizer as cmv
-from smv.web_utils import build_diagram_response
+from smv import web_utils
+from smv.web_utils import build_response
+from smv.core.actions import render_component_diagram
 
 config = web_utils.web_controller_config(
     controller = Blueprint('component-model', 'component-model'),
@@ -23,8 +22,8 @@ def draw_component_diagram(component):
       - in: query
         type: string
         name: format
-        enum: ["image","plantuml"]
-        default: ["image"]
+        enum: ["image","text"]
+        default: "image"
         required: true
     responses:
         200:
@@ -36,7 +35,6 @@ def draw_component_diagram(component):
     tags:
     - component
     '''
-
-    model = c4_diagram.search(component)
-    diagram = cmv(model).draw()
-    return build_diagram_response(diagram, request.args.get("format"))
+    output_format = request.args.get("format")
+    render_result = render_component_diagram(component, output_format)
+    return build_response(render_result, output_format)

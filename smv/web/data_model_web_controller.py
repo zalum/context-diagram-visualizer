@@ -2,11 +2,11 @@ from flask import Blueprint
 from flask import abort
 from flask import request
 
-import smv.datamodel_diagram as datamodel_diagram
-from smv import web_utils, system_model_visualizer as smv
+from smv.core.actions import render_datamodel_diagram,render_datamodel_diagram_from_json
+from smv import web_utils
 from smv.core.model import system_model as sm
 from smv.core.model import system_models_repository
-from smv.web_utils import build_diagram_response
+from smv.web_utils import build_response
 
 config = web_utils.web_controller_config(
     controller = Blueprint('datamodel', 'datamodel'),
@@ -70,8 +70,8 @@ def draw_db_user(user):
       - in: query
         type: string
         name: format
-        enum: ["image","plantuml","graph"]
-        default: ["image"]
+        enum: ["image","test","json"]
+        default: "image"
         required: true
     responses:
         200:
@@ -83,10 +83,39 @@ def draw_db_user(user):
     tags:
     - datamodel
     """
-    output_format = request.args.get("format") if "format" in request.args else "image"
-    data_model = datamodel_diagram.search_database_user(user)
-    if output_format == "graph":
-        return data_model.to_string()
+    output_format = request.args.get("format")
+    render_result = render_datamodel_diagram(user, output_format)
+    return build_response(render_result,output_format)
 
-    diagram = smv.datamodel_visualizer(data_model).draw()
-    return build_diagram_response(diagram, output_format)
+
+@config.controller.route("/diagram", methods=['POST'])
+def render_diagram():
+    '''
+    render a datamodel diagram from json graph
+    ---
+    parameters:
+    - in: query
+      type: string
+      name: format
+      enum: ["image","text"]
+      default: "image"
+      required: true
+    - in: body
+      name: graph
+      required: true
+      schema:
+        type: string
+    responses:
+        200:
+            content:
+                image/png:
+                    schema:
+                        type: file
+                        format: binary
+    tags:
+    - datamodel
+    '''
+    output_format = request.args.get("format")
+    response = render_datamodel_diagram_from_json(request.data, output_format=output_format)
+    return web_utils.build_response(response, output_format)
+

@@ -12,6 +12,7 @@ from smv.search_model import find_connected_graph
 from smv.core.model import system_models_repository
 
 import smv.core.actions as actions
+from smv.core import *
 
 config = web_utils.web_controller_config(
     controller=Blueprint('system-model', 'system-model'),
@@ -102,7 +103,7 @@ def add_system_node():
     '''
     node = request.get_json()
     response = actions.add_system_node(node["name"], system_node_type=node["type"])
-    return web_utils.build_response(response)
+    return web_utils.build_response(response, SupportedOutputFormats.json)
 
 @config.controller.route("/system-node", methods=['GET'])
 def list_nodes():

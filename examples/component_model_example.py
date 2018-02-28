@@ -1,5 +1,5 @@
-from smv import system_model_visualizer as svm, system_model_output as smo
-from smv.core.model import system_model as sm
+from smv.core.infrastructure import system_model_output as smo
+from smv.core.model import system_model as sm, system_model_visualizer as svm
 
 
 def get_component_graph():
@@ -24,7 +24,7 @@ def draw_component_model():
     f = open('output-cm.png', 'wb')
     inputSystemGraph = sm.component_model(get_component_graph())
     lines = svm.component_model_visualizer(inputSystemGraph).draw()
-    picture = smo.writeAsImage(lines).getvalue()
+    picture = smo.render_image(lines).getvalue()
     f.write(picture)
 
 draw_component_model()

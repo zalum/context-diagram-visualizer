@@ -38,11 +38,11 @@ class datamodel_visualizer():
     def __init__(self, system_model: sm.data_model):
         self.system_model = system_model
 
-    def draw(self,colapsed_columns = False):
+    def draw(self, collapsed_columns = False):
         lines = ["@startuml","left to right direction"]
-        self.draw_database_users(colapsed_columns, lines)
-        self.draw_foreign_keys(colapsed_columns, lines)
-        self._draw_composition_relations(colapsed_columns, lines)
+        self.draw_database_users(collapsed_columns, lines)
+        self.draw_foreign_keys(collapsed_columns, lines)
+        self._draw_composition_relations(collapsed_columns, lines)
         lines.append("@enduml")
         return lines
 
