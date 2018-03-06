@@ -6,13 +6,12 @@ from flask import abort
 from flask import request
 from flask import send_file
 
-from smv import web_utils
-from smv.core.model.system_model import RESPONSE_OK_deprecated
-from smv.search_model import find_connected_graph
-from smv.core.model import system_models_repository
-
 import smv.core.actions as actions
 from smv.core import *
+from smv.core.model import system_models_repository
+from smv.core.model.system_model import RESPONSE_OK_deprecated
+from smv.search_model import find_connected_graph
+from smv.web import web_utils
 
 config = web_utils.web_controller_config(
     controller=Blueprint('system-model', 'system-model'),

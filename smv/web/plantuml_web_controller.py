@@ -1,8 +1,9 @@
-from flask import request
 from flask import Blueprint
-from smv.web_utils import build_response
-from smv.web_utils import web_controller_config
+from flask import request
+
 from smv.core.actions import render_datamodel_diagram_from_plantuml
+from smv.web.web_utils import build_response
+from smv.web.web_utils import web_controller_config
 
 config = web_controller_config(
     controller = Blueprint('plantuml', 'plantuml'),

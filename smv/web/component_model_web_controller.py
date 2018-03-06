@@ -1,9 +1,9 @@
 from flask import Blueprint
 from flask import request
 
-from smv import web_utils
-from smv.web_utils import build_response
 from smv.core.actions import render_component_diagram
+from smv.web import web_utils
+from smv.web.web_utils import build_response
 
 config = web_utils.web_controller_config(
     controller = Blueprint('component-model', 'component-model'),

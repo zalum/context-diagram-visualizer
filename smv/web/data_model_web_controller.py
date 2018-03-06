@@ -2,11 +2,11 @@ from flask import Blueprint
 from flask import abort
 from flask import request
 
-from smv.core.actions import render_datamodel_diagram,render_datamodel_diagram_from_json
-from smv import web_utils
+from smv.core.actions import render_datamodel_diagram, render_datamodel_diagram_from_json
 from smv.core.model import system_model as sm
 from smv.core.model import system_models_repository
-from smv.web_utils import build_response
+from smv.web import web_utils
+from smv.web.web_utils import build_response
 
 config = web_utils.web_controller_config(
     controller = Blueprint('datamodel', 'datamodel'),

@@ -6,7 +6,7 @@ from smv.web.component_model_web_controller import config as cm_web
 from smv.web.data_model_web_controller import config as dm_web
 from smv.web.plantuml_web_controller import config as plantuml_web
 from smv.web.system_model_web_controller import config as sm_web
-from smv.web_utils import rule_filter
+from smv.web.web_utils import rule_filter
 
 
 def get_swagger_config():
