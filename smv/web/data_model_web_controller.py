@@ -2,7 +2,7 @@ from flask import Blueprint
 from flask import abort
 from flask import request
 
-from smv.core.actions import render_datamodel_diagram, render_datamodel_diagram_from_json
+from smv.core.actions import render_datamodel_diagram, render_datamodel_diagram_from_graph
 from smv.core.model import system_model as sm
 from smv.core.model import system_models_repository
 from smv.web import web_utils
@@ -91,12 +91,17 @@ def draw_db_user(user):
 @config.controller.route("/diagram", methods=['POST'])
 def render_diagram():
     '''
-    render a datamodel diagram from json graph
+    render a datamodel diagram from graph
     ---
     parameters:
     - in: query
       type: string
-      name: format
+      name: input_format
+      enum: ["json","yaml"]
+      required: true
+    - in: query
+      type: string
+      name: output_format
       enum: ["image","text"]
       default: "image"
       required: true
@@ -115,7 +120,8 @@ def render_diagram():
     tags:
     - datamodel
     '''
-    output_format = request.args.get("format")
-    response = render_datamodel_diagram_from_json(request.data, output_format=output_format)
+    output_format = request.args.get("output_format")
+    input_format = request.args.get("input_format")
+    response = render_datamodel_diagram_from_graph(request.data, input_format = input_format, output_format=output_format)
     return web_utils.build_response(response, output_format)
 

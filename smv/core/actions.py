@@ -9,6 +9,7 @@ from smv.core.infrastructure.system_model_output import writeAsText
 from smv.core.model.system_model_visualizer import component_model_visualizer as cmv
 from smv.core.model.system_model_visualizer import datamodel_visualizer as dmv
 from smv.core import *
+import yaml
 import json
 
 
@@ -45,9 +46,18 @@ def render_datamodel_diagram_from_plantuml(plantuml, output_format)->Response:
         return Response.success(render_image(plantuml))
 
 
-def render_datamodel_diagram_from_json(json_content, output_format)->Response:
-    graph = json.loads(json_content)
-    model = data_model(graph)
+def _transform_to_model(graph_content, input_format):
+    if input_format == "json":
+        graph = json.loads(graph_content)
+    else:
+        if input_format == "yaml":
+            graph = yaml.load(graph_content)
+    return data_model(graph)
+
+
+def render_datamodel_diagram_from_graph(graph_content, output_format, input_format="json")->Response:
+    model = _transform_to_model(graph_content,input_format)
+
     markdown = datamodel_visualizer(model).draw()
     if not SupportedOutputFormats.is_in(output_format):
         return Response.error("Format {} is not accepted".format(output_format()))
@@ -56,7 +66,7 @@ def render_datamodel_diagram_from_json(json_content, output_format)->Response:
     if output_format == SupportedOutputFormats.image:
         return Response.success(render_image(markdown))
     if output_format == SupportedOutputFormats.json:
-        return Response.success(json_content)
+        return Response.success(graph_content)
 
 def _render_diagram_from_system_model(model, markdown, output_format):
     if not SupportedOutputFormats.is_in(output_format):
