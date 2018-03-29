@@ -17,7 +17,7 @@ class Test(TestCase):
         repo.set_model(model)
 
         # when
-        result = repo.find_connected_graph("2", level=3 )
+        result = repo.find_connected_graph("2", level=3)
 
         #then
         self.assert_models_are_equal(system_model(), result)

@@ -1,4 +1,3 @@
-from smv import c4_diagram
 from smv.core import SupportedOutputFormats, Response
 from smv.core.model import system_models_repository
 from smv.core.model.system_model import data_model as data_model
@@ -9,6 +8,7 @@ from smv.core.infrastructure.system_model_output import writeAsText
 from smv.core.model.system_model_visualizer import component_model_visualizer as cmv
 from smv.core.model.system_model_visualizer import datamodel_visualizer as dmv
 from smv.core.model.diagram_search import search_database_user
+from smv.core.model.diagram_search import search_component_diagram
 import yaml
 import json
 
@@ -24,15 +24,15 @@ def append_json(json_content):
 
 
 def render_component_diagram(component,output_format):
-    model = c4_diagram.search(component)
+    model = search_component_diagram(component)
     markdown = cmv(model).draw()
-    return _render_diagram_from_system_model(model,markdown,output_format)
+    return __render_diagram_from_system_model(model, markdown, output_format)
 
 
 def render_datamodel_diagram(database_user, output_format, collapsed_columns=False):
     model = search_database_user(database_user)
     markdown = dmv(model).draw(collapsed_columns)
-    return _render_diagram_from_system_model(model, markdown, output_format)
+    return __render_diagram_from_system_model(model, markdown, output_format)
 
 
 def render_datamodel_diagram_from_plantuml(plantuml, output_format)->Response:
@@ -46,7 +46,7 @@ def render_datamodel_diagram_from_plantuml(plantuml, output_format)->Response:
         return Response.success(render_image(plantuml))
 
 
-def _transform_to_model(graph_content, input_format):
+def __transform_to_model(graph_content, input_format):
     if input_format == "json":
         graph = json.loads(graph_content)
     else:
@@ -56,7 +56,7 @@ def _transform_to_model(graph_content, input_format):
 
 
 def render_datamodel_diagram_from_graph(graph_content, output_format, input_format="json")->Response:
-    model = _transform_to_model(graph_content,input_format)
+    model = __transform_to_model(graph_content, input_format)
 
     markdown = datamodel_visualizer(model).draw()
     if not SupportedOutputFormats.is_in(output_format):
@@ -69,7 +69,7 @@ def render_datamodel_diagram_from_graph(graph_content, output_format, input_form
         return Response.success(graph_content)
 
 
-def _render_diagram_from_system_model(model, markdown, output_format):
+def __render_diagram_from_system_model(model, markdown, output_format):
     if not SupportedOutputFormats.is_in(output_format):
         return Response.error("Format {} is not accepted".format(output_format()))
     if output_format == SupportedOutputFormats.json:
