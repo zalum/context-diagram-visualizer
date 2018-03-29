@@ -1,4 +1,4 @@
-import smv.datamodel_diagram as diagram
+import smv.core.model.diagram_search as diagram
 from smv.core.model.system_model import data_model
 from smv.core.model.system_model import SYSTEM_NODES
 from smv.core.model import system_models_repository
@@ -6,7 +6,7 @@ from smv.core.model import system_models_repository
 import unittest
 
 
-class DatamodelDiagramTest(unittest.TestCase):
+class DatamodelSearchDiagramTest(unittest.TestCase):
     def test_search_tables_and_users(self):
         # given
         input_model = data_model()

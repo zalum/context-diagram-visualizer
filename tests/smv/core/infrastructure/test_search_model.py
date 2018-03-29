@@ -3,7 +3,8 @@ from unittest import TestCase
 from smv.core.model.system_model import system_model
 from smv.core.model.system_model import SYSTEM_NODES
 from smv.core.model.system_model import RELATIONS
-from smv.search_model import search_criteria, find_connected_graph
+from smv.core.infrastructure.file_system_model_repository import _find_connected_graph as find_connected_graph
+from smv.core.model.system_models_repository import SearchCriteria
 
 
 class Test(TestCase):
@@ -137,7 +138,7 @@ class Test(TestCase):
         model.add_relation("user", "table1", "uses")
         model.add_relation("user", "schema", "uses")
 
-        criteria = search_criteria()
+        criteria = SearchCriteria()
 
         #when
         result = find_connected_graph(model,"user",criteria)
@@ -183,7 +184,7 @@ class Test(TestCase):
         model.add_relation("user", "table1", "uses")
         model.add_relation("user", "schema", "uses")
 
-        criteria = search_criteria().with_include_vertex_types(0, ["table"])
+        criteria = SearchCriteria().with_include_vertex_types(0, ["table"])
 
         #when
         result = find_connected_graph(model,"user", criteria=criteria)
@@ -206,7 +207,7 @@ class Test(TestCase):
         model.add_relation("user", "table1", "uses")
         model.add_relation("user", "schema", "uses")
         model.add_relation("user", "xxx", "uses")
-        criteria = search_criteria().with_include_vertex_types(0,["table","schema"])
+        criteria = SearchCriteria().with_include_vertex_types(0, ["table", "schema"])
 
         #when
         result = find_connected_graph(model,"user",criteria=criteria)
@@ -230,7 +231,7 @@ class Test(TestCase):
         model.add_relation("user", "table1", "uses")
         model.add_relation("user", "schema", "xxx")
 
-        criteria = search_criteria().with_include_relation_types(0,["uses"])
+        criteria = SearchCriteria().with_include_relation_types(0, ["uses"])
 
         #when
         result = find_connected_graph(model,"user",criteria=criteria)
@@ -261,7 +262,7 @@ class Test(TestCase):
         model.add_relation("column1", "table1", "contains")
         model.add_relation("column2", "column1", "fk")
         #when
-        criteria = search_criteria().with_include_vertex_types(0, ["table"]).\
+        criteria = SearchCriteria().with_include_vertex_types(0, ["table"]).\
             with_include_vertex_types(1, ["schema","column"]).\
             with_include_relation_types(2, ["fk"])
 

@@ -1,5 +1,5 @@
 from smv import c4_diagram
-from smv import datamodel_diagram
+from smv.core import SupportedOutputFormats, Response
 from smv.core.model import system_models_repository
 from smv.core.model.system_model import data_model as data_model
 from smv.core.model.system_model import system_model as system_model
@@ -8,7 +8,7 @@ from smv.core.infrastructure.system_model_output import render_image
 from smv.core.infrastructure.system_model_output import writeAsText
 from smv.core.model.system_model_visualizer import component_model_visualizer as cmv
 from smv.core.model.system_model_visualizer import datamodel_visualizer as dmv
-from smv.core import *
+from smv.core.model.diagram_search import search_database_user
 import yaml
 import json
 
@@ -30,7 +30,7 @@ def render_component_diagram(component,output_format):
 
 
 def render_datamodel_diagram(database_user, output_format, collapsed_columns=False):
-    model = datamodel_diagram.search_database_user(database_user)
+    model = search_database_user(database_user)
     markdown = dmv(model).draw(collapsed_columns)
     return _render_diagram_from_system_model(model, markdown, output_format)
 
@@ -67,6 +67,7 @@ def render_datamodel_diagram_from_graph(graph_content, output_format, input_form
         return Response.success(render_image(markdown))
     if output_format == SupportedOutputFormats.json:
         return Response.success(graph_content)
+
 
 def _render_diagram_from_system_model(model, markdown, output_format):
     if not SupportedOutputFormats.is_in(output_format):

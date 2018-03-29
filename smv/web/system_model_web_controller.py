@@ -10,7 +10,6 @@ import smv.core.actions as actions
 from smv.core import *
 from smv.core.model import system_models_repository
 from smv.core.model.system_model import RESPONSE_OK_deprecated
-from smv.search_model import find_connected_graph
 from smv.web import web_utils
 
 config = web_utils.web_controller_config(
@@ -45,7 +44,7 @@ def get_node_graph(node):
     if level is not None:
         level = int(level)
     state = system_models_repository.get_full_system_model()
-    return find_connected_graph(state,node,level=level).to_string()
+    return system_models_repository.find_connected_graph(state,node,level=level).to_string()
 
 @config.controller.route("/system-node/<string:node>",methods=['GET'])
 def get_node(node):

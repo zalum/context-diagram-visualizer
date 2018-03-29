@@ -51,7 +51,7 @@ setup(
     install_requires=[
         "flask>=0.12.2",
         "flasgger>=0.8.0",
-        'PyYAML'
+        'PyYAML>=3.12'
     ],
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
