@@ -3,8 +3,8 @@ from unittest import TestCase
 from smv.core.model.system_model import system_model
 from smv.core.model.system_model import SYSTEM_NODES
 from smv.core.model.system_model import RELATIONS
-from smv.core.infrastructure.file_system_model_repository import _find_connected_graph as find_connected_graph
 from smv.core.model.system_models_repository import SearchCriteria
+from smv.core.infrastructure.file_system_model_repository import FileSystemModelsRepository
 
 
 class Test(TestCase):
@@ -13,9 +13,11 @@ class Test(TestCase):
         # given
         model = system_model()
         model.add_system_node("1", "application")
+        repo = FileSystemModelsRepository()
+        repo.set_model(model)
 
         # when
-        result = find_connected_graph(model, "2", level=3)
+        result = repo.find_connected_graph("2", level=3 )
 
         #then
         self.assert_models_are_equal(system_model(), result)
@@ -32,9 +34,11 @@ class Test(TestCase):
         model.add_relation("2", "3")
         model.add_relation("3", "4")
         model.add_relation("4", "5")
+        repo = FileSystemModelsRepository()
+        repo.set_model(model)
 
         #when
-        result = find_connected_graph(model,"1",level=3)
+        result = repo.find_connected_graph("1",level=3)
 
         #then
         expected = system_model()
@@ -55,9 +59,11 @@ class Test(TestCase):
             "application1": {"type": "application"},
         }
         graph[RELATIONS]=[]
+        repo = FileSystemModelsRepository()
+        repo.set_model(system_model(graph))
 
         #when
-        result = find_connected_graph(system_model(graph),"product")
+        result = repo.find_connected_graph("product")
 
         #then
         expected = dict()
@@ -73,9 +79,11 @@ class Test(TestCase):
             "application1":{"type":"application"},
             }
         graph[RELATIONS] = [{"start":"product","end":"application1","relation_type":"contains"}]
+        repo = FileSystemModelsRepository()
+        repo.set_model(system_model(graph))
 
         # when
-        connected_graph = find_connected_graph(system_model(graph),"product")
+        connected_graph = repo.find_connected_graph("product")
 
         #then
         expected = dict()
@@ -95,8 +103,11 @@ class Test(TestCase):
         graph[RELATIONS] = [{"start":"product","end":"application1","relation_type":"contains"},
                  {"start": "application1", "end": "application2", "relation_type": "calls"}]
 
+        repo = FileSystemModelsRepository()
+        repo.set_model(system_model(graph))
+
         # when
-        connected_graph = find_connected_graph(system_model(graph),"product")
+        connected_graph = repo.find_connected_graph("product")
 
         # then
         expected = dict()
@@ -116,11 +127,11 @@ class Test(TestCase):
         graph[RELATIONS]=[{"start": "product", "end": "application1", "relation_type": "contains"},
                {"start": "product", "end": "application2", "relation_type": "contains"}]
 
-
-        model = system_model(graph)
+        repo = FileSystemModelsRepository()
+        repo.set_model(system_model(graph))
 
         # when
-        result = find_connected_graph(model,"product")
+        result = repo.find_connected_graph("product")
 
         # then
         expected = system_model()
@@ -139,9 +150,11 @@ class Test(TestCase):
         model.add_relation("user", "schema", "uses")
 
         criteria = SearchCriteria()
+        repo = FileSystemModelsRepository()
+        repo.set_model(model)
 
         #when
-        result = find_connected_graph(model,"user",criteria)
+        result = repo.find_connected_graph("user",criteria)
 
         #then
         expected = system_model()
@@ -164,8 +177,10 @@ class Test(TestCase):
         graph[RELATIONS] = [{"start":"product","end":"application1","relation_type":"contains"},
                  {"start": "product", "end": "application2", "relation_type": "contains"},
                  {"start": "application1", "end": "application2", "relation_type": "calls"}]
+        repo = FileSystemModelsRepository()
+        repo.set_model(system_model(graph))
 
-        result = find_connected_graph(system_model(graph),"product")
+        result = repo.find_connected_graph("product")
 
         expected = dict()
         expected[SYSTEM_NODES] ={"product": {"type": "product"}, "application1": {"type": "application"},
@@ -185,9 +200,11 @@ class Test(TestCase):
         model.add_relation("user", "schema", "uses")
 
         criteria = SearchCriteria().with_include_vertex_types(0, ["table"])
+        repo = FileSystemModelsRepository()
+        repo.set_model(model)
 
         #when
-        result = find_connected_graph(model,"user", criteria=criteria)
+        result = repo.search("user", criteria=criteria)
 
         #then
         expected = system_model()
@@ -208,9 +225,11 @@ class Test(TestCase):
         model.add_relation("user", "schema", "uses")
         model.add_relation("user", "xxx", "uses")
         criteria = SearchCriteria().with_include_vertex_types(0, ["table", "schema"])
+        repo = FileSystemModelsRepository()
+        repo.set_model(model)
 
         #when
-        result = find_connected_graph(model,"user",criteria=criteria)
+        result = repo.search("user",criteria=criteria)
 
         #then
         expected = system_model()
@@ -232,9 +251,11 @@ class Test(TestCase):
         model.add_relation("user", "schema", "xxx")
 
         criteria = SearchCriteria().with_include_relation_types(0, ["uses"])
+        repo = FileSystemModelsRepository()
+        repo.set_model(model)
 
         #when
-        result = find_connected_graph(model,"user",criteria=criteria)
+        result = repo.search("user",criteria=criteria)
 
         #then
         expected = system_model()
@@ -261,13 +282,17 @@ class Test(TestCase):
         model.add_relation("column2", "table2", "contains")
         model.add_relation("column1", "table1", "contains")
         model.add_relation("column2", "column1", "fk")
+
         #when
         criteria = SearchCriteria().with_include_vertex_types(0, ["table"]).\
             with_include_vertex_types(1, ["schema","column"]).\
             with_include_relation_types(2, ["fk"])
 
+        repo = FileSystemModelsRepository()
+        repo.set_model(model)
+
         #then
-        result = find_connected_graph(model,"user", criteria=criteria)
+        result = repo.search("user", criteria=criteria)
         expected_model = system_model()
         expected_model.add_system_node("user", "user")
         expected_model.add_system_node("table1", "table")

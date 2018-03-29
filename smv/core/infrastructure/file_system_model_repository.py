@@ -25,11 +25,11 @@ def _read_state() -> system_model:
 
 class FileSystemModelsRepository(SystemModelsRepository):
 
-    def find_connected_graph(self, system_mode,level) -> system_model:
-        _find_connected_graph(self.state, system_mode,level=level)
+    def find_connected_graph(self, system_mode, level=None) -> system_model:
+        return _find_connected_graph(self.state, system_mode, level=level)
 
-    def search(self, system_mode, criteria: SearchCriteria) -> system_model:
-        return _find_connected_graph(self.state, system_mode, criteria)
+    def search(self, system_mode, criteria: SearchCriteria, level=None) -> system_model:
+        return _find_connected_graph(self.state, system_mode, criteria, level)
 
     def __init__(self):
         self.state = _read_state()
@@ -70,7 +70,7 @@ def _matching_edge(criteria:SearchCriteria, model:system_model, current_level, e
     return True
 
 
-def _find_connected_graph(source_model: system_model, from_vertex, criteria = None, level=None, connected_model=None, current_level=0):
+def _find_connected_graph(source_model: system_model, from_vertex, criteria=None, level=None, connected_model=None, current_level=0):
     if connected_model is None:
         connected_model = system_model()
         if not source_model.has_system_node(from_vertex):

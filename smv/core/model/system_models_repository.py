@@ -9,10 +9,10 @@ class SystemModelsRepository(object):
     def get_full_system_model(self)-> system_model:
         pass
 
-    def search(self, system_mode, criteria: 'SearchCriteria')->system_model:
+    def search(self, system_mode, criteria: 'SearchCriteria', level)->system_model:
         pass
 
-    def find_connected_graph(self, system_mode)->system_model:
+    def find_connected_graph(self, system_mode, level=None)->system_model:
         pass
 
     def set_model(self, system_mode):
@@ -53,5 +53,6 @@ class SearchCriteria:
 
     def include_relation_types(self,level)->[]:
         return self.level_search_criteria(level)["include_relation_types"]
+
 
 

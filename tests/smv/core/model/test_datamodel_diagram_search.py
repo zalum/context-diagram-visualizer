@@ -1,7 +1,7 @@
-import smv.core.model.diagram_search as diagram
 from smv.core.model.system_model import data_model
 from smv.core.model.system_model import SYSTEM_NODES
 from smv.core.model import system_models_repository
+import smv.core.model.diagram_search as diagram_search
 
 import unittest
 
@@ -30,7 +30,7 @@ class DatamodelSearchDiagramTest(unittest.TestCase):
         system_models_repository.set_model(input_model)
 
         # when
-        result = diagram.search_database_user("user1")
+        result = diagram_search.search_database_user("user1")
 
         # then
         expected = data_model()
@@ -69,7 +69,7 @@ class DatamodelSearchDiagramTest(unittest.TestCase):
         system_models_repository.set_model(input_model)
 
         # when
-        result = diagram.search_database_user("user1")
+        result = diagram_search.search_database_user("user1")
 
         # then
         expected = data_model()
@@ -106,7 +106,7 @@ class DatamodelSearchDiagramTest(unittest.TestCase):
         system_models_repository.set_model(input_model)
 
         # when
-        result = diagram.search_database_user("user")
+        result = diagram_search.search_database_user("user")
 
         # then
         self.assert_models_are_equal(input_model, result)
@@ -128,7 +128,7 @@ class DatamodelSearchDiagramTest(unittest.TestCase):
         system_models_repository.set_model(input_model)
 
         # when
-        result = diagram.search_database_user("user1")
+        result = diagram_search.search_database_user("user1")
 
         # then
         expected = data_model()
