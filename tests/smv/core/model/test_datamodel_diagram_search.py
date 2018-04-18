@@ -1,4 +1,5 @@
 from smv.core.model.system_model import data_model
+from smv.core.model.system_model import component_model
 from smv.core.model.system_model import SYSTEM_NODES
 from smv.core.model import system_models_repository
 import smv.core.model.diagram_search as diagram_search
@@ -141,6 +142,42 @@ class DatamodelSearchDiagramTest(unittest.TestCase):
         expected.add_relation("user2", "table1", "contains")
         expected.add_relation("col1", "table1", "contains")
         self.assert_models_are_equal(expected, result)
+
+
+    def test_component_search(self):
+        #given
+        system_model = component_model()
+        system_model.add_system_node("P1","product")
+        system_model.add_system_node("app1","application")
+        system_model.add_system_node("app2","application")
+        system_model.add_system_node("app3","application")
+        system_model.add_system_node("t1","table")
+
+        system_model.add_relation("P1","app1","contains")
+        system_model.add_relation("P1","app2","contains")
+        system_model.add_relation("P1","app3","contains")
+        system_model.add_relation("app1","app3","calls")
+        system_model.add_relation("P1","t1","owns")
+        system_models_repository.set_model(system_model)
+
+        #when
+        result = diagram_search.search_component_diagram("P1")
+
+        #then
+        expected = component_model()
+        expected.add_system_node("P1", "product")
+        expected.add_system_node("app1", "application")
+        expected.add_system_node("app2", "application")
+        expected.add_system_node("app3", "application")
+
+        expected.add_relation("P1", "app1", "contains")
+        expected.add_relation("P1", "app2", "contains")
+        expected.add_relation("P1", "app3", "contains")
+        expected.add_relation("app1", "app3", "calls")
+
+        self.assert_models_are_equal(expected, result)
+
+
 
     def assert_models_are_equal(self, model1: data_model, model2: data_model):
         self.assertDictEqual(model1.graph[SYSTEM_NODES], model2.graph[SYSTEM_NODES])

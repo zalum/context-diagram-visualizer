@@ -15,6 +15,10 @@ def search_database_user(user):
 
 
 def search_component_diagram(component):
-    criteria = SearchCriteria().with_include_vertex_types(0, ["application"])
-    system_model = system_models_repository.search(component, criteria, level=1)
+    criteria = SearchCriteria().\
+        with_include_vertex_types(0, ["application"]).\
+        with_include_relation_types(0, ["contains"]).\
+        with_include_vertex_types(1, ["application"]).\
+        with_include_relation_types(1, ["calls"])
+    system_model = system_models_repository.search(component, criteria, level=2)
     return sm.component_model(system_model.graph)

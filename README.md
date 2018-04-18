@@ -42,3 +42,11 @@ What are the supported modelling options
 * make a different between table id and name, and allow special caracters in the table name
 * annotate with timestamp the relations and components, to extract snapshots in time of the model
 
+## Code refactorings
+* improve encapsulation
+* rename names to python standards
+* fix RESPONSE_OK_deprecated
+* fix transformation of a model to a more specific one: sm.data_model(system_model.graph)
+* improve identity of nodes
+
+
