@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-import smv.core.infrastructure.system_model_output as smo
+from smv.core.infrastructure.system_model_output import PlantUmlLocalRenderer
 
 
 class Test(TestCase):
@@ -10,13 +10,12 @@ class Test(TestCase):
         untrimmed_image = self.read_image("untrimmed.png")
 
         #when
-        result = smo.trim_left_png(untrimmed_image)
+        result = PlantUmlLocalRenderer.__trim_left_png__(untrimmed_image)
 
         #then
         self.assertIsNotNone(result)
         self.assertEqual(result,self.read_image("trimmed.png"))
 
-
-    def read_image(self,path):
+    def read_image(self, path):
         file = open(path, "rb")
         return file.read()

@@ -14,7 +14,7 @@ import json
 
 
 def add_system_node(system_node_id, system_node_type):
-    return system_models_repository.add_system_node(system_node_id, system_node_type=system_node_type)
+    return system_models_repository.add_vertex(system_node_id, system_node_type=system_node_type)
 
 
 def append_json(json_content):
@@ -41,9 +41,9 @@ def render_datamodel_diagram_from_plantuml(plantuml, output_format)->Response:
     if output_format == SupportedOutputFormats.json:
         return Response.error("Format {} is not accepted".format(output_format()))
     if output_format == SupportedOutputFormats.text:
-        return Response.success(writeAsText(plantuml))
+        return Response.success(plantuml)
     if output_format == SupportedOutputFormats.image:
-        return Response.success(render_image(plantuml))
+        return Response.success(render_image(plantuml,"block"))
 
 
 def __transform_to_model(graph_content, input_format):
