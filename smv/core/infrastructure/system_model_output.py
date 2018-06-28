@@ -54,7 +54,7 @@ class PlantUmlLocalRenderer(PlantUmlRenderer):
         return png[index + 1:]
 
 
-image_renderer = PlantUmlServerRenderer("http://localhost:8090")
+image_renderer = PlantUmlServerRenderer(os.environ["PLANT_UML_SERVER"])
 
 
 def render_image(input, input_format="lines"):
