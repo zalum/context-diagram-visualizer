@@ -43,7 +43,7 @@ def render_datamodel_diagram_from_plantuml(plantuml, output_format)->Response:
     if output_format == SupportedOutputFormats.text:
         return Response.success(plantuml)
     if output_format == SupportedOutputFormats.image:
-        return Response.success(render_image(plantuml,"block"))
+        return render_image(plantuml,"block")
 
 
 def __transform_to_model(graph_content, input_format):
@@ -64,7 +64,7 @@ def render_datamodel_diagram_from_graph(graph_content, output_format, input_form
     if output_format == SupportedOutputFormats.text:
         return Response.success(writeAsText(markdown))
     if output_format == SupportedOutputFormats.image:
-        return Response.success(render_image(markdown))
+        return render_image(markdown)
     if output_format == SupportedOutputFormats.json:
         return Response.success(graph_content)
 
@@ -77,5 +77,5 @@ def __render_diagram_from_system_model(model, markdown, output_format):
     if output_format == SupportedOutputFormats.text:
         return Response.success(writeAsText(markdown))
     if output_format == SupportedOutputFormats.image:
-        return Response.success(render_image(markdown))
+        return render_image(markdown)
 

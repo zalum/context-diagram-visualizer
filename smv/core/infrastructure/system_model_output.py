@@ -3,6 +3,8 @@ import io
 import os
 import requests
 
+from smv.core import Response
+
 
 def writeAsFile(lines, file='output.plantuml'):
     f = open(file, 'w')
@@ -28,8 +30,9 @@ class PlantUmlServerRenderer(PlantUmlRenderer):
         result = requests.post(self.render_png_url,
                                data=content)
         if result.status_code != 200:
-            return None
-        return io.BytesIO(result.content)
+            return Response.error("Plant uml server {} failed to generate with error code {}".
+                                  format(self.render_png_url, result.status_code))
+        return Response.success(io.BytesIO(result.content))
 
 
 class PlantUmlLocalRenderer(PlantUmlRenderer):
@@ -45,7 +48,7 @@ class PlantUmlLocalRenderer(PlantUmlRenderer):
         result = p.communicate(content)
         result = self.__trim_left_png__(result[0])
 
-        return io.BytesIO(result)
+        return  Response.success(io.BytesIO(result))
 
     @staticmethod
     def __trim_left_png__(png: bytes):
