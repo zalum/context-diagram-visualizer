@@ -18,7 +18,7 @@ class PlantUmlRenderer():
 
 class PlantUmlServerRenderer(PlantUmlRenderer):
     def __init__(self, server_url):
-        self.render_png_url = server_url + "/plantuml/png"
+        self.render_png_url = server_url + "/png"
 
     def render_image(self, input, input_format="lines"):
         if input_format == "lines":
@@ -59,7 +59,6 @@ image_renderer = PlantUmlServerRenderer(os.environ["PLANT_UML_SERVER"])
 
 def render_image(input, input_format="lines"):
     return image_renderer.render_image(input, input_format)
-
 
 def writeAsText(lines):
     return "\n".join(lines)
