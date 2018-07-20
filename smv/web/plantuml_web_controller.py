@@ -32,7 +32,7 @@ def draw_plant_uml():
     tags:
     - plantuml
     '''
-    markdown = request.data.decode().split("\n")
+    markdown = request.data.decode()
     output_format = "image"
     result = render_datamodel_diagram_from_plantuml(markdown,output_format)
     return build_response(result, output_format)

@@ -70,7 +70,7 @@ def draw_db_user(user):
       - in: query
         type: string
         name: format
-        enum: ["image","test","json"]
+        enum: ["image","text","json"]
         default: "image"
         required: true
     responses:
