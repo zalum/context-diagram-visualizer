@@ -17,7 +17,8 @@ config = web_utils.web_controller_config(
     url_prefix="/system-model"
 )
 
-@config.controller.route("/system-node/<string:node>/graph",methods=['GET'])
+
+@config.controller.route("/system-node/<string:node>/graph", methods=['GET'])
 def get_node_graph(node):
     '''
     get node graph
@@ -44,9 +45,10 @@ def get_node_graph(node):
     if level is not None:
         level = int(level)
     state = system_models_repository.get_full_system_model()
-    return system_models_repository.find_connected_graph(state,node,level=level).to_string()
+    return system_models_repository.find_connected_graph(state, node, level=level).to_string()
 
-@config.controller.route("/system-node/<string:node>",methods=['GET'])
+
+@config.controller.route("/system-node/<string:node>", methods=['GET'])
 def get_node(node):
     '''
     get node
@@ -103,6 +105,7 @@ def add_system_node():
     response = actions.add_system_node(node["name"], system_node_type=node["type"])
     return web_utils.build_response(response, SupportedOutputFormats.json)
 
+
 @config.controller.route("/system-node", methods=['GET'])
 def list_nodes():
     '''
@@ -132,14 +135,14 @@ def list_nodes():
     node_type = request.args.get("type")
     format = request.args.get("format")
     if node_type is None:
-        return abort(400,"Type cannot be null")
+        return abort(400, "Type cannot be null")
     state = system_models_repository.get_full_system_model()
     nodes = state.get_system_nodes_of_type(node_type)
     if format == "full":
         result = dict()
         for key in nodes:
             result[key] = state.get_system_node(key)
-        return json.dumps(result,indent = 2)
+        return json.dumps(result, indent=2)
     else:
         return json.dumps([key for key in nodes])
 
@@ -178,12 +181,8 @@ def create_relation():
     - system
     '''
     relation = request.get_json()
-    state = system_models_repository.get_full_system_model()
-    result = state.add_relation(start=relation["start"], end=relation["end"], relation_type=relation["relation_type"])
-    if result is RESPONSE_OK_deprecated:
-        return "ok"
-    else:
-        abort(400,result)
+    result = actions.add_relation(**relation)
+    return web_utils.build_response(result, SupportedOutputFormats.text)
 
 
 @config.controller.route("/state/", methods=['PUT'])
@@ -207,6 +206,7 @@ def persist_state():
     f.close()
     return "ok"
 
+
 @config.controller.route("/state/", methods=['GET'])
 def download_state():
     """
@@ -223,10 +223,10 @@ def download_state():
     """
     state = system_models_repository.get_full_system_model()
     content = state.to_string()
-    return send_file(io.BytesIO(bytes(content,"UTF-8")), mimetype="text/plain")
+    return send_file(io.BytesIO(bytes(content, "UTF-8")), mimetype="text/plain")
 
 
-@config.controller.route("/system-node/<string:node>/direct-connections",methods=['GET'])
+@config.controller.route("/system-node/<string:node>/direct-connections", methods=['GET'])
 def get_direct_connections(node):
     '''
     get direct connections of node
@@ -261,5 +261,5 @@ def get_direct_connections(node):
     relation_type = request.args.get("relation-type")
     if vertex is None:
         abort(404)
-    connections = state.find_direct_connections(node,type,relation_type)
+    connections = state.find_direct_connections(node, type, relation_type)
     return json.dumps(connections)

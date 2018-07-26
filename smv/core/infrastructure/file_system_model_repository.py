@@ -3,6 +3,7 @@ import logging
 import os
 from json import JSONDecodeError
 
+from smv.core import Response
 from smv.core.model.system_models_repository import SystemModelsRepository, SearchCriteria
 from smv.core.model.system_model import system_model
 
@@ -24,6 +25,10 @@ def _read_state() -> system_model:
 
 
 class FileSystemModelsRepository(SystemModelsRepository):
+
+    def add_relation(self, start, end, relation_type):
+        self.state.add_relation(start,end,relation_type)
+        return Response.success()
 
     def find_connected_graph(self, system_mode, level=None) -> system_model:
         return _find_connected_graph(self.state, system_mode, level=level)

@@ -9,12 +9,15 @@ from smv.core.model.system_model_visualizer import component_model_visualizer as
 from smv.core.model.system_model_visualizer import datamodel_visualizer as dmv
 from smv.core.model.diagram_search import search_database_user
 from smv.core.model.diagram_search import search_component_diagram
-import yaml
 import json
 
 
 def add_system_node(system_node_id, system_node_type):
-    return system_models_repository.add_vertex(system_node_id, system_node_type=system_node_type)
+    return system_models_repository.add_vertex(system_node_id, type=system_node_type)
+
+
+def add_relation(start, end, relation_type)->Response:
+    return system_models_repository.add_relation(start, end, relation_type)
 
 
 def append_json(json_content):
