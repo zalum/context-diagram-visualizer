@@ -25,6 +25,9 @@ class SystemModelsRepository(object):
     def append_system_model(self,system_model):
         pass
 
+    def get_node(self, node):
+        pass
+
 
 class SearchCriteria:
     def __init__(self):

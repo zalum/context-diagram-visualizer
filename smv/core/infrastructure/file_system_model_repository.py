@@ -26,6 +26,9 @@ def _read_state() -> system_model:
 
 class FileSystemModelsRepository(SystemModelsRepository):
 
+    def get_node(self, node):
+        self.state.get_system_node(node)
+
     def add_relation(self, start, end, relation_type):
         self.state.add_relation(start,end,relation_type)
         return Response.success()

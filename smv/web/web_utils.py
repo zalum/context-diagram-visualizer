@@ -6,7 +6,7 @@ from flask import send_file
 from smv.core import *
 
 
-def build_response(response:Response, output_format):
+def build_response(response:Response, output_format=SupportedOutputFormats.text):
     if response.return_code == RESPONSE_OK:
         return _build_success_response(response.content, output_format)
     else:
@@ -25,7 +25,7 @@ class web_controller_config:
 
 
 def _build_success_response(content, output_format):
-    if output_format == SupportedOutputFormats.json:
+    if type(content) is dict:
         return json.dumps(content, indent=2)
     else:
         if output_format == SupportedOutputFormats.text:

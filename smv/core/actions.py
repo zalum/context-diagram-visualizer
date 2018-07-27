@@ -20,10 +20,23 @@ def add_system_node(system_node_id, system_node_type):
 def add_relation(start, end, relation_type)->Response:
     return system_models_repository.add_relation(start, end, relation_type)
 
+
 def append_json(json_content):
     graph = json.loads(json_content)
     model = system_model(graph)
     system_models_repository.append_system_model(model)
+
+
+def add_table(schema, table):
+    if system_models_repository.get_node(schema) is None:
+        return Response.error("Schema {} does not exist".format(schema))
+    table_name = table["name"]
+    table_model = data_model()
+    table_model.add_system_node(table_name, "table")
+    [table_model.add_column(column, table_name) for column in table["columns"]]
+    system_models_repository.append_system_model(table_model)
+    system_models_repository.add_relation(start=schema, end=table_name, relation_type="contains")
+    return Response.success(table)
 
 
 def append_model(system_model:system_model):

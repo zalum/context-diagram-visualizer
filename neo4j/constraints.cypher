@@ -1,0 +1,1 @@
+CREATE CONSTRAINT ON (d:database_user) ASSERT d.name IS UNIQUE

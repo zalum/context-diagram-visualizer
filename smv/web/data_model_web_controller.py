@@ -1,16 +1,13 @@
 from flask import Blueprint
-from flask import abort
 from flask import request
 
 from smv.core.actions import render_datamodel_diagram, render_datamodel_diagram_from_graph
-from smv.core.model import system_model as sm
-from smv.core.model import system_models_repository
 from smv.web import web_utils
 from smv.web.web_utils import build_response
-from smv.core.actions import append_model,add_relation
+from smv.core.actions import add_table as actions_add_table
 
 config = web_utils.web_controller_config(
-    controller = Blueprint('datamodel', 'datamodel'),
+    controller=Blueprint('datamodel', 'datamodel'),
     url_prefix="/data-model"
 )
 
@@ -46,16 +43,8 @@ def add_table(schema):
           description: Created a table
     """
     table = request.get_json()
-    state = system_models_repository.get_full_system_model()
-    if state.has_system_node(schema) is False:
-        return abort(404,"Schema {} does not exist".format(schema))
-    table_name = table["name"]
-    table_model = sm.data_model()
-    table_model.add_system_node(table_name, "table")
-    [table_model.add_column(column,table_name) for column in table["columns"]]
-    state.append(table_model)
-    state.add_relation(start=schema, end=table_name, relation_type="contains")
-    return "ok"
+    result = actions_add_table(schema, table)
+    return web_utils.build_response(result)
 
 
 @config.controller.route("/user/<string:user>/diagram", methods=['GET'])
@@ -86,7 +75,7 @@ def draw_db_user(user):
     """
     output_format = request.args.get("format")
     render_result = render_datamodel_diagram(user, output_format)
-    return build_response(render_result,output_format)
+    return build_response(render_result, output_format)
 
 
 @config.controller.route("/diagram", methods=['POST'])
@@ -123,6 +112,5 @@ def render_diagram():
     '''
     output_format = request.args.get("output_format")
     input_format = request.args.get("input_format")
-    response = render_datamodel_diagram_from_graph(request.data, input_format = input_format, output_format=output_format)
+    response = render_datamodel_diagram_from_graph(request.data, input_format=input_format, output_format=output_format)
     return web_utils.build_response(response, output_format)
-

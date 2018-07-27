@@ -52,18 +52,31 @@ class Neo4JSystemModelsRepository(SystemModelsRepository):
         for relation in sm.get_relations():
             Neo4JSystemModelsRepository.__write_relation__(tx, **relation)
 
+    def get_node(self, node):
+        with get_db_session() as session:
+            result = session.read_transaction(self.__get_node__, node)
+        return result
+
     @staticmethod
-    def __write_relation__(tx, start, end, relation_type):
-        tx.run(
-            """
-         match 
+    def __get_node__(tx, node):
+        result = tx.run("match (x {name:$name}) return x", name=node)
+        record = result.single()
+        if record is None:
+            return None
+        return record[0].get("name")
+
+    @staticmethod
+    def __write_relation__(tx, start, end, relation_type=None):
+        if relation_type is not None:
+            merge_query = "merge  (x)-[:{}]-(y)".format(relation_type)
+        else:
+            merge_query = "merge  (x)-[:unknown]-(y)"
+        match_query = """match 
             (x {name: $start_name}),
-            (y {name: $end_name})
-            """
-            +
-            "merge  (x)-[:{}]-(y)".format(relation_type),
-            start_name=start,
-            end_name=end
+            (y {name: $end_name})"""
+        tx.run(
+            "{} {}".format(match_query, merge_query)
+            , start_name=start, end_name=end
         )
 
     def search(self, system_mode, criteria: 'SearchCriteria', level) -> system_model:

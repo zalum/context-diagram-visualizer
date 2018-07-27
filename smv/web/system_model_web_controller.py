@@ -9,7 +9,6 @@ from flask import send_file
 import smv.core.actions as actions
 from smv.core import *
 from smv.core.model import system_models_repository
-from smv.core.model.system_model import RESPONSE_OK_deprecated
 from smv.web import web_utils
 
 config = web_utils.web_controller_config(

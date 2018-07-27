@@ -7,11 +7,12 @@ from smv.core import RESPONSE_ERROR
 def empty_graph():
     return {SYSTEM_NODES: {}, RELATIONS: []}
 
-RESPONSE_OK_deprecated = object()
+
 SYSTEM_NODES = "system-nodes"
 RELATIONS = "relations"
 SYSTEM_NODE_TYPE = "type"
 RELATION_TYPE = "relation-type"
+
 
 class DatamodelRelationTypes():
     fk = "fk"
@@ -20,13 +21,16 @@ class DatamodelRelationTypes():
     owns = "owns"
     uses = "uses"
 
+
 class RelationTypes():
     datamodel = DatamodelRelationTypes
+
 
 class DatamodelNodeTypes:
     table = "table"
     column = "column"
-    database_user = "database-user"
+    database_user = "database_user"
+    schema = "schema"
 
 class SystemNodesTypes():
     datamodel = DatamodelNodeTypes
@@ -190,19 +194,23 @@ class component_model(system_model):
 
 
 class data_model(system_model):
+
+    def add_databse_user(self,database_user):
+        self.add_system_node(database_user, DatamodelNodeTypes.database_user)
+
     def add_schema(self, schema):
-        self.add_system_node(schema, "schema")
+        self.add_system_node(schema, DatamodelNodeTypes.schema)
 
     def add_column(self, column, table):
-        self.add_system_node(column, "column")
+        self.add_system_node(column, DatamodelNodeTypes.column)
         self.add_relation(column, table)
 
-    def add_table(self, table, schema):
-        self.add_system_node(table, "table")
-        self.add_relation(table, schema)
+    def add_table(self, table, owner):
+        self.add_system_node(table, DatamodelNodeTypes.table)
+        self.add_relation(table, owner,RelationTypes.datamodel.contains)
 
     def is_table(self, system_node):
-        return self.is_system_node_of_type(system_node, "table")
+        return self.is_system_node_of_type(system_node, DatamodelNodeTypes.table)
 
     def get_table_for_column(self, column):
         column_edges = [edge for edge in self.get_relations_of_type(relation_type=RelationTypes.datamodel.contains)
@@ -214,13 +222,13 @@ class data_model(system_model):
         return None
 
     def get_database_users(self):
-        return self.get_system_nodes_of_type("database-user")
+        return self.get_system_nodes_of_type(DatamodelNodeTypes.database_user)
 
     def get_tables_in_database_user(self, database_user):
-        return self.get_children(database_user, "table", "contains")
+        return self.get_children(database_user, DatamodelNodeTypes.table, RelationTypes.datamodel.contains)
 
     def get_columns_in_table(self, table):
-        return self.get_children(table, "column",in_relation_of=RelationTypes.datamodel.contains)
+        return self.get_children(table, DatamodelNodeTypes.column, in_relation_of=RelationTypes.datamodel.contains)
 
     def get_foreign_keys(self):
         return list(
