@@ -7,6 +7,7 @@ from smv.core.model import system_model as sm
 from smv.core.model import system_models_repository
 from smv.web import web_utils
 from smv.web.web_utils import build_response
+from smv.core.actions import append_model,add_relation
 
 config = web_utils.web_controller_config(
     controller = Blueprint('datamodel', 'datamodel'),

@@ -44,7 +44,7 @@ class Neo4JSystemModelsRepository(SystemModelsRepository):
 
     @staticmethod
     def __write_system_node__(tx, name, type):
-        tx.run("CREATE (node:{}".format(type) + " {name: $name})",
+        tx.run("CREATE (node:`{}`".format(type) + " {name: $name})",
                name=name)
 
     @staticmethod
@@ -57,7 +57,7 @@ class Neo4JSystemModelsRepository(SystemModelsRepository):
         tx.run(
             """
          match 
-            (x {name:$start_name}),
+            (x {name: $start_name}),
             (y {name: $end_name})
             """
             +
