@@ -208,7 +208,7 @@ class data_model(system_model):
         response = self.add_system_node(column, DatamodelNodeTypes.column)
         if response.is_error():
             return response
-        response = self.add_relation(column, table_id)
+        response = self.add_relation(column, table_id, RelationTypes.datamodel.contains)
         return response
 
     def add_used_table(self, table, owner, database_user):
