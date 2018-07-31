@@ -1,11 +1,12 @@
 import smv.core.model.system_model as sm
+from smv.core.model.system_model import DatamodelNodeTypes
 from smv.core.model.system_models_repository import SearchCriteria
 from smv.core.model import system_models_repository
 
 
 def search_database_user(user):
-    criteria = SearchCriteria().with_include_vertex_types(0, ["table"]). \
-        with_include_vertex_types(1, ["database-user", "column"]). \
+    criteria = SearchCriteria().with_include_vertex_types(0, [DatamodelNodeTypes.table]). \
+        with_include_vertex_types(1, [DatamodelNodeTypes.database_user, DatamodelNodeTypes.column]). \
         with_include_relation_types(1, ["contains"]). \
         with_include_relation_types(2, ["fk", "composition"]). \
         with_include_vertex_types(3, ["table"])
