@@ -19,8 +19,8 @@ class PlantUmlRenderer():
 
 
 class PlantUmlServerRenderer(PlantUmlRenderer):
-    def __init__(self, server_url):
-        self.render_png_url = server_url + "/png"
+    def __init__(self):
+        self.render_png_url = os.environ["PLANT_UML_SERVER"] + "/png"
 
     def render_image(self, input, input_format="lines"):
         if input_format == "lines":
@@ -46,21 +46,21 @@ class PlantUmlLocalRenderer(PlantUmlRenderer):
         p = subprocess.Popen(["java", "-jar", "-DPLANTUML_LIMIT_SIZE=16384", plant_uml_location, "-pipe"],
                              stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         result = p.communicate(content)
-        result = self.__trim_left_png__(result[0])
+        result = self._trim_left_png(result[0])
 
         return  Response.success(io.BytesIO(result))
 
     @staticmethod
-    def __trim_left_png__(png: bytes):
+    def _trim_left_png(png: bytes):
         index = png.find(b'PNG')
         index = png[0:index].rfind(b'\n')
         return png[index + 1:]
 
 
-image_renderer = PlantUmlServerRenderer(os.environ["PLANT_UML_SERVER"])
-
+__image_renderer = None
 
 def render_image(input, input_format="lines"):
+    image_renderer = PlantUmlServerRenderer()
     return image_renderer.render_image(input, input_format)
 
 def writeAsText(lines):

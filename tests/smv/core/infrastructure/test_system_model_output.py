@@ -10,7 +10,7 @@ class Test(TestCase):
         untrimmed_image = self.read_image("untrimmed.png")
 
         #when
-        result = PlantUmlLocalRenderer.__trim_left_png__(untrimmed_image)
+        result = PlantUmlLocalRenderer._trim_left_png(untrimmed_image)
 
         #then
         self.assertIsNotNone(result)
