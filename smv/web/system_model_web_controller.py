@@ -30,7 +30,7 @@ def get_node_graph(node):
       - in: query
         type: number
         name: level
-        required: false
+        required: true
     responses:
         200:
             content:
