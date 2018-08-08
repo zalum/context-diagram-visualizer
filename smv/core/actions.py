@@ -37,7 +37,7 @@ def add_table(schema, table):
     table_name = table["name"]
     table_model = data_model()
     table_model.add_system_node(table_name, "table")
-    [table_model.add_column(column, table_name) for column in table["columns"]]
+    [table_model.add_column(column, table_name, schema) for column in table["columns"]]
     system_models_repository.append_system_model(table_model)
     system_models_repository.add_relation(start=schema, end=table_name, relation_type="contains")
     return Response.success(table)

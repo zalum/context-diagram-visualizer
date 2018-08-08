@@ -108,13 +108,7 @@ class Neo4JSystemModelsRepository(SystemModelsRepository):
             Neo4JSystemModelsRepository.__write_relation(tx, **relation)
 
     def get_node(self, node):
-        with get_db_session() as session:
-            result = session.read_transaction(self.__get_node, node)
-        return result
-
-    @staticmethod
-    def __get_node(tx: Transaction, node):
-        result = tx.run("match (x {system_node_id:$system_node_id}) return x", system_node_id=node)
+        result = query_db("match (x {system_node_id:$system_node_id}) return x", system_node_id=node)
         record = result.single()
         if record is None:
             return None
