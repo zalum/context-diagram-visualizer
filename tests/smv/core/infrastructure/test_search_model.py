@@ -20,7 +20,7 @@ class Test(TestCase):
         result = repo.find_connected_graph("2", level=3)
 
         #then
-        self.assert_models_are_equal(system_model(), result)
+        self.assert_models_are_equal(system_model(), result.content)
 
     def test_find_connected_graph_until_certain_level(self):
         #given
@@ -49,7 +49,7 @@ class Test(TestCase):
         expected.add_relation("1", "2")
         expected.add_relation("2", "3")
         expected.add_relation("3", "4")
-        self.assert_models_are_equal(expected,result)
+        self.assert_models_are_equal(expected,result.content)
 
     def test_find_isolated_connected_graph(self):
         # given
@@ -69,7 +69,7 @@ class Test(TestCase):
         expected = dict()
         expected[SYSTEM_NODES] = {"product": {"type": "product"}}
         expected[RELATIONS] = []
-        self.assert_models_are_equal(system_model(expected), result)
+        self.assert_models_are_equal(system_model(expected), result.content)
 
     def test_find_connected_graph_with_one_level(self):
         # given
@@ -83,13 +83,13 @@ class Test(TestCase):
         repo.set_model(system_model(graph))
 
         # when
-        connected_graph = repo.find_connected_graph("product")
+        result = repo.find_connected_graph("product")
 
         #then
         expected = dict()
         expected[SYSTEM_NODES] ={"product": {"type": "product"}, "application1": {"type": "application"}}
         expected[RELATIONS] = [{"start": "product", "end": "application1", "relation_type": "contains"}]
-        self.assert_models_are_equal(system_model(expected), connected_graph)
+        self.assert_models_are_equal(system_model(expected), result.content)
 
     def test_find_connected_graph_with_multiple_levels(self):
         # given
@@ -107,7 +107,7 @@ class Test(TestCase):
         repo.set_model(system_model(graph))
 
         # when
-        connected_graph = repo.find_connected_graph("product")
+        result = repo.find_connected_graph("product")
 
         # then
         expected = dict()
@@ -115,7 +115,7 @@ class Test(TestCase):
                            "application2": {"type": "application"}}
         expected[RELATIONS]=[{"start": "product", "end": "application1", "relation_type": "contains"},
                         {"start": "application1", "end": "application2", "relation_type": "calls"}]
-        self.assert_models_are_equal(system_model(expected), connected_graph)
+        self.assert_models_are_equal(system_model(expected), result.content)
 
     def test_find_connected_graph_with_corrupted_edge(self):
         # given
@@ -138,7 +138,7 @@ class Test(TestCase):
         expected.add_system_node("product", "product")
         expected.add_system_node("application1", "application")
         expected.add_relation("product", "application1", "contains")
-        self.assert_models_are_equal(expected,result)
+        self.assert_models_are_equal(expected, result.content)
 
     def test_find_connected_graph_with_empty_criteria(self):
         #given
@@ -163,7 +163,7 @@ class Test(TestCase):
         expected.add_system_node("schema", "schema")
         expected.add_relation("user", "table1", "uses")
         expected.add_relation("user", "schema", "uses")
-        self.assert_models_are_equal(expected, result)
+        self.assert_models_are_equal(expected, result.content)
 
     def test_find_connected_graph_with_cycle(self):
         graph = dict()
@@ -188,7 +188,7 @@ class Test(TestCase):
         expected[RELATIONS]=[{"start": "product", "end": "application1", "relation_type": "contains"},
                         {"start": "product", "end": "application2", "relation_type": "contains"},
                         {"start": "application1", "end": "application2", "relation_type": "calls"}]
-        self.assert_models_are_equal(system_model(expected), result)
+        self.assert_models_are_equal(system_model(expected), result.content)
 
     def test_search_criteria_by_vertex_type(self):
         #given

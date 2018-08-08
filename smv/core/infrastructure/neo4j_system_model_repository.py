@@ -1,4 +1,3 @@
-from neo4j.util import watch
 from neo4j.v1 import GraphDatabase, session, Transaction, Record, Node, BoltStatementResult
 
 from smv.core.model.system_model import system_model
