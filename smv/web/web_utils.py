@@ -29,7 +29,7 @@ def _build_success_response(content, output_format):
         return json.dumps(content, indent=2)
     else:
         if output_format == SupportedOutputFormats.text:
-            return content
+            return str(content)
         else:
             if output_format == SupportedOutputFormats.image:
                 return send_file(content, mimetype="image/png")

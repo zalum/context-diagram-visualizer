@@ -43,8 +43,8 @@ def get_node_graph(node):
     level = request.args.get("level")
     if level is not None:
         level = int(level)
-    state = system_models_repository.get_full_system_model()
-    return system_models_repository.find_connected_graph(state, node, level=level).to_string()
+    response = actions.find_connected_graph(node, level=level)
+    return web_utils.build_response(response)
 
 
 @config.controller.route("/system-node/<string:node>", methods=['GET'])
@@ -200,7 +200,7 @@ def persist_state():
     """
     f = open("graph.json", 'w')
     state = system_models_repository.get_full_system_model()
-    content = state.to_string()
+    content = str(state)
     f.write(content)
     f.close()
     return "ok"
@@ -221,7 +221,7 @@ def download_state():
     - system
     """
     state = system_models_repository.get_full_system_model()
-    content = state.to_string()
+    content = str(state)
     return send_file(io.BytesIO(bytes(content, "UTF-8")), mimetype="text/plain")
 
 

@@ -21,6 +21,10 @@ def add_relation(start, end, relation_type)->Response:
     return system_models_repository.add_relation(start, end, relation_type)
 
 
+def find_connected_graph(system_node, level):
+    return system_models_repository.find_connected_graph(system_node,level)
+
+
 def append_json(json_content):
     graph = json.loads(json_content)
     model = system_model(graph)

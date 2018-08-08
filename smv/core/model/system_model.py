@@ -45,7 +45,7 @@ class system_model:
         else:
             self.graph = graphx
 
-    def to_string(self):
+    def __str__(self):
         return json.dumps(self.graph, indent=2)
 
     def get_system_node(self, system_node):

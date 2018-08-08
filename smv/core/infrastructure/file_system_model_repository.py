@@ -33,8 +33,8 @@ class FileSystemModelsRepository(SystemModelsRepository):
         self.state.add_relation(start,end,relation_type)
         return Response.success()
 
-    def find_connected_graph(self, system_mode, level=None) -> system_model:
-        return _find_connected_graph(self.state, system_mode, level=level)
+    def find_connected_graph(self, system_mode, level=None) -> Response:
+        return Response.success(_find_connected_graph(self.state, system_mode, level=level))
 
     def search(self, system_mode, criteria: SearchCriteria, level=None) -> system_model:
         return _find_connected_graph(self.state, system_mode, criteria, level)

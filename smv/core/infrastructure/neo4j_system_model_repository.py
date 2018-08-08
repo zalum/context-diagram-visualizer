@@ -1,10 +1,11 @@
 from neo4j.util import watch
-from neo4j.v1 import GraphDatabase, session, Transaction
+from neo4j.v1 import GraphDatabase, session, Transaction, Record, Node, BoltStatementResult
 
 from smv.core.model.system_model import system_model
 from smv.core.model.system_models_repository import SystemModelsRepository, SearchCriteria
 from smv.core.common import Response
 import logging
+
 neo4j_log = logging.getLogger("neo4j.bolt")
 neo4j_log.setLevel(logging.WARNING)
 
@@ -18,14 +19,32 @@ def get_db_session() -> session:
     return driver.session()
 
 
+def query_db(query, **params):
+    with get_db_session() as session:
+        return session.read_transaction(lambda tx: tx.run(query, **params))
+
+
 class Neo4JSystemModelsRepository(SystemModelsRepository):
     def add_relation(self, start, end, relation_type):
         with get_db_session() as session:
             session.write_transaction(self.__write_relation, start, end, relation_type)
         return Response.success()
 
-    def find_connected_graph(self, system_mode, level=None) -> system_model:
-        pass
+    def find_connected_graph(self, system_node, level) -> system_model:
+        if level is None:
+            return Response.error("Neo4j find_connected_graph implementation does work on unlimited levels")
+
+        if level <= 0:
+            return Response.error("The level to search should be greater then 0")
+
+        query = """
+        MATCH p = (root {{system_node_id:"{}" }})-[*1..{}]-(b) 
+        with relationships(p) as rels
+        unwind rels as rel
+        return startNode(rel) as start,endNode(rel) as end, type(rel) as relation_type
+        """.format(system_node, level)
+        result = query_db(query)
+        return Response.success(self.__extract_model(result))
 
     def add_vertex(self, node_id, type):
         with get_db_session() as session:
@@ -39,6 +58,32 @@ class Neo4JSystemModelsRepository(SystemModelsRepository):
         with get_db_session() as session:
             session.write_transaction(self.__write_system_nodes, sm)
             session.write_transaction(self.__write_relations, sm)
+
+    @staticmethod
+    def __extract_model(results:BoltStatementResult):
+        model = system_model()
+        for record in results.records():  # type: Record
+            start = Neo4JSystemModelsRepository.__add_node_to_model(model, record, "start")
+            end = Neo4JSystemModelsRepository.__add_node_to_model(model, record, "end")
+            model.add_relation(start, end, record.value("relation_type"))
+        return model
+
+    @staticmethod
+    def __add_node_to_model(model, record, record_key):
+        node_value = Neo4JSystemModelsRepository.__extract_system_node(record.value(record_key))
+        properties = node_value.pop()
+        response  = model.add_system_node(*node_value,**properties)
+        return node_value[0]
+
+    @staticmethod
+    def __extract_system_node(node: Node):
+        result = [node.properties.pop("system_node_id")]
+        if len(node.labels) > 0:
+            result.append(node.labels.pop())
+        else:
+            result.append(None)
+        result.append(node.properties)
+        return result
 
     @staticmethod
     def __write_system_nodes(tx, sm: system_model):
@@ -69,7 +114,7 @@ class Neo4JSystemModelsRepository(SystemModelsRepository):
         return result
 
     @staticmethod
-    def __get_node(tx:Transaction, node):
+    def __get_node(tx: Transaction, node):
         result = tx.run("match (x {system_node_id:$system_node_id}) return x", system_node_id=node)
         record = result.single()
         if record is None:
@@ -77,7 +122,7 @@ class Neo4JSystemModelsRepository(SystemModelsRepository):
         return record[0].get("system_node_id")
 
     @staticmethod
-    def __write_relation(tx:Transaction, start, end, relation_type=None):
+    def __write_relation(tx: Transaction, start, end, relation_type=None):
         if relation_type is not None:
             merge_query = "merge  (x)-[:{}]-(y)".format(relation_type)
         else:

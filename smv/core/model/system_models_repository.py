@@ -16,7 +16,7 @@ class SystemModelsRepository(object):
     def search(self, system_mode, criteria: 'SearchCriteria', level)->system_model:
         pass
 
-    def find_connected_graph(self, system_mode, level=None)->system_model:
+    def find_connected_graph(self, system_mode, level)->Response:
         pass
 
     def set_model(self, system_mode):
