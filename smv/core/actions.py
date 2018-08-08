@@ -13,8 +13,8 @@ import json
 import yaml
 
 
-def add_system_node(system_node_id, system_node_type):
-    return system_models_repository.add_vertex(system_node_id, type=system_node_type)
+def add_system_node(system_node_id, system_node_type, name=None):
+    return system_models_repository.add_vertex(system_node_id, system_node_type, name)
 
 
 def add_relation(start, end, relation_type)->Response:

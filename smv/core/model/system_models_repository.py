@@ -4,7 +4,7 @@ from smv.core.model import system_model
 
 class SystemModelsRepository(object):
 
-    def add_vertex(self,system_node_id, system_node_type):
+    def add_vertex(self,system_node_id, system_node_type, name=None):
         pass
 
     def add_relation(self,start, end, relation_type)->Response:

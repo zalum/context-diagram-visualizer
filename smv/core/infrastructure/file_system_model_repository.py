@@ -25,12 +25,11 @@ def _read_state() -> system_model:
 
 
 class FileSystemModelsRepository(SystemModelsRepository):
-
     def get_node(self, node):
         self.state.get_system_node(node)
 
     def add_relation(self, start, end, relation_type):
-        self.state.add_relation(start,end,relation_type)
+        self.state.add_relation(start, end, relation_type)
         return Response.success()
 
     def find_connected_graph(self, system_mode, level=None) -> Response:
@@ -45,17 +44,17 @@ class FileSystemModelsRepository(SystemModelsRepository):
     def append_system_model(self, model: system_model):
         self.state.append(model)
 
-    def get_full_system_model(self)-> system_model:
+    def get_full_system_model(self) -> system_model:
         return self.state
 
-    def add_vertex(self, system_node_id, system_node_type):
-        return self.state.add_system_node(system_node_id, system_node_type)
+    def add_vertex(self, system_node_id, system_node_type, name=None):
+        return self.state.add_system_node(system_node_id, system_node_type, name=name)
 
     def set_model(self, system_model):
         return self.state.set_model(system_model)
 
 
-def _matching_edge(criteria:SearchCriteria, model:system_model, current_level, edge):
+def _matching_edge(criteria: SearchCriteria, model: system_model, current_level, edge):
     if criteria is None:
         return True
     if criteria.has_criteria(current_level) is False:
@@ -78,7 +77,8 @@ def _matching_edge(criteria:SearchCriteria, model:system_model, current_level, e
     return True
 
 
-def _find_connected_graph(source_model: system_model, from_vertex, criteria=None, level=None, connected_model=None, current_level=0):
+def _find_connected_graph(source_model: system_model, from_vertex, criteria=None, level=None, connected_model=None,
+                          current_level=0):
     if connected_model is None:
         connected_model = system_model()
         if not source_model.has_system_node(from_vertex):
@@ -102,10 +102,10 @@ def _find_connected_graph(source_model: system_model, from_vertex, criteria=None
 
     for adjacent_vertex in adjacent_vertexes:
         connected_model = _find_connected_graph(source_model,
-                            from_vertex=adjacent_vertex,
-                            criteria=criteria,
-                            level=level,
-                            connected_model=connected_model,
-                            current_level=current_level+1)
+                                                from_vertex=adjacent_vertex,
+                                                criteria=criteria,
+                                                level=level,
+                                                connected_model=connected_model,
+                                                current_level=current_level + 1)
 
     return connected_model

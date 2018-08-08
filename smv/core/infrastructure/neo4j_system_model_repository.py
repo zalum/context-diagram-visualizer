@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from neo4j.v1 import GraphDatabase, session, Transaction, Record, Node, BoltStatementResult
 
 from smv.core.model.system_model import system_model
@@ -18,16 +20,37 @@ def get_db_session() -> session:
     return driver.session()
 
 
-def query_db(query, **params):
-    with get_db_session() as session:
-        return session.read_transaction(lambda tx: tx.run(query, **params))
+def query_db(query, **params) -> BoltStatementResult:
+    with get_db_session() as db_session:
+        return db_session.read_transaction(lambda tx: tx.run(query, **params))
+
+
+def write_db(query: Tuple[str, dict]) -> BoltStatementResult:
+    with get_db_session() as db_session:
+        return db_session.write_transaction(lambda tx: tx.run(query[0], **query[1]))
+
+
+def write_bulk_db(queries: [Tuple[str, dict]]):
+    with get_db_session() as db_session:
+        for query in queries:  # type: tuple
+            db_session.write_transaction(lambda tx: tx.run(query[0], **query[1]))
 
 
 class Neo4JSystemModelsRepository(SystemModelsRepository):
+    def get_node(self, node):
+        result = query_db("match (x {system_node_id:$system_node_id}) return x", system_node_id=node)
+        record = result.single()
+        if record is None:
+            return None
+        return record[0].get("system_node_id")
+
+    def add_vertex(self, system_node_id, node_type, name=None):
+        write_db(self.__add_system_node_query(system_node_id, node_type, name))
+        return Response.success(system_node_id)
+
     def add_relation(self, start, end, relation_type):
-        with get_db_session() as session:
-            session.write_transaction(self.__write_relation, start, end, relation_type)
-        return Response.success()
+        response = write_db(self.__add_relation_query(start, end, relation_type))
+        return Response.success(response.summary())
 
     def find_connected_graph(self, system_node, level) -> system_model:
         if level is None:
@@ -45,21 +68,12 @@ class Neo4JSystemModelsRepository(SystemModelsRepository):
         result = query_db(query)
         return Response.success(self.__extract_model(result))
 
-    def add_vertex(self, node_id, type):
-        with get_db_session() as session:
-            session.write_transaction(self.__write_system_node, node_id, type)
-        return Response.success(node_id)
-
-    def get_full_system_model(self) -> system_model:
-        pass
-
     def append_system_model(self, sm: system_model):
-        with get_db_session() as session:
-            session.write_transaction(self.__write_system_nodes, sm)
-            session.write_transaction(self.__write_relations, sm)
+        self.__write_system_nodes(sm)
+        self.__write_relations(sm)
 
     @staticmethod
-    def __extract_model(results:BoltStatementResult):
+    def __extract_model(results: BoltStatementResult):
         model = system_model()
         for record in results.records():  # type: Record
             start = Neo4JSystemModelsRepository.__add_node_to_model(model, record, "start")
@@ -71,7 +85,7 @@ class Neo4JSystemModelsRepository(SystemModelsRepository):
     def __add_node_to_model(model, record, record_key):
         node_value = Neo4JSystemModelsRepository.__extract_system_node(record.value(record_key))
         properties = node_value.pop()
-        response  = model.add_system_node(*node_value,**properties)
+        model.add_system_node(*node_value, **properties)
         return node_value[0]
 
     @staticmethod
@@ -85,52 +99,52 @@ class Neo4JSystemModelsRepository(SystemModelsRepository):
         return result
 
     @staticmethod
-    def __write_system_nodes(tx, sm: system_model):
-        for system_node in sm.get_system_nodes():
-            system_node_properties = sm.get_system_node(system_node)
-            Neo4JSystemModelsRepository.__write_system_node(tx, system_node,
-                                                            system_node_properties.get("type"),
-                                                            system_node_properties.get("name"))
-
-    @staticmethod
-    def __write_system_node(tx, system_node_id, node_type, name=None):
-        query = "MERGE (node:{} ".format(node_type)
-        query += " {system_node_id: $system_node_id})"
-        arguments = {"system_node_id": system_node_id}
-        if name is not None:
-            query += "ON CREATE SET node.name = $ name"
-            arguments["name"] = name
-        tx.run(query, arguments)
-
-    @staticmethod
-    def __write_relations(tx, sm: system_model):
-        for relation in sm.get_relations():
-            Neo4JSystemModelsRepository.__write_relation(tx, **relation)
-
-    def get_node(self, node):
-        result = query_db("match (x {system_node_id:$system_node_id}) return x", system_node_id=node)
-        record = result.single()
-        if record is None:
-            return None
-        return record[0].get("system_node_id")
-
-    @staticmethod
-    def __write_relation(tx: Transaction, start, end, relation_type=None):
+    def __add_relation_query(start, end, relation_type):
         if relation_type is not None:
             merge_query = "merge  (x)-[:{}]-(y)".format(relation_type)
         else:
             merge_query = "merge  (x)-[:unknown]-(y)"
         match_query = """match 
-            (x {system_node_id: $start}),
-            (y {system_node_id: $end})"""
-        result = tx.run(
-            "{} {}".format(match_query, merge_query)
-            , start=start, end=end
-        )
-        return Response.success(result.summary())
+                   (x {system_node_id: $start}),
+                   (y {system_node_id: $end})"""
+
+        return "{} {}".format(match_query, merge_query), dict(start=start, end=end)
+
+    @staticmethod
+    def __add_system_node_query(system_node_id, node_type, name):
+        query = "MERGE (node:{} ".format(node_type)
+        query += " {system_node_id: $system_node_id})"
+        arguments = {"system_node_id": system_node_id}
+        if name is not None:
+            query += "ON CREATE SET node.name = $name"
+            arguments["name"] = name
+        return query, arguments
+
+    @staticmethod
+    def __write_system_nodes(sm: system_model):
+        queries = []
+        for system_node in sm.get_system_nodes():
+            system_node_properties = sm.get_system_node(system_node)
+            query = Neo4JSystemModelsRepository.__add_system_node_query(system_node,
+                                                                        system_node_properties.get("type"),
+                                                                        system_node_properties.get("name"))
+            queries.append(query)
+
+        write_bulk_db(queries)
+
+    @staticmethod
+    def __write_relations( sm: system_model):
+        queries = []
+        for relation in sm.get_relations():
+            query = Neo4JSystemModelsRepository.__add_relation_query(**relation)
+            queries.append(query)
+        write_bulk_db(queries)
 
     def search(self, system_mode, criteria: SearchCriteria, level) -> system_model:
         pass
 
     def set_model(self, system_mode):
+        pass
+
+    def get_full_system_model(self) -> system_model:
         pass

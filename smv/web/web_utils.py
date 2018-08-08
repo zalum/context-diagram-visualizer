@@ -27,6 +27,8 @@ class web_controller_config:
 def _build_success_response(content, output_format):
     if type(content) is dict:
         return json.dumps(content, indent=2)
+    if type(content) is str:
+        return content
     else:
         if output_format == SupportedOutputFormats.text:
             return str(content)
