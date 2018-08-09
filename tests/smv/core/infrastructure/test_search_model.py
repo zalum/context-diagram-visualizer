@@ -229,7 +229,7 @@ class Test(TestCase):
         repo.set_model(model)
 
         #when
-        result = repo.search("user",criteria=criteria)
+        result = repo.search("user", criteria=criteria)
 
         #then
         expected = system_model()
@@ -255,7 +255,7 @@ class Test(TestCase):
         repo.set_model(model)
 
         #when
-        result = repo.search("user",criteria=criteria)
+        result = repo.search("user", criteria=criteria)
 
         #then
         expected = system_model()

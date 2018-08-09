@@ -13,7 +13,7 @@ class SystemModelsRepository(object):
     def get_full_system_model(self)-> system_model:
         pass
 
-    def search(self, system_mode, criteria: 'SearchCriteria', level)->system_model:
+    def search(self, system_mode, criteria: 'SearchCriteria') ->system_model:
         pass
 
     def find_connected_graph(self, system_mode, level)->Response:
@@ -32,20 +32,22 @@ class SystemModelsRepository(object):
 class SearchCriteria:
     def __init__(self):
         self.levels_criteria = dict()
+        self.max_levels = None
 
-    def level_search_criteria(self,level):
+    def __init_level_search_criteria(self, level):
         if level not in self.levels_criteria:
             self.levels_criteria[level] = {"include_vertex_types": [], "include_relation_types":[]}
         return self.levels_criteria[level]
 
     def with_include_vertex_types(self, level, vertex_types:[])-> 'SearchCriteria':
-        level_search_criteria = self.level_search_criteria(level)
+        level_search_criteria = self.__init_level_search_criteria(level)
         for vertex_type in vertex_types:
             level_search_criteria["include_vertex_types"].append(vertex_type)
         return self
 
-    def include_vertex_types(self,level):
-        return self.level_search_criteria(level)["include_vertex_types"]
+    def with_max_levels(self, max_levels):
+        self.max_levels = max_levels
+        return self
 
     def has_criteria(self, level):
         if level in self.levels_criteria:
@@ -53,13 +55,16 @@ class SearchCriteria:
         return False
 
     def with_include_relation_types(self, level, relation_types)-> 'SearchCriteria':
-        level_search_criteria = self.level_search_criteria(level)
+        level_search_criteria = self.__init_level_search_criteria(level)
         for relation_type in relation_types:
             level_search_criteria["include_relation_types"].append(relation_type)
         return self
 
-    def include_relation_types(self,level)->[]:
-        return self.level_search_criteria(level)["include_relation_types"]
+    def get_include_vertex_types(self, level):
+        return self.__init_level_search_criteria(level)["include_vertex_types"]
+
+    def get_include_relation_types(self, level)->[]:
+        return self.__init_level_search_criteria(level)["include_relation_types"]
 
 
 
