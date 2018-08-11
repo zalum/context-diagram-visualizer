@@ -1,19 +1,18 @@
 import unittest
-
+import importlib
 from smv.core.model.application_config import config
 
 config["persistance-engine"] = "file-system"
 from smv.core.model import load_context
 load_context()
 from smv.core.model import system_models_repository
-
 import smv.core.model.diagram_search as diagram_search
 from smv.core.model.system_model import DatamodelNodeTypes
 from smv.core.model.system_model import DatamodelRelationTypes
 from smv.core.model.system_model import SYSTEM_NODES
 from smv.core.model.system_model import component_model
 from smv.core.model.system_model import data_model
-
+importlib.reload(diagram_search)
 
 
 class DatamodelSearchDiagramTest(unittest.TestCase):

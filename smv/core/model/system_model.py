@@ -146,15 +146,6 @@ class system_model:
         for edge in to_append.graph[RELATIONS]:
             self.add_relation(edge["start"], edge["end"], edge["relation_type"] if "relation_type" in edge else None)
 
-    def find_direct_connections(self, system_node, system_node_type=None, relation_type=None):
-        connections = []
-        for edge in self.get_relations_of_system_node(system_node):
-            connection = self.get_related_system_node(system_node, edge)
-            if relation_type is None or system_model.is_relation_of_type(edge, relation_type):
-                if system_node_type is None or self.is_system_node_of_type(connection, system_node_type):
-                    connections.append(connection)
-        return connections
-
     def get_relation(self, start, end, relation_type):
         edges = list(
             filter(lambda edge: system_model.is_relation_of_type(edge, relation_type),

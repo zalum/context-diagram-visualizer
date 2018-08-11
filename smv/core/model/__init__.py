@@ -3,7 +3,8 @@ from smv.core.infrastructure.neo4j_system_model_repository import Neo4JSystemMod
 from smv.core.model.application_config import config
 from smv.core.model.system_models_repository import SystemModelsRepository
 
-system_models_repository = None
+
+system_models_repository = None  # type: SystemModelsRepository
 
 
 def get_system_model_repository()->SystemModelsRepository:

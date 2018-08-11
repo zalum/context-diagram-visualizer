@@ -140,7 +140,7 @@ class Neo4JSystemModelsRepository(SystemModelsRepository):
             queries.append(query)
         write_bulk_db(queries)
 
-    def search(self, system_mode, criteria: SearchCriteria) -> system_model:
+    def search(self, system_node, criteria: SearchCriteria) -> system_model:
         pass
 
     def set_model(self, system_mode):

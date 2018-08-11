@@ -13,7 +13,7 @@ class SystemModelsRepository(object):
     def get_full_system_model(self)-> system_model:
         pass
 
-    def search(self, system_mode, criteria: 'SearchCriteria') ->system_model:
+    def search(self, system_node, criteria: 'SearchCriteria') ->system_model:
         pass
 
     def find_connected_graph(self, system_mode, level)->Response:

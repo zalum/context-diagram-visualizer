@@ -260,5 +260,5 @@ def get_direct_connections(node):
     relation_type = request.args.get("relation-type")
     if vertex is None:
         abort(404)
-    connections = state.find_direct_connections(node, type, relation_type)
+    connections = actions.find_direct_connections(node, type, relation_type)
     return json.dumps(connections)

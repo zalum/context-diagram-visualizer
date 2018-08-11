@@ -9,6 +9,7 @@ from smv.core.model.system_model_visualizer import component_model_visualizer as
 from smv.core.model.system_model_visualizer import datamodel_visualizer as dmv
 from smv.core.model.diagram_search import search_database_user
 from smv.core.model.diagram_search import search_component_diagram
+from smv.core.model.system_models_repository import SearchCriteria
 import json
 import yaml
 
@@ -22,7 +23,22 @@ def add_relation(start, end, relation_type)->Response:
 
 
 def find_connected_graph(system_node, level):
-    return system_models_repository.find_connected_graph(system_node,level)
+    return system_models_repository.find_connected_graph(system_node, level)
+
+
+def find_direct_connections(node, type = None, relation_type = None):
+    search_criteria = SearchCriteria().with_max_levels(1)
+    if type is not None:
+        search_criteria.with_include_vertex_types(0, [type])
+    if relation_type is not None:
+        search_criteria.with_include_relation_types(0, [relation_type])
+
+    model = system_models_repository.search(node, search_criteria)  # type: system_model
+    if model is None:
+        return []
+    nodes = model.get_system_nodes()
+    nodes.remove(node)
+    return nodes
 
 
 def append_json(json_content):
