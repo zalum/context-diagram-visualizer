@@ -36,8 +36,8 @@ class FileSystemModelsRepository(SystemModelsRepository):
         return Response.success(_find_connected_graph(self.state, system_mode,
                                                       criteria=SearchCriteria().with_max_levels(level)))
 
-    def search(self, system_node, criteria: SearchCriteria) -> system_model:
-        return _find_connected_graph(self.state, system_node, criteria)
+    def search(self, start_node, search_query: SearchCriteria) -> system_model:
+        return _find_connected_graph(self.state, start_node, search_query)
 
     def __init__(self):
         self.state = _read_state()

@@ -60,7 +60,9 @@ class Neo4JSystemModelsRepository(SystemModelsRepository):
             return Response.error("The level to search should be greater then 0")
 
         query = """
-        MATCH p = (root {{system_node_id:"{}" }})-[*1..{}]-(b) 
+        MATCH p = 
+            (x:database_user {system_node_id:'APP_LNC'})--(:table)-[:contains]-(:database_user),
+            (x:database_user {system_node_id:'APP_LNC'})--(:table)-[:contains]-(:column)
         with relationships(p) as rels
         unwind rels as rel
         return startNode(rel) as start,endNode(rel) as end, type(rel) as relation_type
@@ -140,8 +142,10 @@ class Neo4JSystemModelsRepository(SystemModelsRepository):
             queries.append(query)
         write_bulk_db(queries)
 
-    def search(self, system_node, criteria: SearchCriteria) -> system_model:
-        pass
+    def search(self, start_node, search_query: str) -> system_model:
+        query = search_query.format(start_node=start_node)
+        result = query_db(query)
+        return self.__extract_model(result)
 
     def set_model(self, system_mode):
         pass

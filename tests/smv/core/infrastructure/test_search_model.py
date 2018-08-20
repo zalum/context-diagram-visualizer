@@ -204,7 +204,7 @@ class Test(TestCase):
         repo.set_model(model)
 
         #when
-        result = repo.search("user", criteria=criteria)
+        result = repo.search("user", search_query=criteria)
 
         #then
         expected = system_model()
@@ -229,7 +229,7 @@ class Test(TestCase):
         repo.set_model(model)
 
         #when
-        result = repo.search("user", criteria=criteria)
+        result = repo.search("user", search_query=criteria)
 
         #then
         expected = system_model()
@@ -255,7 +255,7 @@ class Test(TestCase):
         repo.set_model(model)
 
         #when
-        result = repo.search("user", criteria=criteria)
+        result = repo.search("user", search_query=criteria)
 
         #then
         expected = system_model()
@@ -292,7 +292,7 @@ class Test(TestCase):
         repo.set_model(model)
 
         #then
-        result = repo.search("user", criteria=criteria)
+        result = repo.search("user", search_query=criteria)
         expected_model = system_model()
         expected_model.add_system_node("user", "user")
         expected_model.add_system_node("table1", "table")

@@ -1,8 +1,8 @@
 import unittest
 import importlib
-from smv.core.model.application_config import config
+from smv.core.model.application_config import config, PERSISTANCE_ENGINE, FILE_SYSTEM_DB
 
-config["persistance-engine"] = "file-system"
+config[PERSISTANCE_ENGINE] = FILE_SYSTEM_DB
 from smv.core.model import load_context
 load_context()
 from smv.core.model import system_models_repository
