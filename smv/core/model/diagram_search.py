@@ -54,6 +54,13 @@ def __create_union_cypher_query(template: str, match_clauses: []):
 SEARCH_DATABASE_USER = "SEARCH_DATABASE_USER"
 SEARCH_SOFTWARE_PRODUCT = "SEARCH_SOFTWARE_PRODUCT"
 
+__cypher_search_query_template = """
+MATCH 
+p = {clause}
+with relationships(p) as rels
+unwind rels as rel
+return startNode(rel) as start,endNode(rel) as end, type(rel) as relation_type 
+       """
 
 queries = [
     SearchQuery(SEARCH_DATABASE_USER, "extracts the datamodel related to a database user ").
@@ -65,24 +72,19 @@ queries = [
         with_include_vertex_types(3, ["table"]).
         with_max_levels(4)).
     with_cyper_query(
-        __create_union_cypher_query("""
-MATCH 
-p = {clause}
-with relationships(p) as rels
-unwind rels as rel
-return startNode(rel) as start,endNode(rel) as end, type(rel) as relation_type 
-       """, [
+        __create_union_cypher_query(__cypher_search_query_template, [
             "(x:database_user {{system_node_id:'{start_node}'}})-[:uses]-(y:table)-[:contains]-(z:database_user)",
             """
             (x:database_user {{system_node_id:'{start_node}'}})--(y:table)
-            -[:contains]-(:column)-[:fk|composition]-(:column)--(:table)-[:uses]-(x:database_user {{system_node_id:'{start_node}'}})
+            -[:contains]-(:column)-[:fk]-(:column)--(:table)-[:uses]-(x:database_user {{system_node_id:'{start_node}'}})
             """,
             """
-            (x:database_user {{system_node_id:'{start_node}'}})--(y:table)
-            -[:contains]-(:column)
+            (x:database_user {{system_node_id:'{start_node}'}})--(y:table)-[:contains]-(:column)
+            """,
             """
-        ]
-    )
+            (x:database_user {{system_node_id:'{start_node}'}})--(y:table)-[:composition]-(:column)
+            """
+        ])
     ),
 
     SearchQuery(SEARCH_SOFTWARE_PRODUCT, "extracts the contents of a C4 diagram of a Software product").
@@ -92,7 +94,16 @@ return startNode(rel) as start,endNode(rel) as end, type(rel) as relation_type
         with_include_relation_types(0, ["contains"]).
         with_include_vertex_types(1, ["application"]).
         with_include_relation_types(1, ["calls"]).
-        with_max_levels(2))
+        with_max_levels(2)).
+    with_cyper_query(
+        __create_union_cypher_query(
+            __cypher_search_query_template,
+            [
+                "({{system_node_id:'{start_node}'}})-[:contains]-(:application)-[:calls]-(:application)",
+                "({{system_node_id:'{start_node}'}})-[:contains]-(:application)"
+            ]
+            )
+        )
 ]
 
 
