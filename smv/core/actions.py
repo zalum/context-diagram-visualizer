@@ -10,6 +10,7 @@ from smv.core.model.system_model_visualizer import datamodel_visualizer as dmv
 from smv.core.model.diagram_search import search_database_user
 from smv.core.model.diagram_search import search_component_diagram
 from smv.core.model.system_models_repository import SearchCriteria
+from smv.core.model.application_config import config, NEO4J_DB, PERSISTANCE_ENGINE
 import json
 import yaml
 
@@ -18,7 +19,7 @@ def add_system_node(system_node_id, system_node_type, name=None):
     return system_models_repository.add_vertex(system_node_id, system_node_type, name)
 
 
-def add_relation(start, end, relation_type)->Response:
+def add_relation(start, end, relation_type) -> Response:
     return system_models_repository.add_relation(start, end, relation_type)
 
 
@@ -26,17 +27,40 @@ def find_connected_graph(system_node, level):
     return system_models_repository.find_connected_graph(system_node, level)
 
 
-def find_direct_connections(node, type = None, relation_type = None):
-    search_criteria = SearchCriteria().with_max_levels(1)
-    if type is not None:
-        search_criteria.with_include_vertex_types(0, [type])
-    if relation_type is not None:
-        search_criteria.with_include_relation_types(0, [relation_type])
+def find_direct_connections(node, type=None, relation_type=None):
+    if config[PERSISTANCE_ENGINE] == NEO4J_DB:
+        if type is not None:
+            end_node_query = "(:{})".format(type)
+        else:
+            end_node_query = "()"
 
-    model = system_models_repository.search(node, search_criteria)  # type: system_model
+        if relation_type is not None:
+            relation_query = "-[:{}]-".format(relation_type)
+        else:
+            relation_query = "--"
+        start_node_query = "({{system_node_id:'{start_node}'}})"
+        match_clause = start_node_query + relation_query + end_node_query
+        template = """
+        MATCH 
+        p = {clause}
+        with relationships(p) as rels
+        unwind rels as rel
+        return startNode(rel) as start,endNode(rel) as end, type(rel) as relation_type 
+        """
+        search_query = template.format(clause=match_clause)
+    else:
+        search_query = SearchCriteria().with_max_levels(1)
+        if type is not None:
+            search_query.with_include_vertex_types(0, [type])
+        if relation_type is not None:
+            search_query.with_include_relation_types(0, [relation_type])
+
+    model = system_models_repository.search(node, search_query)  # type: system_model
     if model is None:
         return []
     nodes = model.get_system_nodes()
+    if len(nodes) is 0:
+        return nodes
     nodes.remove(node)
     return nodes
 
@@ -59,11 +83,11 @@ def add_table(schema, table):
     return Response.success(table)
 
 
-def append_model(system_model:system_model):
+def append_model(system_model: system_model):
     system_models_repository.append_system_model(system_model)
 
 
-def render_component_diagram(component,output_format):
+def render_component_diagram(component, output_format):
     model = search_component_diagram(component)
     markdown = cmv(model).draw()
     return __render_diagram_from_system_model(model, markdown, output_format)
@@ -75,7 +99,7 @@ def render_datamodel_diagram(database_user, output_format, collapsed_columns=Fal
     return __render_diagram_from_system_model(model, markdown, output_format)
 
 
-def render_datamodel_diagram_from_plantuml(plantuml, output_format)->Response:
+def render_datamodel_diagram_from_plantuml(plantuml, output_format) -> Response:
     if not SupportedOutputFormats.is_in(output_format):
         return Response.error("Format {} is not accepted".format(output_format()))
     if output_format == SupportedOutputFormats.json:
@@ -83,7 +107,7 @@ def render_datamodel_diagram_from_plantuml(plantuml, output_format)->Response:
     if output_format == SupportedOutputFormats.text:
         return Response.success(plantuml)
     if output_format == SupportedOutputFormats.image:
-        return render_image(plantuml,"block")
+        return render_image(plantuml, "block")
 
 
 def __transform_to_model(graph_content, input_format):
@@ -95,7 +119,7 @@ def __transform_to_model(graph_content, input_format):
     return data_model(graph)
 
 
-def render_datamodel_diagram_from_graph(graph_content, output_format, input_format="json")->Response:
+def render_datamodel_diagram_from_graph(graph_content, output_format, input_format="json") -> Response:
     model = __transform_to_model(graph_content, input_format)
 
     markdown = datamodel_visualizer(model).draw()
@@ -118,4 +142,3 @@ def __render_diagram_from_system_model(model, markdown, output_format):
         return Response.success(writeAsText(markdown))
     if output_format == SupportedOutputFormats.image:
         return render_image(markdown)
-

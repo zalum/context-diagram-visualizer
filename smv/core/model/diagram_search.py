@@ -54,6 +54,7 @@ def __create_union_cypher_query(template: str, match_clauses: []):
 SEARCH_DATABASE_USER = "SEARCH_DATABASE_USER"
 SEARCH_SOFTWARE_PRODUCT = "SEARCH_SOFTWARE_PRODUCT"
 
+
 __cypher_search_query_template = """
 MATCH 
 p = {clause}

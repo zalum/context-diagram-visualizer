@@ -35,7 +35,6 @@ def write_bulk_db(queries: [Tuple[str, dict]]):
         for query in queries:  # type: tuple
             db_session.write_transaction(lambda tx: tx.run(query[0], **query[1]))
 
-
 class Neo4JSystemModelsRepository(SystemModelsRepository):
     def get_node(self, node):
         result = query_db("match (x {system_node_id:$system_node_id}) return x", system_node_id=node)

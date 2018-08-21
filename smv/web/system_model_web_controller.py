@@ -254,11 +254,10 @@ def get_direct_connections(node):
     tags:
      - system
     '''
-    state = system_models_repository.get_full_system_model()
-    vertex = state.get_system_node(node)
-    type = request.args.get("type")
-    relation_type = request.args.get("relation-type")
-    if vertex is None:
+    node = system_models_repository.get_node(node)
+    if node is None:
         abort(404)
+    relation_type = request.args.get("relation-type")
+    type = request.args.get("type")
     connections = actions.find_direct_connections(node, type, relation_type)
     return json.dumps(connections)
