@@ -3,14 +3,15 @@ from smv.core.model import system_models_repository
 from smv.core.model.system_model import data_model as data_model
 from smv.core.model.system_model import system_model as system_model
 from smv.core.model.system_model_visualizer import datamodel_visualizer
-from smv.core.infrastructure.system_model_output import render_image
-from smv.core.infrastructure.system_model_output import writeAsText
 from smv.core.model.system_model_visualizer import component_model_visualizer as cmv
 from smv.core.model.system_model_visualizer import datamodel_visualizer as dmv
 from smv.core.model.diagram_search import search_database_user
 from smv.core.model.diagram_search import search_component_diagram
 from smv.core.model.system_models_repository import SearchCriteria
 from smv.core.model.application_config import config, NEO4J_DB, PERSISTANCE_ENGINE
+from smv.core.infrastructure.system_model_output import render_image
+from smv.core.infrastructure.system_model_output import writeAsText
+from smv.core.infrastructure.neo4j_system_model_repository import Neo4jSearchCriteria
 import json
 import yaml
 
@@ -29,25 +30,11 @@ def find_connected_graph(system_node, level):
 
 def find_direct_connections(node, type=None, relation_type=None):
     if config[PERSISTANCE_ENGINE] == NEO4J_DB:
-        if type is not None:
-            end_node_query = "(:{})".format(type)
-        else:
-            end_node_query = "()"
-
-        if relation_type is not None:
-            relation_query = "-[:{}]-".format(relation_type)
-        else:
-            relation_query = "--"
+        end_node_query = "()" if type is None else "(:{})".format(type)
+        relation_query = "--" if relation_type is None else "-[:{}]-".format(relation_type)
         start_node_query = "({{system_node_id:'{start_node}'}})"
         match_clause = start_node_query + relation_query + end_node_query
-        template = """
-        MATCH 
-        p = {clause}
-        with relationships(p) as rels
-        unwind rels as rel
-        return startNode(rel) as start,endNode(rel) as end, type(rel) as relation_type 
-        """
-        search_query = template.format(clause=match_clause)
+        search_query = Neo4jSearchCriteria([match_clause])
     else:
         search_query = SearchCriteria().with_max_levels(1)
         if type is not None:

@@ -1,4 +1,5 @@
 import smv.core.model.system_model as sm
+from smv.core.infrastructure.neo4j_system_model_repository import Neo4jSearchCriteria
 from smv.core.model.system_model import DatamodelNodeTypes
 from smv.core.model.system_models_repository import SearchCriteria
 from smv.core.model import system_models_repository
@@ -25,7 +26,7 @@ class SearchQuery:
         self.in_memory_query = None
         self.cypher_query = None
 
-    def with_in_memory_query(self, in_memory_query: SearchCriteria):
+    def with_in_memory_search_criteria(self, in_memory_query: SearchCriteria):
         self.in_memory_query = in_memory_query
         return self
 
@@ -35,7 +36,7 @@ class SearchQuery:
         if db_engine is FILE_SYSTEM_DB:
             return self.in_memory_query
 
-    def with_cyper_query(self, query):
+    def with_neo4j_search_criteria(self, query: Neo4jSearchCriteria):
         self.cypher_query = query
         return self
 
@@ -47,58 +48,42 @@ def get_query(name)->SearchQuery:
     return None
 
 
-def __create_union_cypher_query(template: str, match_clauses: []):
-    return "union".join(map(lambda c: template.format(clause=c), match_clauses))
-
-
 SEARCH_DATABASE_USER = "SEARCH_DATABASE_USER"
 SEARCH_SOFTWARE_PRODUCT = "SEARCH_SOFTWARE_PRODUCT"
 
 
-__cypher_search_query_template = """
-MATCH 
-p = {clause}
-with relationships(p) as rels
-unwind rels as rel
-return startNode(rel) as start,endNode(rel) as end, type(rel) as relation_type 
-       """
-
 queries = [
     SearchQuery(SEARCH_DATABASE_USER, "extracts the datamodel related to a database user ").
-    with_in_memory_query(
+    with_in_memory_search_criteria(
         SearchCriteria().with_include_vertex_types(0, [DatamodelNodeTypes.table]).
         with_include_vertex_types(1, [DatamodelNodeTypes.database_user, DatamodelNodeTypes.column]).
         with_include_relation_types(1, ["contains"]).
         with_include_relation_types(2, ["fk", "composition"]).
         with_include_vertex_types(3, ["table"]).
         with_max_levels(4)).
-    with_cyper_query(
-        __create_union_cypher_query(__cypher_search_query_template, [
+    with_neo4j_search_criteria(
+        Neo4jSearchCriteria([
             "(x:database_user {{system_node_id:'{start_node}'}})-[:uses]-(y:table)-[:contains]-(z:database_user)",
             """
             (x:database_user {{system_node_id:'{start_node}'}})--(y:table)
-            -[:contains]-(:column)-[:fk]-(:column)--(:table)-[:uses]-(x:database_user {{system_node_id:'{start_node}'}})
+            -[:contains]-(:column)-[:fk]-(:column)--(:table)
+            -[:uses]-(x:database_user {{system_node_id:'{start_node}'}})
             """,
-            """
-            (x:database_user {{system_node_id:'{start_node}'}})--(y:table)-[:contains]-(:column)
-            """,
-            """
-            (x:database_user {{system_node_id:'{start_node}'}})--(y:table)-[:composition]-(:column)
-            """
+            "(x:database_user {{system_node_id:'{start_node}'}})--(y:table)-[:contains]-(:column)",
+            "(x:database_user {{system_node_id:'{start_node}'}})--(y:table)-[:composition]-(:column)"
         ])
     ),
 
     SearchQuery(SEARCH_SOFTWARE_PRODUCT, "extracts the contents of a C4 diagram of a Software product").
-    with_in_memory_query(
+    with_in_memory_search_criteria(
         SearchCriteria().
         with_include_vertex_types(0, ["application"]).
         with_include_relation_types(0, ["contains"]).
         with_include_vertex_types(1, ["application"]).
         with_include_relation_types(1, ["calls"]).
         with_max_levels(2)).
-    with_cyper_query(
-        __create_union_cypher_query(
-            __cypher_search_query_template,
+    with_neo4j_search_criteria(
+        Neo4jSearchCriteria(
             [
                 "({{system_node_id:'{start_node}'}})-[:contains]-(:application)-[:calls]-(:application)",
                 "({{system_node_id:'{start_node}'}})-[:contains]-(:application)"

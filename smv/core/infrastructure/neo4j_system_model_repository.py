@@ -1,9 +1,9 @@
 from typing import Tuple
 
-from neo4j.v1 import GraphDatabase, session, Transaction, Record, Node, BoltStatementResult
+from neo4j.v1 import GraphDatabase, session, Record, Node, BoltStatementResult
 
 from smv.core.model.system_model import system_model
-from smv.core.model.system_models_repository import SystemModelsRepository, SearchCriteria
+from smv.core.model.system_models_repository import SystemModelsRepository
 from smv.core.common import Response
 import logging
 
@@ -34,6 +34,28 @@ def write_bulk_db(queries: [Tuple[str, dict]]):
     with get_db_session() as db_session:
         for query in queries:  # type: tuple
             db_session.write_transaction(lambda tx: tx.run(query[0], **query[1]))
+
+
+class Neo4jSearchCriteria:
+    __union_template = """
+MATCH 
+p = {clause}
+with relationships(p) as rels
+unwind rels as rel
+return startNode(rel) as start,endNode(rel) as end, type(rel) as relation_type 
+    """
+
+    def __init__(self, match_clauses):
+        self.match_clauses = match_clauses
+
+    def generate_query(self, **params):
+        query = self.__create_union_query(match_clauses=self.match_clauses)
+        return query.format(**params)
+
+    @staticmethod
+    def __create_union_query(match_clauses: []):
+        return "union".join(map(lambda c: Neo4jSearchCriteria.__union_template.format(clause=c), match_clauses))
+
 
 class Neo4JSystemModelsRepository(SystemModelsRepository):
     def get_node(self, node):
@@ -141,8 +163,8 @@ class Neo4JSystemModelsRepository(SystemModelsRepository):
             queries.append(query)
         write_bulk_db(queries)
 
-    def search(self, start_node, search_query: str) -> system_model:
-        query = search_query.format(start_node=start_node)
+    def search(self, start_node, search_query: Neo4jSearchCriteria) -> system_model:
+        query = search_query.generate_query(start_node=start_node)
         result = query_db(query)
         return self.__extract_model(result)
 
