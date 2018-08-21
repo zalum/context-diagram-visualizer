@@ -14,7 +14,7 @@ class Test(TestCase):
         model = system_model()
         model.add_system_node("1", "application")
         repo = FileSystemModelsRepository()
-        repo.set_model(model)
+        repo.append_system_model(model)
 
         # when
         result = repo.find_connected_graph("2", level=3)
@@ -35,7 +35,7 @@ class Test(TestCase):
         model.add_relation("3", "4")
         model.add_relation("4", "5")
         repo = FileSystemModelsRepository()
-        repo.set_model(model)
+        repo.append_system_model(model)
 
         #when
         result = repo.find_connected_graph("1",level=3)
@@ -60,7 +60,7 @@ class Test(TestCase):
         }
         graph[RELATIONS]=[]
         repo = FileSystemModelsRepository()
-        repo.set_model(system_model(graph))
+        repo.append_system_model(system_model(graph))
 
         #when
         result = repo.find_connected_graph("product")
@@ -80,7 +80,7 @@ class Test(TestCase):
             }
         graph[RELATIONS] = [{"start":"product","end":"application1","relation_type":"contains"}]
         repo = FileSystemModelsRepository()
-        repo.set_model(system_model(graph))
+        repo.append_system_model(system_model(graph))
 
         # when
         result = repo.find_connected_graph("product")
@@ -104,7 +104,7 @@ class Test(TestCase):
                  {"start": "application1", "end": "application2", "relation_type": "calls"}]
 
         repo = FileSystemModelsRepository()
-        repo.set_model(system_model(graph))
+        repo.append_system_model(system_model(graph))
 
         # when
         result = repo.find_connected_graph("product")
@@ -128,7 +128,7 @@ class Test(TestCase):
                {"start": "product", "end": "application2", "relation_type": "contains"}]
 
         repo = FileSystemModelsRepository()
-        repo.set_model(system_model(graph))
+        repo.append_system_model(system_model(graph))
 
         # when
         result = repo.find_connected_graph("product")
@@ -151,7 +151,7 @@ class Test(TestCase):
 
         criteria = SearchCriteria()
         repo = FileSystemModelsRepository()
-        repo.set_model(model)
+        repo.append_system_model(model)
 
         #when
         result = repo.find_connected_graph("user",criteria)
@@ -178,7 +178,7 @@ class Test(TestCase):
                  {"start": "product", "end": "application2", "relation_type": "contains"},
                  {"start": "application1", "end": "application2", "relation_type": "calls"}]
         repo = FileSystemModelsRepository()
-        repo.set_model(system_model(graph))
+        repo.append_system_model(system_model(graph))
 
         result = repo.find_connected_graph("product")
 
@@ -201,7 +201,7 @@ class Test(TestCase):
 
         criteria = SearchCriteria().with_include_vertex_types(0, ["table"])
         repo = FileSystemModelsRepository()
-        repo.set_model(model)
+        repo.append_system_model(model)
 
         #when
         result = repo.search("user", search_query=criteria)
@@ -226,7 +226,7 @@ class Test(TestCase):
         model.add_relation("user", "xxx", "uses")
         criteria = SearchCriteria().with_include_vertex_types(0, ["table", "schema"])
         repo = FileSystemModelsRepository()
-        repo.set_model(model)
+        repo.append_system_model(model)
 
         #when
         result = repo.search("user", search_query=criteria)
@@ -252,7 +252,7 @@ class Test(TestCase):
 
         criteria = SearchCriteria().with_include_relation_types(0, ["uses"])
         repo = FileSystemModelsRepository()
-        repo.set_model(model)
+        repo.append_system_model(model)
 
         #when
         result = repo.search("user", search_query=criteria)
@@ -289,7 +289,7 @@ class Test(TestCase):
             with_include_relation_types(2, ["fk"])
 
         repo = FileSystemModelsRepository()
-        repo.set_model(model)
+        repo.append_system_model(model)
 
         #then
         result = repo.search("user", search_query=criteria)

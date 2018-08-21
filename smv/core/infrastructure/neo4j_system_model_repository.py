@@ -168,8 +168,5 @@ class Neo4JSystemModelsRepository(SystemModelsRepository):
         result = query_db(query)
         return self.__extract_model(result)
 
-    def set_model(self, system_mode):
-        pass
-
     def get_full_system_model(self) -> system_model:
         pass

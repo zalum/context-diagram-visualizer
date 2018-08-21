@@ -51,9 +51,6 @@ class FileSystemModelsRepository(SystemModelsRepository):
     def add_vertex(self, system_node_id, system_node_type, name=None):
         return self.state.add_system_node(system_node_id, system_node_type, name=name)
 
-    def set_model(self, system_model):
-        return self.state.set_model(system_model)
-
 
 def _matching_edge(criteria: SearchCriteria, model: system_model, current_level, edge):
     if criteria is None:

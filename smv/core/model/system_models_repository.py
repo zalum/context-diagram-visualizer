@@ -19,9 +19,6 @@ class SystemModelsRepository(object):
     def find_connected_graph(self, system_mode, level)->Response:
         pass
 
-    def set_model(self, system_mode):
-        pass
-
     def append_system_model(self,system_model):
         pass
 
