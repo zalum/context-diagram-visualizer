@@ -169,4 +169,10 @@ class Neo4JSystemModelsRepository(SystemModelsRepository):
         return self.__extract_model(result)
 
     def get_full_system_model(self) -> system_model:
-        pass
+        query = """
+        MATCH p = (x)--(y) with relationships(p) as rels 
+        unwind rels as rel 
+        return startNode(rel) as start,endNode(rel) as end, type(rel) as relation_type
+        """
+        result = query_db(query)
+        return self.__extract_model(result)

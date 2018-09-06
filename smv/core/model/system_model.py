@@ -1,4 +1,5 @@
 import json
+
 from smv.core import Response
 from smv.core import RESPONSE_OK
 from smv.core import RESPONSE_ERROR
@@ -8,14 +9,22 @@ def empty_graph():
     return {SYSTEM_NODES: {}, RELATIONS: []}
 
 
-RESPONSE_OK_deprecated = object()
 SYSTEM_NODES = "system-nodes"
 RELATIONS = "relations"
 SYSTEM_NODE_TYPE = "type"
 RELATION_TYPE = "relation-type"
 
 
-class DatamodelRelationTypes():
+class ComponentNodeTypes:
+    application = "application"
+    product = "product"
+
+    @staticmethod
+    def get_types() -> set:
+        return {ComponentNodeTypes.product,ComponentNodeTypes.application}
+
+
+class DatamodelRelationTypes:
     fk = "fk"
     composition = "composition"
     contains = "contains"
@@ -23,7 +32,7 @@ class DatamodelRelationTypes():
     uses = "uses"
 
 
-class RelationTypes():
+class RelationTypes:
     datamodel = DatamodelRelationTypes
 
 
@@ -33,9 +42,21 @@ class DatamodelNodeTypes:
     database_user = "database_user"
     schema = "database_user"
 
+    @staticmethod
+    def get_types()->set:
+        return {DatamodelNodeTypes.table,
+                DatamodelNodeTypes.column,
+                DatamodelNodeTypes.database_user,
+                DatamodelNodeTypes.schema}
 
-class SystemNodesTypes():
+
+class SystemNodesTypes:
     datamodel = DatamodelNodeTypes
+    component = ComponentNodeTypes
+
+    @staticmethod
+    def get_types()->set:
+        return SystemNodesTypes.datamodel.get_types().union(SystemNodesTypes.component.get_types())
 
 
 class system_model:
