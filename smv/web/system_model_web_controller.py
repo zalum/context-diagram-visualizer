@@ -69,27 +69,38 @@ def get_node(node):
     return json.dumps(state.get_system_node(node), indent=2)
 
 
-@config.controller.route("/system-node", methods=['POST'])
-def add_system_node():
+@config.controller.route("", methods=['POST'])
+def append_model():
     '''
-    create system node
+    append a system model to the state
     ---
     parameters:
-      - in: body
-        name: node
-        required: true
-        schema:
-            type: string
-            properties:
-                name:
-                    type: string
-                type:
-                    type: string
-                    enum: ["application","product","database-user","schema","table","column"]
-            examples:
-                example:
-                    name: productXYZ
-                    type: product
+       - in: body
+         name: system_model
+         required: true
+         schema:
+             type: object
+             properties:
+                system-nodes:
+                    type: object
+                    properties:
+                        system-node:
+                            type: object
+                            properties:
+                                type:
+                                    type: string
+                relations:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            start:
+                                type: string
+                            end:
+                                type: string
+                            relation-type:
+                                type: string
+
     responses:
         200:
             content:
@@ -99,9 +110,9 @@ def add_system_node():
     tags:
     - system
     '''
-    node = request.get_json()
-    response = actions.add_system_node(node["name"], system_node_type=node["type"])
-    return web_utils.build_response(response, SupportedOutputFormats.json)
+    result = actions.append_json(request.data)
+    return web_utils.build_response(result, SupportedOutputFormats.json)
+
 
 @config.controller.route("/system-node", methods=['GET'])
 def list_nodes():
@@ -142,48 +153,6 @@ def list_nodes():
         return json.dumps(result,indent = 2)
     else:
         return json.dumps([key for key in nodes])
-
-
-@config.controller.route("/relation", methods=['POST'])
-def create_relation():
-    '''
-    create relation
-    ---
-    parameters:
-          - in: body
-            name: relation
-            required: true
-            schema:
-                type: object
-                properties:
-                    start:
-                        type: string
-                    end:
-                        type: string
-                    relation_type:
-                        type: string
-                        enum: ["contains","calls","uses","fk"]
-                examples:
-                    example:
-                        start: app1
-                        end: app2
-                        relation_type: contains
-    responses:
-        200:
-            content:
-                text/plain:
-                  schema:
-                    type: string
-    tags:
-    - system
-    '''
-    relation = request.get_json()
-    state = system_models_repository.get_full_system_model()
-    result = state.add_relation(start=relation["start"], end=relation["end"], relation_type=relation["relation_type"])
-    if result is RESPONSE_OK_deprecated:
-        return "ok"
-    else:
-        abort(400,result)
 
 
 @config.controller.route("/state/", methods=['PUT'])

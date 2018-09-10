@@ -13,14 +13,11 @@ import yaml
 import json
 
 
-def add_system_node(system_node_id, system_node_type):
-    return system_models_repository.add_vertex(system_node_id, system_node_type=system_node_type)
-
-
 def append_json(json_content):
     graph = json.loads(json_content)
     model = system_model(graph)
     system_models_repository.append_system_model(model)
+    return Response.success("Append succesfull.")
 
 
 def render_component_diagram(component,output_format):
