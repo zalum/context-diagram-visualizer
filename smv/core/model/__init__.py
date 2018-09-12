@@ -8,7 +8,7 @@ system_models_repository = None  # type: SystemModelsRepository
 
 
 def get_system_model_repository()->SystemModelsRepository:
-    if config[PERSISTANCE_ENGINE] is NEO4J_DB:
+    if config[PERSISTANCE_ENGINE] == NEO4J_DB:
         return Neo4JSystemModelsRepository()
     else:
         return FileSystemModelsRepository()

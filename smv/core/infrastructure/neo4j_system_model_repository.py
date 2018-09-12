@@ -5,6 +5,8 @@ from neo4j.v1 import GraphDatabase, session, Record, Node, BoltStatementResult
 from smv.core.model.system_model import system_model
 from smv.core.model.system_models_repository import SystemModelsRepository
 from smv.core.common import Response
+from smv.core.model.application_config import config
+from smv.core.model.application_config import NEO4J_URL
 import logging
 
 neo4j_log = logging.getLogger("neo4j.bolt")
@@ -16,7 +18,7 @@ driver = None
 def get_db_session() -> session:
     global driver
     if driver is None:
-        driver = GraphDatabase.driver('bolt://localhost')
+            driver = GraphDatabase.driver(config[NEO4J_URL])
     return driver.session()
 
 
