@@ -1,6 +1,6 @@
 from typing import Tuple
 
-from neo4j.v1 import GraphDatabase, session, Record, Node, BoltStatementResult
+from neo4j.v1 import GraphDatabase, Session, Record, Node, BoltStatementResult
 
 from smv.core.model.system_model import system_model
 from smv.core.model.system_models_repository import SystemModelsRepository
@@ -15,7 +15,7 @@ neo4j_log.setLevel(logging.WARNING)
 driver = None
 
 
-def get_db_session() -> session:
+def get_db_session() -> Session:
     global driver
     if driver is None:
             driver = GraphDatabase.driver(config[NEO4J_URL])
