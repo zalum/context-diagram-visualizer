@@ -109,18 +109,18 @@ class Neo4JSystemModelsRepository(SystemModelsRepository):
     @staticmethod
     def __add_node_to_model(model, record, record_key):
         node_value = Neo4JSystemModelsRepository.__extract_system_node(record.value(record_key))
-        properties = node_value.pop()
-        model.add_system_node(*node_value, **properties)
+        model.add_system_node(node_value[0], node_value[1], **node_value[2])
         return node_value[0]
 
     @staticmethod
     def __extract_system_node(node: Node):
-        result = [node.properties.pop("system_node_id")]
+        result = [None]*3
+        result[0] = node.get("system_node_id")
         if len(node.labels) > 0:
-            result.append(node.labels.pop())
-        else:
-            result.append(None)
-        result.append(node.properties)
+            result[1] = list(node.labels).pop()
+        properties = dict()
+        properties.update(filter(lambda x: x[0] != "system_node_id", node.items()))
+        result[2] = properties
         return result
 
     @staticmethod

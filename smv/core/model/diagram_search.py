@@ -31,9 +31,9 @@ class SearchQuery:
         return self
 
     def get_native_query(self, db_engine):
-        if db_engine is NEO4J_DB:
+        if db_engine == NEO4J_DB:
             return self.cypher_query
-        if db_engine is FILE_SYSTEM_DB:
+        if db_engine == FILE_SYSTEM_DB:
             return self.in_memory_query
 
     def with_neo4j_search_criteria(self, query: Neo4jSearchCriteria):
