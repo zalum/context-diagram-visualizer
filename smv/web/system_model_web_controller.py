@@ -9,15 +9,23 @@ from flask import send_file
 import smv.core.actions as actions
 from smv.core import *
 from smv.core.model import system_models_repository
-from smv.core.model.system_model import RESPONSE_OK_deprecated
 from smv.web import web_utils
+from smv.core.model.system_model import SystemNodesTypes
 
 config = web_utils.web_controller_config(
     controller=Blueprint('system-model', 'system-model'),
     url_prefix="/system-model"
 )
 
-@config.controller.route("/system-node/<string:node>/graph",methods=['GET'])
+
+def docstring_parameter(*sub):
+    def dec(obj):
+        obj.__doc__ = obj.__doc__.format(*sub)
+        return obj
+
+    return dec
+
+@config.controller.route("/system-node/<string:node>/graph", methods=['GET'])
 def get_node_graph(node):
     '''
     get node graph
@@ -30,7 +38,7 @@ def get_node_graph(node):
       - in: query
         type: number
         name: level
-        required: false
+        required: true
     responses:
         200:
             content:
@@ -43,10 +51,11 @@ def get_node_graph(node):
     level = request.args.get("level")
     if level is not None:
         level = int(level)
-    state = system_models_repository.get_full_system_model()
-    return system_models_repository.find_connected_graph(state,node,level=level).to_string()
+    response = actions.find_connected_graph(node, level=level)
+    return web_utils.build_response(response)
 
-@config.controller.route("/system-node/<string:node>",methods=['GET'])
+
+@config.controller.route("/system-node/<string:node>", methods=['GET'])
 def get_node(node):
     '''
     get node
@@ -114,6 +123,8 @@ def append_model():
     return web_utils.build_response(result, SupportedOutputFormats.json)
 
 
+
+@docstring_parameter(list(SystemNodesTypes.get_types()))
 @config.controller.route("/system-node", methods=['GET'])
 def list_nodes():
     '''
@@ -124,7 +135,7 @@ def list_nodes():
             type: string
             name: type
             required: true
-            enum: ["application","product","database-user","schema","table","column"]
+            enum: {}
           - in: query
             type: string
             name: format
@@ -143,14 +154,14 @@ def list_nodes():
     node_type = request.args.get("type")
     format = request.args.get("format")
     if node_type is None:
-        return abort(400,"Type cannot be null")
+        return abort(400, "Type cannot be null")
     state = system_models_repository.get_full_system_model()
     nodes = state.get_system_nodes_of_type(node_type)
     if format == "full":
         result = dict()
         for key in nodes:
             result[key] = state.get_system_node(key)
-        return json.dumps(result,indent = 2)
+        return json.dumps(result, indent=2)
     else:
         return json.dumps([key for key in nodes])
 
@@ -171,10 +182,11 @@ def persist_state():
     """
     f = open("graph.json", 'w')
     state = system_models_repository.get_full_system_model()
-    content = state.to_string()
+    content = str(state)
     f.write(content)
     f.close()
     return "ok"
+
 
 @config.controller.route("/state/", methods=['GET'])
 def download_state():
@@ -191,11 +203,11 @@ def download_state():
     - system
     """
     state = system_models_repository.get_full_system_model()
-    content = state.to_string()
-    return send_file(io.BytesIO(bytes(content,"UTF-8")), mimetype="text/plain")
+    content = str(state)
+    return send_file(io.BytesIO(bytes(content, "UTF-8")), mimetype="text/plain")
 
 
-@config.controller.route("/system-node/<string:node>/direct-connections",methods=['GET'])
+@config.controller.route("/system-node/<string:node>/direct-connections", methods=['GET'])
 def get_direct_connections(node):
     '''
     get direct connections of node
@@ -224,11 +236,10 @@ def get_direct_connections(node):
     tags:
      - system
     '''
-    state = system_models_repository.get_full_system_model()
-    vertex = state.get_system_node(node)
-    type = request.args.get("type")
-    relation_type = request.args.get("relation-type")
-    if vertex is None:
+    node = system_models_repository.get_node(node)
+    if node is None:
         abort(404)
-    connections = state.find_direct_connections(node,type,relation_type)
+    relation_type = request.args.get("relation-type")
+    type = request.args.get("type")
+    connections = actions.find_direct_connections(node, type, relation_type)
     return json.dumps(connections)

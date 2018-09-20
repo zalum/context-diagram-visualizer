@@ -1,4 +1,5 @@
 import json
+
 from smv.core import Response
 from smv.core import RESPONSE_OK
 from smv.core import RESPONSE_ERROR
@@ -8,14 +9,22 @@ def empty_graph():
     return {SYSTEM_NODES: {}, RELATIONS: []}
 
 
-RESPONSE_OK_deprecated = object()
 SYSTEM_NODES = "system-nodes"
 RELATIONS = "relations"
 SYSTEM_NODE_TYPE = "type"
 RELATION_TYPE = "relation-type"
 
 
-class DatamodelRelationTypes():
+class ComponentNodeTypes:
+    application = "application"
+    product = "product"
+
+    @staticmethod
+    def get_types() -> set:
+        return {ComponentNodeTypes.product,ComponentNodeTypes.application}
+
+
+class DatamodelRelationTypes:
     fk = "fk"
     composition = "composition"
     contains = "contains"
@@ -23,7 +32,7 @@ class DatamodelRelationTypes():
     uses = "uses"
 
 
-class RelationTypes():
+class RelationTypes:
     datamodel = DatamodelRelationTypes
 
 
@@ -33,9 +42,21 @@ class DatamodelNodeTypes:
     database_user = "database_user"
     schema = "database_user"
 
+    @staticmethod
+    def get_types()->set:
+        return {DatamodelNodeTypes.table,
+                DatamodelNodeTypes.column,
+                DatamodelNodeTypes.database_user,
+                DatamodelNodeTypes.schema}
 
-class SystemNodesTypes():
+
+class SystemNodesTypes:
     datamodel = DatamodelNodeTypes
+    component = ComponentNodeTypes
+
+    @staticmethod
+    def get_types()->set:
+        return SystemNodesTypes.datamodel.get_types().union(SystemNodesTypes.component.get_types())
 
 
 class system_model:
@@ -45,7 +66,7 @@ class system_model:
         else:
             self.graph = graphx
 
-    def to_string(self):
+    def __str__(self):
         return json.dumps(self.graph, indent=2)
 
     def get_system_node(self, system_node):
@@ -145,15 +166,6 @@ class system_model:
             self.graph[SYSTEM_NODES][vertex] = dict(to_append.graph[SYSTEM_NODES][vertex])
         for edge in to_append.graph[RELATIONS]:
             self.add_relation(edge["start"], edge["end"], edge["relation_type"] if "relation_type" in edge else None)
-
-    def find_direct_connections(self, system_node, system_node_type=None, relation_type=None):
-        connections = []
-        for edge in self.get_relations_of_system_node(system_node):
-            connection = self.get_related_system_node(system_node, edge)
-            if relation_type is None or system_model.is_relation_of_type(edge, relation_type):
-                if system_node_type is None or self.is_system_node_of_type(connection, system_node_type):
-                    connections.append(connection)
-        return connections
 
     def get_relation(self, start, end, relation_type):
         edges = list(

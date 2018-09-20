@@ -1,15 +1,33 @@
-from smv.core.model.system_model import data_model
-from smv.core.model.system_model import component_model
-from smv.core.model.system_model import SYSTEM_NODES
-from smv.core.model import system_models_repository
+import unittest
+import importlib
+
+from smv.core.model import SystemModelsRepository
 import smv.core.model.diagram_search as diagram_search
 from smv.core.model.system_model import DatamodelNodeTypes
 from smv.core.model.system_model import DatamodelRelationTypes
+from smv.core.model.system_model import SYSTEM_NODES
+from smv.core.model.system_model import component_model
+from smv.core.model.system_model import data_model
 
-import unittest
+system_models_repository = None  # type:SystemModelsRepository
 
 
-class DatamodelSearchDiagramTest(unittest.TestCase):
+def reload_system_model_repository()->SystemModelsRepository:
+    from smv.core.model.application_config import config, PERSISTANCE_ENGINE, FILE_SYSTEM_DB
+    config[PERSISTANCE_ENGINE] = FILE_SYSTEM_DB
+    from smv.core.model import load_context
+    load_context()
+    from smv.core.model import system_models_repository as system_models_repository
+    return system_models_repository
+
+
+class InMemoryDiagramSearchTest(unittest.TestCase):
+
+    def setUp(self):
+        global system_models_repository
+        system_models_repository = reload_system_model_repository()
+        importlib.reload(diagram_search)
+
     def test_search_tables_and_users(self):
         # given
         input_model = data_model()
@@ -30,7 +48,7 @@ class DatamodelSearchDiagramTest(unittest.TestCase):
         # data_model().add_edge("table1","col1",DatamodelRelationTypes.contains)
         # data_model().add_edge("table2","col2",DatamodelRelationTypes.contains)
         # data_model().add_edge("table3","col3",DatamodelRelationTypes.contains)
-        system_models_repository.set_model(input_model)
+        system_models_repository.append_system_model(input_model)
 
         # when
         result = diagram_search.search_database_user("user1")
@@ -69,7 +87,7 @@ class DatamodelSearchDiagramTest(unittest.TestCase):
         input_model.add_relation("table3", "col3", DatamodelRelationTypes.contains)
         input_model.add_relation("table4", "col4", DatamodelRelationTypes.contains)
         input_model.add_relation("col1", "col3", "fk")
-        system_models_repository.set_model(input_model)
+        system_models_repository.append_system_model(input_model)
 
         # when
         result = diagram_search.search_database_user("user1")
@@ -106,7 +124,7 @@ class DatamodelSearchDiagramTest(unittest.TestCase):
         input_model.add_relation(DatamodelNodeTypes.table, "parts", DatamodelRelationTypes.contains)
         input_model.add_relation("part", "parts", "composition")
         input_model.add_relation("column_part", "part", DatamodelRelationTypes.contains)
-        system_models_repository.set_model(input_model)
+        system_models_repository.append_system_model(input_model)
 
         # when
         result = diagram_search.search_database_user("user")
@@ -128,7 +146,7 @@ class DatamodelSearchDiagramTest(unittest.TestCase):
         input_model.add_relation("user3", "table1", DatamodelRelationTypes.uses)
         input_model.add_relation("col1", "table1", DatamodelRelationTypes.contains)
 
-        system_models_repository.set_model(input_model)
+        system_models_repository.append_system_model(input_model)
 
         # when
         result = diagram_search.search_database_user("user1")
@@ -160,7 +178,7 @@ class DatamodelSearchDiagramTest(unittest.TestCase):
         system_model.add_relation("P1","app3",DatamodelRelationTypes.contains)
         system_model.add_relation("app1","app3","calls")
         system_model.add_relation("P1","t1","owns")
-        system_models_repository.set_model(system_model)
+        system_models_repository.append_system_model(system_model)
 
         #when
         result = diagram_search.search_component_diagram("P1")
@@ -176,10 +194,7 @@ class DatamodelSearchDiagramTest(unittest.TestCase):
         expected.add_relation("P1", "app2", DatamodelRelationTypes.contains)
         expected.add_relation("P1", "app3", DatamodelRelationTypes.contains)
         expected.add_relation("app1", "app3", "calls")
-
         self.assert_models_are_equal(expected, result)
-
-
 
     def assert_models_are_equal(self, model1: data_model, model2: data_model):
         self.assertDictEqual(model1.graph[SYSTEM_NODES], model2.graph[SYSTEM_NODES])

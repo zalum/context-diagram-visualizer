@@ -1,6 +1,8 @@
 import subprocess
 import io
-import os
+from smv.core.model.application_config import config
+from smv.core.model.application_config import PLANT_UML_LOCAL_JAR
+from smv.core.model.application_config import PLANT_UML_SERVER
 import requests
 
 from smv.core import Response
@@ -20,7 +22,7 @@ class PlantUmlRenderer():
 
 class PlantUmlServerRenderer(PlantUmlRenderer):
     def __init__(self):
-        self.render_png_url = os.environ["PLANT_UML_SERVER"] + "/png"
+        self.render_png_url = config[PLANT_UML_SERVER] + "/png"
 
     def render_image(self, input, input_format="lines"):
         if input_format == "lines":
@@ -42,7 +44,7 @@ class PlantUmlLocalRenderer(PlantUmlRenderer):
             content = bytes(content, "UTF-8")
         else:
             content = input
-        plant_uml_location = os.environ["PLANT_UML"]
+        plant_uml_location = config[PLANT_UML_LOCAL_JAR]
         p = subprocess.Popen(["java", "-jar", "-DPLANTUML_LIMIT_SIZE=16384", plant_uml_location, "-pipe"],
                              stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         result = p.communicate(content)

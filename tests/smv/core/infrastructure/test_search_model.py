@@ -14,13 +14,13 @@ class Test(TestCase):
         model = system_model()
         model.add_system_node("1", "application")
         repo = FileSystemModelsRepository()
-        repo.set_model(model)
+        repo.append_system_model(model)
 
         # when
         result = repo.find_connected_graph("2", level=3)
 
         #then
-        self.assert_models_are_equal(system_model(), result)
+        self.assert_models_are_equal(system_model(), result.content)
 
     def test_find_connected_graph_until_certain_level(self):
         #given
@@ -35,7 +35,7 @@ class Test(TestCase):
         model.add_relation("3", "4")
         model.add_relation("4", "5")
         repo = FileSystemModelsRepository()
-        repo.set_model(model)
+        repo.append_system_model(model)
 
         #when
         result = repo.find_connected_graph("1",level=3)
@@ -49,7 +49,7 @@ class Test(TestCase):
         expected.add_relation("1", "2")
         expected.add_relation("2", "3")
         expected.add_relation("3", "4")
-        self.assert_models_are_equal(expected,result)
+        self.assert_models_are_equal(expected,result.content)
 
     def test_find_isolated_connected_graph(self):
         # given
@@ -60,7 +60,7 @@ class Test(TestCase):
         }
         graph[RELATIONS]=[]
         repo = FileSystemModelsRepository()
-        repo.set_model(system_model(graph))
+        repo.append_system_model(system_model(graph))
 
         #when
         result = repo.find_connected_graph("product")
@@ -69,7 +69,7 @@ class Test(TestCase):
         expected = dict()
         expected[SYSTEM_NODES] = {"product": {"type": "product"}}
         expected[RELATIONS] = []
-        self.assert_models_are_equal(system_model(expected), result)
+        self.assert_models_are_equal(system_model(expected), result.content)
 
     def test_find_connected_graph_with_one_level(self):
         # given
@@ -80,16 +80,16 @@ class Test(TestCase):
             }
         graph[RELATIONS] = [{"start":"product","end":"application1","relation_type":"contains"}]
         repo = FileSystemModelsRepository()
-        repo.set_model(system_model(graph))
+        repo.append_system_model(system_model(graph))
 
         # when
-        connected_graph = repo.find_connected_graph("product")
+        result = repo.find_connected_graph("product")
 
         #then
         expected = dict()
         expected[SYSTEM_NODES] ={"product": {"type": "product"}, "application1": {"type": "application"}}
         expected[RELATIONS] = [{"start": "product", "end": "application1", "relation_type": "contains"}]
-        self.assert_models_are_equal(system_model(expected), connected_graph)
+        self.assert_models_are_equal(system_model(expected), result.content)
 
     def test_find_connected_graph_with_multiple_levels(self):
         # given
@@ -104,10 +104,10 @@ class Test(TestCase):
                  {"start": "application1", "end": "application2", "relation_type": "calls"}]
 
         repo = FileSystemModelsRepository()
-        repo.set_model(system_model(graph))
+        repo.append_system_model(system_model(graph))
 
         # when
-        connected_graph = repo.find_connected_graph("product")
+        result = repo.find_connected_graph("product")
 
         # then
         expected = dict()
@@ -115,7 +115,7 @@ class Test(TestCase):
                            "application2": {"type": "application"}}
         expected[RELATIONS]=[{"start": "product", "end": "application1", "relation_type": "contains"},
                         {"start": "application1", "end": "application2", "relation_type": "calls"}]
-        self.assert_models_are_equal(system_model(expected), connected_graph)
+        self.assert_models_are_equal(system_model(expected), result.content)
 
     def test_find_connected_graph_with_corrupted_edge(self):
         # given
@@ -128,7 +128,7 @@ class Test(TestCase):
                {"start": "product", "end": "application2", "relation_type": "contains"}]
 
         repo = FileSystemModelsRepository()
-        repo.set_model(system_model(graph))
+        repo.append_system_model(system_model(graph))
 
         # when
         result = repo.find_connected_graph("product")
@@ -138,7 +138,7 @@ class Test(TestCase):
         expected.add_system_node("product", "product")
         expected.add_system_node("application1", "application")
         expected.add_relation("product", "application1", "contains")
-        self.assert_models_are_equal(expected,result)
+        self.assert_models_are_equal(expected, result.content)
 
     def test_find_connected_graph_with_empty_criteria(self):
         #given
@@ -151,7 +151,7 @@ class Test(TestCase):
 
         criteria = SearchCriteria()
         repo = FileSystemModelsRepository()
-        repo.set_model(model)
+        repo.append_system_model(model)
 
         #when
         result = repo.find_connected_graph("user",criteria)
@@ -163,7 +163,7 @@ class Test(TestCase):
         expected.add_system_node("schema", "schema")
         expected.add_relation("user", "table1", "uses")
         expected.add_relation("user", "schema", "uses")
-        self.assert_models_are_equal(expected, result)
+        self.assert_models_are_equal(expected, result.content)
 
     def test_find_connected_graph_with_cycle(self):
         graph = dict()
@@ -178,7 +178,7 @@ class Test(TestCase):
                  {"start": "product", "end": "application2", "relation_type": "contains"},
                  {"start": "application1", "end": "application2", "relation_type": "calls"}]
         repo = FileSystemModelsRepository()
-        repo.set_model(system_model(graph))
+        repo.append_system_model(system_model(graph))
 
         result = repo.find_connected_graph("product")
 
@@ -188,7 +188,7 @@ class Test(TestCase):
         expected[RELATIONS]=[{"start": "product", "end": "application1", "relation_type": "contains"},
                         {"start": "product", "end": "application2", "relation_type": "contains"},
                         {"start": "application1", "end": "application2", "relation_type": "calls"}]
-        self.assert_models_are_equal(system_model(expected), result)
+        self.assert_models_are_equal(system_model(expected), result.content)
 
     def test_search_criteria_by_vertex_type(self):
         #given
@@ -201,10 +201,10 @@ class Test(TestCase):
 
         criteria = SearchCriteria().with_include_vertex_types(0, ["table"])
         repo = FileSystemModelsRepository()
-        repo.set_model(model)
+        repo.append_system_model(model)
 
         #when
-        result = repo.search("user", criteria=criteria)
+        result = repo.search("user", search_query=criteria)
 
         #then
         expected = system_model()
@@ -226,10 +226,10 @@ class Test(TestCase):
         model.add_relation("user", "xxx", "uses")
         criteria = SearchCriteria().with_include_vertex_types(0, ["table", "schema"])
         repo = FileSystemModelsRepository()
-        repo.set_model(model)
+        repo.append_system_model(model)
 
         #when
-        result = repo.search("user",criteria=criteria)
+        result = repo.search("user", search_query=criteria)
 
         #then
         expected = system_model()
@@ -252,10 +252,10 @@ class Test(TestCase):
 
         criteria = SearchCriteria().with_include_relation_types(0, ["uses"])
         repo = FileSystemModelsRepository()
-        repo.set_model(model)
+        repo.append_system_model(model)
 
         #when
-        result = repo.search("user",criteria=criteria)
+        result = repo.search("user", search_query=criteria)
 
         #then
         expected = system_model()
@@ -289,10 +289,10 @@ class Test(TestCase):
             with_include_relation_types(2, ["fk"])
 
         repo = FileSystemModelsRepository()
-        repo.set_model(model)
+        repo.append_system_model(model)
 
         #then
-        result = repo.search("user", criteria=criteria)
+        result = repo.search("user", search_query=criteria)
         expected_model = system_model()
         expected_model.add_system_node("user", "user")
         expected_model.add_system_node("table1", "table")
