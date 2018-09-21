@@ -3,7 +3,7 @@ from typing import Tuple
 from neo4j.v1 import GraphDatabase, Session, Record, Node, BoltStatementResult
 
 from smv.core.model.system_model import system_model
-from smv.core.model.system_models_repository import SystemModelsRepository
+from smv.core.model.system_models_repository import SystemModelsRepository, SystemModelStoreUnavailable
 from smv.core.common import Response
 from smv.core.model.application_config import config
 from smv.core.model.application_config import NEO4J_URL
@@ -23,8 +23,11 @@ def get_db_session() -> Session:
 
 
 def query_db(query, **params) -> BoltStatementResult:
-    with get_db_session() as db_session:
-        return db_session.read_transaction(lambda tx: tx.run(query, **params))
+    try:
+        with get_db_session() as db_session:
+            return db_session.read_transaction(lambda tx: tx.run(query, **params))
+    except Exception as error:
+        raise SystemModelStoreUnavailable(error)
 
 
 def write_db(query: Tuple[str, dict]) -> BoltStatementResult:
