@@ -3,7 +3,7 @@ from typing import Tuple
 from neo4j.v1 import GraphDatabase, Session, Record, Node, BoltStatementResult
 
 from smv.core.model.system_model import system_model
-from smv.core.model.system_models_repository import SystemModelsRepository, SystemModelStoreUnavailable
+from smv.core.model.system_models_repository import SystemModelsRepository
 from smv.core.common import Response
 from smv.core.model.application_config import config
 from smv.core.model.application_config import NEO4J_URL
@@ -15,19 +15,22 @@ neo4j_log.setLevel(logging.WARNING)
 driver = None
 
 
+def __is_connection_encrypted():
+    open_ssl_1_0_1_bug_on_system = True
+    return not open_ssl_1_0_1_bug_on_system
+
+
 def get_db_session() -> Session:
     global driver
     if driver is None:
-            driver = GraphDatabase.driver(config[NEO4J_URL])
+            driver = GraphDatabase.driver(config[NEO4J_URL], encrypted=__is_connection_encrypted())
     return driver.session()
 
 
 def query_db(query, **params) -> BoltStatementResult:
-    try:
-        with get_db_session() as db_session:
-            return db_session.read_transaction(lambda tx: tx.run(query, **params))
-    except Exception as error:
-        raise SystemModelStoreUnavailable(error)
+    with get_db_session() as db_session:
+        return db_session.read_transaction(lambda tx: tx.run(query, **params))
+
 
 
 def write_db(query: Tuple[str, dict]) -> BoltStatementResult:

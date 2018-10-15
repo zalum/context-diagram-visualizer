@@ -26,10 +26,6 @@ class SystemModelsRepository(object):
         pass
 
 
-class SystemModelStoreUnavailable(Exception):
-    """Thrown when the system model store is unavailable"""
-
-
 class SearchCriteria:
     def __init__(self):
         self.levels_criteria = dict()
