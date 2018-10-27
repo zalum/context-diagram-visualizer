@@ -19,7 +19,7 @@ class SystemModelsRepository(object):
     def find_connected_graph(self, system_node, level)->Response:
         pass
 
-    def filter(self, **properties):
+    def filter(self, node_type):
         pass
 
     def append_system_model(self, system_model):

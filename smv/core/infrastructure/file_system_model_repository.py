@@ -25,6 +25,12 @@ def _read_state() -> system_model:
 
 
 class FileSystemModelsRepository(SystemModelsRepository):
+    def filter(self, node_type):
+        result = {}
+        for node in self.state.get_system_nodes_of_type(node_type):
+            result[node] = self.state.get_system_node(node)
+        return result
+
     def get_node(self, node):
         self.state.get_system_node(node)
 

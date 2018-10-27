@@ -8,3 +8,4 @@ graph.json
 *egg-info/*
 dist/*
 build/*
+.cache/*

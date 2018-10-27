@@ -66,6 +66,18 @@ return startNode(rel) as start,endNode(rel) as end, type(rel) as relation_type
 
 
 class Neo4JSystemModelsRepository(SystemModelsRepository):
+
+    def filter(self, node_type):
+        query_result = query_db("match (x:{node_type}) return x".format(node_type=node_type))
+        result = {}
+        for record in query_result.records():
+            node = record[0]  # Node
+            node_id = node.get("system_node_id")
+            properties = dict()
+            properties.update(filter(lambda x: x[0] != "system_node_id", node.items()))
+            result.update({node_id : properties})
+        return result
+
     def get_node(self, node):
         result = query_db("match (x {system_node_id:$system_node_id}) return x", system_node_id=node)
         record = result.single()

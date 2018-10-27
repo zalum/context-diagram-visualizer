@@ -21,11 +21,14 @@ def load_defaults():
 
 def load_config_file():
     global config
+    if "CONFIG_LOCATION" not in os.environ:
+        return
+
     with open(os.environ["CONFIG_LOCATION"], 'r') as stream:
         try:
             config.update(yaml.load(stream))
-        except yaml.YAMLError as exc:
-            print(exc)
+        except yaml.YAMLError as e:
+            raise Exception("Error parsing config file", e)
 
 
 def load_from_environment():

@@ -155,13 +155,9 @@ def list_nodes():
     format = request.args.get("format")
     if node_type is None:
         return abort(400, "Type cannot be null")
-    state = system_models_repository.get_full_system_model()
-    nodes = state.get_system_nodes_of_type(node_type)
+    nodes = system_models_repository.filter(node_type)
     if format == "full":
-        result = dict()
-        for key in nodes:
-            result[key] = state.get_system_node(key)
-        return json.dumps(result, indent=2)
+        return json.dumps(nodes, indent=2)
     else:
         return json.dumps([key for key in nodes])
 
