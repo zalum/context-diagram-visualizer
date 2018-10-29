@@ -52,7 +52,7 @@ setup(
         "flask>=0.12.2",
         "flasgger>=0.8.0",
         "PyYAML>=3.12",
-        "neo4j-driver>=1.5.3"
+        "neo4j-driver>1.6.0,<=1.6.1"
     ],
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
