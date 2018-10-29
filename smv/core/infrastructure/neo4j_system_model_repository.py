@@ -71,11 +71,8 @@ class Neo4JSystemModelsRepository(SystemModelsRepository):
         query_result = query_db("match (x:{node_type}) return x".format(node_type=node_type))
         result = {}
         for record in query_result.records():
-            node = record[0]  # Node
-            node_id = node.get("system_node_id")
-            properties = dict()
-            properties.update(filter(lambda x: x[0] != "system_node_id", node.items()))
-            result.update({node_id : properties})
+            node = Neo4JSystemModelsRepository.__extract_system_node(record[0])
+            result.update({node["system_node_id"]: node["properties"]})
         return result
 
     def get_node(self, node):
@@ -127,18 +124,18 @@ class Neo4JSystemModelsRepository(SystemModelsRepository):
     @staticmethod
     def __add_node_to_model(model, record, record_key):
         node_value = Neo4JSystemModelsRepository.__extract_system_node(record.value(record_key))
-        model.add_system_node(node_value[0], node_value[1], **node_value[2])
-        return node_value[0]
+        model.add_system_node(node_value["system_node_id"], node_value["type"], **node_value["properties"])
+        return node_value["system_node_id"]
 
     @staticmethod
     def __extract_system_node(node: Node):
-        result = [None]*3
-        result[0] = node.get("system_node_id")
+        result = dict()
+        result["system_node_id"] = node.get("system_node_id")
         if len(node.labels) > 0:
-            result[1] = list(node.labels).pop()
+            result["type"] = list(node.labels).pop()
         properties = dict()
         properties.update(filter(lambda x: x[0] != "system_node_id", node.items()))
-        result[2] = properties
+        result["properties"] = properties
         return result
 
     @staticmethod
