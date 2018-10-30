@@ -1,5 +1,5 @@
 # System Model & Visualizer - SMV
-[![Build Status](https://travis-ci.org/zalum/system-model-visualizer.svg?branch=feature%2Ffilter_search)](https://travis-ci.org/zalum/system-model-visualizer)
+[![Build Status](https://travis-ci.org/zalum/system-model-visualizer.svg?branch=master)](https://travis-ci.org/zalum/system-model-visualizer)
 
 This utility has the purpose to put in a graph model the dependencies of a system of all kinds
 (until now system lanscape, datamodel) and use it as input for plantuml to generate a corresponding diagram
