@@ -53,7 +53,7 @@ setup(
         "flasgger>=0.8.0",
         "PyYAML>=3.12",
         "neo4j-driver>1.6.0,<=1.6.1",
-        "requests>2.18.3,<=2.18.4"
+        "requests>=2.22.0 "
     ],
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().

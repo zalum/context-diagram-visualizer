@@ -47,8 +47,12 @@ What are the supported modelling options
 ## Code refactorings
 * improve encapsulation
 * rename names to python standards
-* fix RESPONSE_OK_deprecated
+* replace response object wrappers
 * fix transformation of a model to a more specific one: sm.data_model(system_model.graph)
 * improve identity of nodes
+
+## Project rename
+- mo/hub = model hub, a hub for your system model
+
 
 

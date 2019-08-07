@@ -109,11 +109,12 @@ class system_model:
         self.graph[SYSTEM_NODES][key]["type"] = type
         return Response.success({key: self.get_system_node(key)})
 
-    def add_relation(self, start, end, relation_type=None):
-        if self.get_system_node(start) is None:
-            return Response.error("Start node '{}' is not in the model".format(start))
-        if self.get_system_node(end) is None:
-            return Response.error("End node '{}' is not in the model".format(end))
+    def add_relation(self, start, end, relation_type=None, partial_append = False):
+        if partial_append is False:
+            if self.get_system_node(start) is None:
+                return Response.error("Start node '{}' is not in the model".format(start))
+            if self.get_system_node(end) is None:
+                return Response.error("End node '{}' is not in the model".format(end))
         result = self.get_relation(start=start, end=end, relation_type=relation_type)
         if result.return_code == RESPONSE_OK:
             return Response.error("edge already exists")
@@ -161,11 +162,11 @@ class system_model:
         self.graph = empty_graph()
         self.append(new_model)
 
-    def append(self, to_append: 'system_model'):
+    def append(self, to_append: 'system_model', partial_append=False):
         for vertex in to_append.graph[SYSTEM_NODES]:
             self.graph[SYSTEM_NODES][vertex] = dict(to_append.graph[SYSTEM_NODES][vertex])
         for edge in to_append.graph[RELATIONS]:
-            self.add_relation(edge["start"], edge["end"], edge["relation_type"] if "relation_type" in edge else None)
+            self.add_relation(edge["start"], edge["end"], edge["relation_type"] if "relation_type" in edge else None, partial_append)
 
     def get_relation(self, start, end, relation_type):
         edges = list(
