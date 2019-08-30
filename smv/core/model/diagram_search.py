@@ -1,11 +1,10 @@
 import smv.core.model.system_model as sm
 from smv.core.infrastructure.neo4j_system_model_repository import Neo4jSearchCriteria
-from smv.core.model.system_model import DatamodelNodeTypes
 from smv.core.model.system_models_repository import SearchCriteria
 from smv.core.model import system_models_repository
 from smv.core.model.application_config import NEO4J_DB, FILE_SYSTEM_DB, PERSISTANCE_ENGINE
 from smv.core.model.application_config import config
-
+from sms.schema import nodes
 
 def search_database_user(user):
     criteria = get_query(SEARCH_DATABASE_USER).get_native_query(config[PERSISTANCE_ENGINE])
@@ -55,8 +54,8 @@ SEARCH_SOFTWARE_PRODUCT = "SEARCH_SOFTWARE_PRODUCT"
 queries = [
     SearchQuery(SEARCH_DATABASE_USER, "extracts the datamodel related to a database user ").
     with_in_memory_search_criteria(
-        SearchCriteria().with_include_vertex_types(0, [DatamodelNodeTypes.table]).
-        with_include_vertex_types(1, [DatamodelNodeTypes.database_user, DatamodelNodeTypes.column]).
+        SearchCriteria().with_include_vertex_types(0, [nodes.table]).
+        with_include_vertex_types(1, [nodes.database_user, nodes.column]).
         with_include_relation_types(1, ["contains"]).
         with_include_relation_types(2, ["fk", "composition"]).
         with_include_vertex_types(3, ["table"]).

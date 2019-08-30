@@ -1,4 +1,5 @@
 import json
+from sms.schema import nodes
 
 from smv.core import Response
 from smv.core import RESPONSE_OK
@@ -35,23 +36,8 @@ class DatamodelRelationTypes:
 class RelationTypes:
     datamodel = DatamodelRelationTypes
 
-
-class DatamodelNodeTypes:
-    table = "table"
-    column = "column"
-    database_user = "database_user"
-    schema = "database_user"
-
-    @staticmethod
-    def get_types()->set:
-        return {DatamodelNodeTypes.table,
-                DatamodelNodeTypes.column,
-                DatamodelNodeTypes.database_user,
-                DatamodelNodeTypes.schema}
-
-
 class SystemNodesTypes:
-    datamodel = DatamodelNodeTypes
+    datamodel = nodes
     component = ComponentNodeTypes
 
     @staticmethod
@@ -211,14 +197,14 @@ class component_model(system_model):
 
 class data_model(system_model):
     def add_databse_user(self, database_user):
-        self.add_system_node(database_user, DatamodelNodeTypes.database_user)
+        self.add_system_node(database_user, nodes.database_user)
 
     def add_schema(self, schema):
-        self.add_system_node(schema, DatamodelNodeTypes.schema)
+        self.add_system_node(schema, nodes.schema)
 
     def add_column(self, column, table, owner):
         table_id = self.__build_table_id(owner, table)
-        response = self.add_system_node(column, DatamodelNodeTypes.column)
+        response = self.add_system_node(column, nodes.column)
         if response.is_error():
             return response
         response = self.add_relation(column, table_id, RelationTypes.datamodel.contains)
@@ -232,7 +218,7 @@ class data_model(system_model):
 
     def add_owned_table(self, table, owner):
         table_id = self.__build_table_id(owner, table)
-        self.add_system_node(table_id, DatamodelNodeTypes.table, name=table)
+        self.add_system_node(table_id, nodes.table, name=table)
         self.add_relation(table_id, owner, RelationTypes.datamodel.contains)
 
     @staticmethod
@@ -240,7 +226,7 @@ class data_model(system_model):
         return "{}.{}".format(owner, table)
 
     def is_table(self, system_node):
-        return self.is_system_node_of_type(system_node, DatamodelNodeTypes.table)
+        return self.is_system_node_of_type(system_node, nodes.table)
 
     def get_table_for_column(self, column):
         column_edges = [edge for edge in self.get_relations_of_type(relation_type=RelationTypes.datamodel.contains)
@@ -252,13 +238,13 @@ class data_model(system_model):
         return None
 
     def get_database_users(self):
-        return self.get_system_nodes_of_type(DatamodelNodeTypes.database_user)
+        return self.get_system_nodes_of_type(nodes.database_user)
 
     def get_tables_in_database_user(self, database_user):
-        return self.get_children(database_user, DatamodelNodeTypes.table, RelationTypes.datamodel.contains)
+        return self.get_children(database_user, nodes.table, RelationTypes.datamodel.contains)
 
     def get_columns_in_table(self, table):
-        return self.get_children(table, DatamodelNodeTypes.column, in_relation_of=RelationTypes.datamodel.contains)
+        return self.get_children(table, nodes.column, in_relation_of=RelationTypes.datamodel.contains)
 
     def get_foreign_keys(self):
         return list(
