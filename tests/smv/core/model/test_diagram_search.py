@@ -3,11 +3,11 @@ import importlib
 
 from smv.core.model import SystemModelsRepository
 import smv.core.model.diagram_search as diagram_search
-from smv.core.model.system_model import DatamodelRelationTypes
-from smv.core.model.system_model import SYSTEM_NODES
+from smv.core.model.system_model import SYSTEM_NODES, DatamodelRelationTypes
 from smv.core.model.system_model import component_model
 from smv.core.model.system_model import data_model
-from sms.schema import nodes
+from sms import nodes
+from sms import relations
 
 system_models_repository = None  # type:SystemModelsRepository
 
@@ -37,17 +37,11 @@ class InMemoryDiagramSearchTest(unittest.TestCase):
         input_model.add_system_node("table2", nodes.table)
         input_model.add_system_node("table3", nodes.table)
         input_model.add_system_node("table4", nodes.table)
-        # data_model().add_vertex("col1", "column")
-        # data_model().add_vertex("col2", "column")
-        # data_model().add_vertex("col3", "column")
-        input_model.add_relation("user1", "table1", DatamodelRelationTypes.contains)
+        input_model.add_relation("user1", "table1", relations.contains)
         input_model.add_relation("user1", "table2", DatamodelRelationTypes.uses)
-        input_model.add_relation("user2", "table2", DatamodelRelationTypes.contains)
-        input_model.add_relation("user2", "table3", DatamodelRelationTypes.contains)
-        input_model.add_relation("user2", "table4", DatamodelRelationTypes.contains)
-        # data_model().add_edge("table1","col1",DatamodelRelationTypes.contains)
-        # data_model().add_edge("table2","col2",DatamodelRelationTypes.contains)
-        # data_model().add_edge("table3","col3",DatamodelRelationTypes.contains)
+        input_model.add_relation("user2", "table2", relations.contains)
+        input_model.add_relation("user2", "table3", relations.contains)
+        input_model.add_relation("user2", "table4", relations.contains)
         system_models_repository.append_system_model(input_model)
 
         # when
@@ -59,9 +53,9 @@ class InMemoryDiagramSearchTest(unittest.TestCase):
         expected.add_system_node("user2", nodes.database_user)
         expected.add_system_node("table1", nodes.table)
         expected.add_system_node("table2", nodes.table)
-        expected.add_relation("user1", "table1", DatamodelRelationTypes.contains)
+        expected.add_relation("user1", "table1", relations.contains)
         expected.add_relation("user1", "table2", DatamodelRelationTypes.uses)
-        expected.add_relation("user2", "table2", DatamodelRelationTypes.contains)
+        expected.add_relation("user2", "table2", relations.contains)
         self.assert_models_are_equal(expected, result)
 
     def test_search_tables_with_columns_and_fk_and_users(self):
@@ -77,16 +71,16 @@ class InMemoryDiagramSearchTest(unittest.TestCase):
         input_model.add_system_node("col2", "column")
         input_model.add_system_node("col3", "column")
         input_model.add_system_node("col4", "column")
-        input_model.add_relation("user1", "table1", DatamodelRelationTypes.contains)
+        input_model.add_relation("user1", "table1", relations.contains)
         input_model.add_relation("user1", "table2", DatamodelRelationTypes.uses)
-        input_model.add_relation("user2", "table2", DatamodelRelationTypes.contains)
-        input_model.add_relation("user2", "table3", DatamodelRelationTypes.contains)
-        input_model.add_relation("user2", "table4", DatamodelRelationTypes.contains)
-        input_model.add_relation("table1", "col1", DatamodelRelationTypes.contains)
-        input_model.add_relation("table2", "col2", DatamodelRelationTypes.contains)
-        input_model.add_relation("table3", "col3", DatamodelRelationTypes.contains)
-        input_model.add_relation("table4", "col4", DatamodelRelationTypes.contains)
-        input_model.add_relation("col1", "col3", "fk")
+        input_model.add_relation("user2", "table2", relations.contains)
+        input_model.add_relation("user2", "table3", relations.contains)
+        input_model.add_relation("user2", "table4", relations.contains)
+        input_model.add_relation("table1", "col1", relations.contains)
+        input_model.add_relation("table2", "col2", relations.contains)
+        input_model.add_relation("table3", "col3", relations.contains)
+        input_model.add_relation("table4", "col4", relations.contains)
+        input_model.add_relation("col1", "col3", relations.foreign_key)
         system_models_repository.append_system_model(input_model)
 
         # when
@@ -102,13 +96,13 @@ class InMemoryDiagramSearchTest(unittest.TestCase):
         expected.add_system_node("col1", "column")
         expected.add_system_node("col2", "column")
         expected.add_system_node("col3", "column")
-        expected.add_relation("user1", "table1", DatamodelRelationTypes.contains)
+        expected.add_relation("user1", "table1", relations.contains)
         expected.add_relation("user1", "table2", DatamodelRelationTypes.uses)
-        expected.add_relation("user2", "table2", DatamodelRelationTypes.contains)
-        expected.add_relation("table1", "col1", DatamodelRelationTypes.contains)
-        expected.add_relation("table2", "col2", DatamodelRelationTypes.contains)
-        expected.add_relation("table3", "col3", DatamodelRelationTypes.contains)
-        expected.add_relation("col1", "col3", "fk")
+        expected.add_relation("user2", "table2", relations.contains)
+        expected.add_relation("table1", "col1", relations.contains)
+        expected.add_relation("table2", "col2", relations.contains)
+        expected.add_relation("table3", "col3", relations.contains)
+        expected.add_relation("col1", "col3", relations.foreign_key)
         self.assert_models_are_equal(expected, result)
 
     def test_search_composition_relation(self):
@@ -119,11 +113,11 @@ class InMemoryDiagramSearchTest(unittest.TestCase):
         input_model.add_system_node("part", nodes.table)
         input_model.add_system_node("parts", "column")
         input_model.add_system_node("column_part", "column")
-        input_model.add_relation("user", nodes.table, DatamodelRelationTypes.contains)
-        input_model.add_relation("user", "part", DatamodelRelationTypes.contains)
-        input_model.add_relation(nodes.table, "parts", DatamodelRelationTypes.contains)
+        input_model.add_relation("user", nodes.table, relations.contains)
+        input_model.add_relation("user", "part", relations.contains)
+        input_model.add_relation(nodes.table, "parts", relations.contains)
         input_model.add_relation("part", "parts", "composition")
-        input_model.add_relation("column_part", "part", DatamodelRelationTypes.contains)
+        input_model.add_relation("column_part", "part", relations.contains)
         system_models_repository.append_system_model(input_model)
 
         # when
@@ -142,9 +136,9 @@ class InMemoryDiagramSearchTest(unittest.TestCase):
         input_model.add_system_node("table1", nodes.table)
         input_model.add_system_node("col1", "column")
         input_model.add_relation("user1", "table1", DatamodelRelationTypes.uses)
-        input_model.add_relation("user2", "table1", DatamodelRelationTypes.contains)
+        input_model.add_relation("user2", "table1", relations.contains)
         input_model.add_relation("user3", "table1", DatamodelRelationTypes.uses)
-        input_model.add_relation("col1", "table1", DatamodelRelationTypes.contains)
+        input_model.add_relation("col1", "table1", relations.contains)
 
         system_models_repository.append_system_model(input_model)
 
@@ -159,8 +153,8 @@ class InMemoryDiagramSearchTest(unittest.TestCase):
         expected.add_system_node("col1", "column")
         expected.add_system_node("table1", nodes.table)
         expected.add_relation("user1", "table1", DatamodelRelationTypes.uses)
-        expected.add_relation("user2", "table1", DatamodelRelationTypes.contains)
-        expected.add_relation("col1", "table1", DatamodelRelationTypes.contains)
+        expected.add_relation("user2", "table1", relations.contains)
+        expected.add_relation("col1", "table1", relations.contains)
         self.assert_models_are_equal(expected, result)
 
 
@@ -173,9 +167,9 @@ class InMemoryDiagramSearchTest(unittest.TestCase):
         system_model.add_system_node("app3","application")
         system_model.add_system_node("t1",nodes.table)
 
-        system_model.add_relation("P1","app1",DatamodelRelationTypes.contains)
-        system_model.add_relation("P1","app2",DatamodelRelationTypes.contains)
-        system_model.add_relation("P1","app3",DatamodelRelationTypes.contains)
+        system_model.add_relation("P1","app1",relations.contains)
+        system_model.add_relation("P1","app2",relations.contains)
+        system_model.add_relation("P1","app3",relations.contains)
         system_model.add_relation("app1","app3","calls")
         system_model.add_relation("P1","t1","owns")
         system_models_repository.append_system_model(system_model)
@@ -190,9 +184,9 @@ class InMemoryDiagramSearchTest(unittest.TestCase):
         expected.add_system_node("app2", "application")
         expected.add_system_node("app3", "application")
 
-        expected.add_relation("P1", "app1", DatamodelRelationTypes.contains)
-        expected.add_relation("P1", "app2", DatamodelRelationTypes.contains)
-        expected.add_relation("P1", "app3", DatamodelRelationTypes.contains)
+        expected.add_relation("P1", "app1", relations.contains)
+        expected.add_relation("P1", "app2", relations.contains)
+        expected.add_relation("P1", "app3", relations.contains)
         expected.add_relation("app1", "app3", "calls")
         self.assert_models_are_equal(expected, result)
 

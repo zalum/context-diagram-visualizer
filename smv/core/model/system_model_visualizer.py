@@ -1,3 +1,5 @@
+from sms import schemas
+from sms import relations as relation_types
 from smv.core.model import system_model as sm
 
 
@@ -95,7 +97,7 @@ class datamodel_visualizer():
         return self._draw_foreign_key_between_columns(fk)
 
     def _draw_node_for_relation(self, system_node, collapsed_columns):
-        if self.system_model.is_system_node_of_type(system_node, sm.SystemNodesTypes.datamodel.column):
+        if self.system_model.is_system_node_of_type(system_node, schemas.datamodel.nodes.column):
             end_table = self.system_model.get_table_for_column(system_node)
             if collapsed_columns:
                 return end_table
@@ -104,9 +106,8 @@ class datamodel_visualizer():
         else:
             return system_node
 
-
     def _draw_composition_relations(self, collapsed_columns, lines):
-        relations = self.system_model.get_relations_of_type(sm.RelationTypes.datamodel.composition)
+        relations = self.system_model.get_relations_of_type(relation_types.composition)
         for relation in relations:
             self._draw_composition_relation(collapsed_columns, relation, lines)
 

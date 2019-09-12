@@ -3,7 +3,8 @@ import unittest
 import smv.core.model.system_model as sm
 from smv.core.model.system_model import DatamodelRelationTypes
 from smv.core.model import system_model_visualizer as svm
-from sms.schema import nodes
+from sms import nodes
+from sms import relations
 
 
 class DataModelVisualiserTest(unittest.TestCase):
@@ -20,8 +21,8 @@ class DataModelVisualiserTest(unittest.TestCase):
         model.add_system_node("SCHEMA1", type=nodes.database_user)
         model.add_system_node("TABLE1", type=nodes.table)
         model.add_system_node("TABLE2", type=nodes.table)
-        model.add_relation(start="TABLE1", end="SCHEMA1", relation_type=DatamodelRelationTypes.contains)
-        model.add_relation(start="TABLE2", end="SCHEMA1", relation_type=DatamodelRelationTypes.contains)
+        model.add_relation(start="TABLE1", end="SCHEMA1", relation_type=relations.contains)
+        model.add_relation(start="TABLE2", end="SCHEMA1", relation_type=relations.contains)
 
         expected_result = ["@startuml", "left to right direction",
                            "package \"SCHEMA1\"{",
@@ -35,7 +36,7 @@ class DataModelVisualiserTest(unittest.TestCase):
         model = sm.data_model()
         model.add_system_node("SCHEMA1", type=nodes.database_user)
         model.add_system_node("TABLE1", type=nodes.table)
-        model.add_relation("SCHEMA1", "TABLE1", DatamodelRelationTypes.contains)
+        model.add_relation("SCHEMA1", "TABLE1", relations.contains)
         expected_result = ["@startuml", "left to right direction",
                            "package \"SCHEMA1\"{",
                            "class TABLE1 {", "}",
@@ -48,8 +49,8 @@ class DataModelVisualiserTest(unittest.TestCase):
         model.add_system_node("SCHEMA1", type=nodes.database_user)
         model.add_system_node("TABLE1", type=nodes.table)
         model.add_system_node("T1_ID", type="column")
-        model.add_relation(start="TABLE1", end="SCHEMA1", relation_type=DatamodelRelationTypes.contains)
-        model.add_relation(start="T1_ID", end="TABLE1", relation_type=DatamodelRelationTypes.contains)
+        model.add_relation(start="TABLE1", end="SCHEMA1", relation_type=relations.contains)
+        model.add_relation(start="T1_ID", end="TABLE1", relation_type=relations.contains)
 
         expected_result = ["@startuml", "left to right direction", "package \"SCHEMA1\"{", "class TABLE1 {", "+ T1_ID",
                            "}", "}", "@enduml"]
@@ -60,8 +61,8 @@ class DataModelVisualiserTest(unittest.TestCase):
         model.add_system_node("SCHEMA1", type=nodes.database_user)
         model.add_system_node("TABLE1", type=nodes.table)
         model.add_system_node("T1_ID", type="column")
-        model.add_relation(start="TABLE1", end="SCHEMA1", relation_type=DatamodelRelationTypes.contains)
-        model.add_relation(start="T1_ID", end="TABLE1", relation_type=DatamodelRelationTypes.contains)
+        model.add_relation(start="TABLE1", end="SCHEMA1", relation_type=relations.contains)
+        model.add_relation(start="T1_ID", end="TABLE1", relation_type=relations.contains)
         expected_result = ["@startuml", "left to right direction", "package \"SCHEMA1\"{", "class TABLE1 {", "}", "}",
                            "@enduml"]
         self.__run_draw_datamodel_test__(model, expected_result, True)
@@ -73,11 +74,11 @@ class DataModelVisualiserTest(unittest.TestCase):
         model.add_system_node("TABLE2", type=nodes.table)
         model.add_system_node("T1_ID", type="column")
         model.add_system_node("T2_ID", type="column")
-        model.add_relation(start="TABLE1", end="SCHEMA1", relation_type=DatamodelRelationTypes.contains)
-        model.add_relation(start="TABLE2", end="SCHEMA1", relation_type=DatamodelRelationTypes.contains)
-        model.add_relation(start="T1_ID", end="TABLE1", relation_type=DatamodelRelationTypes.contains)
-        model.add_relation(start="T2_ID", end="TABLE2", relation_type=DatamodelRelationTypes.contains)
-        model.add_relation(start="T1_ID", end="T2_ID", relation_type=DatamodelRelationTypes.fk)
+        model.add_relation(start="TABLE1", end="SCHEMA1", relation_type=relations.contains)
+        model.add_relation(start="TABLE2", end="SCHEMA1", relation_type=relations.contains)
+        model.add_relation(start="T1_ID", end="TABLE1", relation_type=relations.contains)
+        model.add_relation(start="T2_ID", end="TABLE2", relation_type=relations.contains)
+        model.add_relation(start="T1_ID", end="T2_ID", relation_type=relations.foreign_key)
 
         expected_result = ["@startuml", "left to right direction", "package \"SCHEMA1\"{",
                            "class TABLE1 {",
@@ -99,11 +100,11 @@ class DataModelVisualiserTest(unittest.TestCase):
         model.add_system_node("TABLE2", type=nodes.table)
         model.add_system_node("T1_ID", type="column")
         model.add_system_node("T2_ID", type="column")
-        model.add_relation(start="TABLE1", end="SCHEMA1", relation_type=DatamodelRelationTypes.contains)
-        model.add_relation(start="TABLE2", end="SCHEMA1", relation_type=DatamodelRelationTypes.contains)
-        model.add_relation(start="T1_ID", end="TABLE1", relation_type=DatamodelRelationTypes.contains)
-        model.add_relation(start="T2_ID", end="TABLE2", relation_type=DatamodelRelationTypes.contains)
-        model.add_relation(start="T1_ID", end="T2_ID", relation_type=DatamodelRelationTypes.fk)
+        model.add_relation(start="TABLE1", end="SCHEMA1", relation_type=relations.contains)
+        model.add_relation(start="TABLE2", end="SCHEMA1", relation_type=relations.contains)
+        model.add_relation(start="T1_ID", end="TABLE1", relation_type=relations.contains)
+        model.add_relation(start="T2_ID", end="TABLE2", relation_type=relations.contains)
+        model.add_relation(start="T1_ID", end="T2_ID", relation_type=relations.foreign_key)
 
         expected_result = ["@startuml", "left to right direction", "package \"SCHEMA1\"{",
                            "class TABLE1 {",
@@ -124,8 +125,8 @@ class DataModelVisualiserTest(unittest.TestCase):
         model.add_system_node(nodes.table, nodes.table)
         model.add_system_node("c1", "column")
         model.add_relation("user1", nodes.table, "uses")
-        model.add_relation("schema", nodes.table, DatamodelRelationTypes.contains)
-        model.add_relation("c1", nodes.table, DatamodelRelationTypes.contains)
+        model.add_relation("schema", nodes.table, relations.contains)
+        model.add_relation("c1", nodes.table, relations.contains)
 
         # then
         expected = self.transform_in_lines("""
@@ -156,11 +157,11 @@ class DataModelVisualiserTest(unittest.TestCase):
         model.add_system_node("TABLE2", type=nodes.table)
         model.add_system_node("T1_ID", type="column")
         model.add_system_node("T2_ID", type="column")
-        model.add_relation(start="TABLE1", end="SCHEMA1", relation_type=DatamodelRelationTypes.contains)
-        model.add_relation(start="TABLE2", end="SCHEMA2", relation_type=DatamodelRelationTypes.contains)
-        model.add_relation(start="T1_ID", end="TABLE1", relation_type=DatamodelRelationTypes.contains)
-        model.add_relation(start="T2_ID", end="TABLE2", relation_type=DatamodelRelationTypes.contains)
-        model.add_relation(start="T1_ID", end="T2_ID", relation_type=DatamodelRelationTypes.fk)
+        model.add_relation(start="TABLE1", end="SCHEMA1", relation_type=relations.contains)
+        model.add_relation(start="TABLE2", end="SCHEMA2", relation_type=relations.contains)
+        model.add_relation(start="T1_ID", end="TABLE1", relation_type=relations.contains)
+        model.add_relation(start="T2_ID", end="TABLE2", relation_type=relations.contains)
+        model.add_relation(start="T1_ID", end="T2_ID", relation_type=relations.foreign_key)
 
         expected_result = ["@startuml", "left to right direction", "package \"SCHEMA1\"{",
                            "class TABLE1 {",
@@ -183,10 +184,10 @@ class DataModelVisualiserTest(unittest.TestCase):
         datamodel.add_system_node("user", type=nodes.database_user)
         datamodel.add_system_node("part", type=nodes.table)
         datamodel.add_system_node("parts", type="column")
-        datamodel.add_relation(start="aggregate_root", end="user", relation_type=DatamodelRelationTypes.contains)
-        datamodel.add_relation(start="part", end="user", relation_type=DatamodelRelationTypes.contains)
-        datamodel.add_relation(start="parts", end="aggregate_root", relation_type=DatamodelRelationTypes.contains)
-        datamodel.add_relation(start="part", end="parts", relation_type=DatamodelRelationTypes.composition)
+        datamodel.add_relation(start="aggregate_root", end="user", relation_type=relations.contains)
+        datamodel.add_relation(start="part", end="user", relation_type=relations.contains)
+        datamodel.add_relation(start="parts", end="aggregate_root", relation_type=relations.contains)
+        datamodel.add_relation(start="part", end="parts", relation_type=relations.composition)
 
         # then
         expected_result = self.transform_in_lines("""
@@ -212,10 +213,10 @@ class DataModelVisualiserTest(unittest.TestCase):
         datamodel.add_system_node("user", type=nodes.database_user)
         datamodel.add_system_node("part", type=nodes.table)
         datamodel.add_system_node("parts", type="column")
-        datamodel.add_relation(start="aggregate_root", end="user", relation_type=DatamodelRelationTypes.contains)
-        datamodel.add_relation(start="part", end="parts", relation_type=DatamodelRelationTypes.composition)
-        datamodel.add_relation(start="part", end="user", relation_type=DatamodelRelationTypes.contains)
-        datamodel.add_relation(end="parts", start="aggregate_root", relation_type=DatamodelRelationTypes.contains)
+        datamodel.add_relation(start="aggregate_root", end="user", relation_type=relations.contains)
+        datamodel.add_relation(start="part", end="parts", relation_type=relations.composition)
+        datamodel.add_relation(start="part", end="user", relation_type=relations.contains)
+        datamodel.add_relation(end="parts", start="aggregate_root", relation_type=relations.contains)
 
         # then
         expected_result = self.transform_in_lines("""
@@ -241,10 +242,10 @@ class DataModelVisualiserTest(unittest.TestCase):
         datamodel.add_system_node("user", type=nodes.database_user)
         datamodel.add_system_node("part", type=nodes.table)
         datamodel.add_system_node("parts", type="column")
-        datamodel.add_relation(start="aggregate_root", end="user", relation_type=DatamodelRelationTypes.contains)
-        datamodel.add_relation(start="part", end="user", relation_type=DatamodelRelationTypes.contains)
-        datamodel.add_relation(start="parts", end="aggregate_root", relation_type=DatamodelRelationTypes.contains)
-        datamodel.add_relation(start="part", end="parts", relation_type=DatamodelRelationTypes.composition)
+        datamodel.add_relation(start="aggregate_root", end="user", relation_type=relations.contains)
+        datamodel.add_relation(start="part", end="user", relation_type=relations.contains)
+        datamodel.add_relation(start="parts", end="aggregate_root", relation_type=relations.contains)
+        datamodel.add_relation(start="part", end="parts", relation_type=relations.composition)
 
         # then
         expected_result = self.transform_in_lines("""
@@ -268,9 +269,9 @@ class DataModelVisualiserTest(unittest.TestCase):
         datamodel.add_system_node("aggregate_root", type=nodes.table)
         datamodel.add_system_node("user", type=nodes.database_user)
         datamodel.add_system_node("part", type=nodes.table)
-        datamodel.add_relation(start="aggregate_root", end="user", relation_type=DatamodelRelationTypes.contains)
-        datamodel.add_relation(start="part", end="user", relation_type=DatamodelRelationTypes.contains)
-        datamodel.add_relation(start="part", end="aggregate_root", relation_type=DatamodelRelationTypes.composition)
+        datamodel.add_relation(start="aggregate_root", end="user", relation_type=relations.contains)
+        datamodel.add_relation(start="part", end="user", relation_type=relations.contains)
+        datamodel.add_relation(start="part", end="aggregate_root", relation_type=relations.composition)
 
         # then
         expected_result = self.transform_in_lines("""
@@ -293,7 +294,7 @@ class DataModelVisualiserTest(unittest.TestCase):
         datamodel = sm.data_model()
         datamodel.add_system_node("table_1", type=nodes.table, name="table 1")
         datamodel.add_system_node("schema1", type=nodes.database_user)
-        datamodel.add_relation("schema1", "table_1", DatamodelRelationTypes.contains)
+        datamodel.add_relation("schema1", "table_1", relations.contains)
 
         # then
         expected_result = ["@startuml",

@@ -3,7 +3,7 @@ import unittest
 from smv.core.model import system_model as sm, system_model_visualizer as svm
 
 
-class component_model_visualizer_test(unittest.TestCase):
+class ComponentModelVisualizerTest(unittest.TestCase):
     def testDrawOneRelation(self):
         model = sm.component_model()
         model.add_system_node("1",type = "application",name = "app1")

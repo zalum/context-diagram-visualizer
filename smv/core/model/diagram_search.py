@@ -5,6 +5,7 @@ from smv.core.model import system_models_repository
 from smv.core.model.application_config import NEO4J_DB, FILE_SYSTEM_DB, PERSISTANCE_ENGINE
 from smv.core.model.application_config import config
 from sms.schema import nodes
+from sms.schema import relations
 
 def search_database_user(user):
     criteria = get_query(SEARCH_DATABASE_USER).get_native_query(config[PERSISTANCE_ENGINE])
@@ -56,9 +57,9 @@ queries = [
     with_in_memory_search_criteria(
         SearchCriteria().with_include_vertex_types(0, [nodes.table]).
         with_include_vertex_types(1, [nodes.database_user, nodes.column]).
-        with_include_relation_types(1, ["contains"]).
-        with_include_relation_types(2, ["fk", "composition"]).
-        with_include_vertex_types(3, ["table"]).
+        with_include_relation_types(1, [relations.contains]).
+        with_include_relation_types(2, [relations.foreign_key, relations.composition]).
+        with_include_vertex_types(3, [nodes.table]).
         with_max_levels(4)).
     with_neo4j_search_criteria(
         Neo4jSearchCriteria([

@@ -10,7 +10,7 @@ import smv.core.actions as actions
 from smv.core import *
 from smv.core.model import system_models_repository
 from smv.web import web_utils
-from smv.core.model.system_model import SystemNodesTypes
+from sms import nodes
 
 config = web_utils.web_controller_config(
     controller=Blueprint('system-model', 'system-model'),
@@ -24,6 +24,7 @@ def docstring_parameter(*sub):
         return obj
 
     return dec
+
 
 @config.controller.route("/system-node/<string:node>/graph", methods=['GET'])
 def get_node_graph(node):
@@ -124,7 +125,7 @@ def append_model():
 
 
 
-@docstring_parameter(list(SystemNodesTypes.get_types()))
+@docstring_parameter(list(nodes.values()))
 @config.controller.route("/system-node", methods=['GET'])
 def list_nodes():
     '''
