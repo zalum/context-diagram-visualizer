@@ -1,6 +1,8 @@
 import json
+import logging
 from sms import nodes
 from sms import relations
+from sms.generic_types import Relation
 
 from smv.core import Response
 from smv.core import RESPONSE_OK
@@ -14,7 +16,22 @@ def empty_graph():
 SYSTEM_NODES = "system-nodes"
 RELATIONS = "relations"
 SYSTEM_NODE_TYPE = "type"
-RELATION_TYPE = "relation-type"
+RELATION_TYPE = "relation_type"
+
+
+class Instrumentation:
+    def __init__(self):
+        self.__logger = logging.getLogger(__name__)
+
+    def node_type_does_not_exist(self, key, type):
+        self.__logger.warn("Node type '{}' of node {} does not exist".format(type, key))
+
+    def relation_type_does_not_exist(self, relation_type, from_type=None, to_type=None):
+        self.__logger.warn(
+            "Relation type ('{}') from ('{}') to ('{}') does not exist".format(relation_type, from_type, to_type))
+
+
+instrumentation = Instrumentation()
 
 
 class DatamodelRelationTypes:
@@ -41,7 +58,7 @@ class system_model:
         keys.sort()
         return keys
 
-    def get_system_nodes_of_type(self, type):
+    def get_system_nodes_of_type(self, type)->[]:
         return [v for v in self.get_system_nodes() if self.is_system_node_of_type(v, type)]
 
     def has_system_node(self, system_node):
@@ -52,9 +69,9 @@ class system_model:
 
     @staticmethod
     def is_relation_of_type(edge, relation_type):
-        if relation_type is None and "relation_type" not in edge:
+        if relation_type is None and RELATION_TYPE not in edge:
             return True
-        if "relation_type" in edge and edge["relation_type"] == relation_type:
+        if RELATION_TYPE in edge and edge[RELATION_TYPE] == relation_type:
             return True
         return False
 
@@ -65,13 +82,15 @@ class system_model:
         return self.graph[SYSTEM_NODES][system_node]["type"] == type
 
     def add_system_node(self, key, type, **kwargs):
+        if nodes.get_value(type) is None:
+            instrumentation.node_type_does_not_exist(key, type)
         if key in self.graph[SYSTEM_NODES]:
             return Response.error("System Node '{}' already exists".format(key))
         self.graph[SYSTEM_NODES][key] = kwargs
         self.graph[SYSTEM_NODES][key]["type"] = type
         return Response.success({key: self.get_system_node(key)})
 
-    def add_relation(self, start, end, relation_type=None, partial_append = False):
+    def add_relation(self, start, end, relation_type=None, partial_append=False):
         if partial_append is False:
             if self.get_system_node(start) is None:
                 return Response.error("Start node '{}' is not in the model".format(start))
@@ -81,12 +100,17 @@ class system_model:
         if result.return_code == RESPONSE_OK:
             return Response.error("edge already exists")
         if result.content == "not found":
+            self.__verify_relation_type(start, end, relation_type)
             result = {"start": start, "end": end}
             if relation_type is not None:
-                result["relation_type"] = relation_type
+                result[RELATION_TYPE] = relation_type
             self.graph[RELATIONS].append(result)
             return Response.success("Relation ({})-[{}]-({}) added".format(start, relation_type, end))
         return Response.error(result.content)
+
+    @staticmethod
+    def get_relation_type(relation):
+        return relation[RELATION_TYPE]
 
     @staticmethod
     def get_related_system_node(system_node, edge):
@@ -126,9 +150,10 @@ class system_model:
 
     def append(self, to_append: 'system_model', partial_append=False):
         for vertex in to_append.graph[SYSTEM_NODES]:
-            self.graph[SYSTEM_NODES][vertex] = dict(to_append.graph[SYSTEM_NODES][vertex])
+            self.add_system_node(vertex, **to_append.graph[SYSTEM_NODES][vertex])
         for edge in to_append.graph[RELATIONS]:
-            self.add_relation(edge["start"], edge["end"], edge["relation_type"] if "relation_type" in edge else None, partial_append)
+            self.add_relation(edge["start"], edge["end"], edge[RELATION_TYPE] if RELATION_TYPE in edge else None,
+                              partial_append)
 
     def get_relation(self, start, end, relation_type):
         edges = list(
@@ -147,6 +172,32 @@ class system_model:
             return result
         self.graph[RELATIONS].remove(result.content)
         return Response.success()
+
+    def get_relation_types_between(self, node1, node2):
+        all_relations = self.get_relations_of_system_node(node1)
+        relation_types = set()
+        for relation in all_relations:
+            if system_model.get_related_system_node(node1, relation) != node2:
+                continue
+            relation_type = system_model.get_relation_type(relation)
+            relation_types.add(relation_type)
+        return relation_types
+
+    def __verify_relation_type(self, start, end, relation_type):
+        if relation_type is None:
+            return
+        from_node = self.get_system_node(start)
+        to_node = self.get_system_node(end)
+        if from_node is None or to_node is None:
+            return
+        relation = relations.get_value(relation_type)  # type: Relation
+        if relation is None:
+            instrumentation.relation_type_does_not_exist(relation_type)
+            return
+        from_type = from_node[SYSTEM_NODE_TYPE]
+        to_type = to_node[SYSTEM_NODE_TYPE]
+        if not relation.supports(from_type=from_type, to_type=to_type):
+            instrumentation.relation_type_does_not_exist(relation_type, from_type=from_type, to_type=to_type)
 
 
 class component_model(system_model):
@@ -175,9 +226,6 @@ class data_model(system_model):
     def add_databse_user(self, database_user):
         self.add_system_node(database_user, nodes.database_user)
 
-    def add_schema(self, schema):
-        self.add_system_node(schema, nodes.schema)
-
     def add_column(self, column, table, owner):
         table_id = self.__build_table_id(owner, table)
         response = self.add_system_node(column, nodes.column)
@@ -186,11 +234,11 @@ class data_model(system_model):
         response = self.add_relation(column, table_id, relations.contains)
         return response
 
-    def add_used_table(self, table, owner, database_user):
+    def add_used_table(self, table, owner, database_user, relation: Relation):
         table_id = self.__build_table_id(owner, table)
         if self.get_system_node(table_id) is None:
             self.add_owned_table(table, owner)
-        self.add_relation(table_id, database_user, relations.uses)
+        self.add_relation(table_id, database_user, relation)
 
     def add_owned_table(self, table, owner):
         table_id = self.__build_table_id(owner, table)
@@ -238,3 +286,4 @@ class data_model(system_model):
                 "table": self.get_table_for_column(column2)
             }
         }
+

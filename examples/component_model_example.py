@@ -23,7 +23,7 @@ def get_component_graph():
 def draw_component_model():
     f = open('output-cm.png', 'wb')
     inputSystemGraph = sm.component_model(get_component_graph())
-    lines = svm.component_model_visualizer(inputSystemGraph).draw()
+    lines = svm.ComponentModelVisualizer(inputSystemGraph).draw()
     picture = smo.render_image(lines).getvalue()
     f.write(picture)
 

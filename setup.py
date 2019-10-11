@@ -1,12 +1,21 @@
 from setuptools import setup, find_packages
 
+
+def __get_version(developement=False):
+    file = open("../version.txt", "r")
+    version = file.readlines()[0]
+    if developement:
+        version += ".dev1"
+    return version
+
+
 setup(
     name='smv',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.0.4',
+    version=__get_version(),
 
     description="System Model & Visualizer - SMV",
     long_description='''
@@ -55,6 +64,9 @@ setup(
         "neo4j-driver>1.6.0,<=1.6.1",
         "requests>=2.22.0 ",
         "sms>=0.0.1"
+    ],
+    dependency_links=[
+        'git+https://github.com/zalum/system-model-schema/releases/download/v0.0.1/system_model_schema-0.0.1.dev1_20191011-py3-none-any.whl',
     ],
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().

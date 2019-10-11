@@ -7,6 +7,7 @@ from smv.core.model.application_config import config
 from sms.schema import nodes
 from sms.schema import relations
 
+
 def search_database_user(user):
     criteria = get_query(SEARCH_DATABASE_USER).get_native_query(config[PERSISTANCE_ENGINE])
     system_model = system_models_repository.search(user, criteria)
@@ -17,6 +18,12 @@ def search_component_diagram(component):
     criteria = get_query(SEARCH_SOFTWARE_PRODUCT).get_native_query(config[PERSISTANCE_ENGINE])
     system_model = system_models_repository.search(component, criteria)
     return sm.component_model(system_model.graph)
+
+
+def search(node, search_query):
+    criteria = get_query(search_query).get_native_query(config[PERSISTANCE_ENGINE])
+    system_model = system_models_repository.search(node, criteria)
+    return sm.system_model(system_model.graph)
 
 
 class SearchQuery:
@@ -41,7 +48,7 @@ class SearchQuery:
         return self
 
 
-def get_query(name)->SearchQuery:
+def get_query(name) -> SearchQuery:
     for query in queries:
         if name == query.name:
             return query
@@ -50,12 +57,27 @@ def get_query(name)->SearchQuery:
 
 SEARCH_DATABASE_USER = "SEARCH_DATABASE_USER"
 SEARCH_SOFTWARE_PRODUCT = "SEARCH_SOFTWARE_PRODUCT"
-
+SEARCH_BOUNDED_CONTEXT = "SEARCH_BOUNDED_CONTEXT"
 
 queries = [
+    SearchQuery(SEARCH_BOUNDED_CONTEXT, "extract the datamodel related to a bounded-context").
+    with_in_memory_search_criteria(SearchCriteria().
+                                   with_include_vertex_types(0, [nodes.bounded_context]).
+                                   with_include_vertex_types(1, [nodes.database_user, nodes.table]).
+                                   with_include_vertex_types(2, [nodes.column]).
+                                   with_include_vertex_types(3, [nodes.column, nodes.table]).
+                                   with_include_vertex_types(4, [nodes.table]).
+                                   with_max_levels(5)).
+    with_neo4j_search_criteria(Neo4jSearchCriteria([
+        "(:bounded_context {{system_node_id:'{start_node}'}})--(y:table)--(:column)",
+        """
+        (:bounded_context {{system_node_id:'{start_node}'}})--(:database_user)--(:table)--(:column)
+        -[:foreign_key|:composition]-(:column)
+        """,
+        "(:bounded_context {{system_node_id:'{start_node}'}})--(:database_user)--(:table)--(:column)"])),
     SearchQuery(SEARCH_DATABASE_USER, "extracts the datamodel related to a database user ").
-    with_in_memory_search_criteria(
-        SearchCriteria().with_include_vertex_types(0, [nodes.table]).
+    with_in_memory_search_criteria(SearchCriteria().
+        with_include_vertex_types(0, [nodes.table]).
         with_include_vertex_types(1, [nodes.database_user, nodes.column]).
         with_include_relation_types(1, [relations.contains]).
         with_include_relation_types(2, [relations.foreign_key, relations.composition]).
@@ -63,7 +85,7 @@ queries = [
         with_max_levels(4)).
     with_neo4j_search_criteria(
         Neo4jSearchCriteria([
-            "(x:database_user {{system_node_id:'{start_node}'}})-[:uses]-(y:table)-[:contains]-(z:database_user)",
+            "(x:database_user {{system_node_id:'{start_node}'}})--(y:table)-[:contains]-(z:database_user)",
             """
             (x:database_user {{system_node_id:'{start_node}'}})--(y:table)
             -[:contains]-(:column)-[:fk]-(:column)--(:table)
@@ -75,22 +97,17 @@ queries = [
     ),
 
     SearchQuery(SEARCH_SOFTWARE_PRODUCT, "extracts the contents of a C4 diagram of a Software product").
-    with_in_memory_search_criteria(
-        SearchCriteria().
+    with_in_memory_search_criteria(SearchCriteria().
         with_include_vertex_types(0, ["application"]).
         with_include_relation_types(0, ["contains"]).
         with_include_vertex_types(1, ["application"]).
         with_include_relation_types(1, ["calls"]).
         with_max_levels(2)).
-    with_neo4j_search_criteria(
-        Neo4jSearchCriteria(
-            [
-                "({{system_node_id:'{start_node}'}})-[:contains]-(:application)-[:calls]-(:application)",
-                "({{system_node_id:'{start_node}'}})-[:contains]-(:application)"
-            ]
-            )
-        )
+    with_neo4j_search_criteria(Neo4jSearchCriteria(
+        [
+            "({{system_node_id:'{start_node}'}})-[:contains]-(:application)-[:calls]-(:application)",
+            "({{system_node_id:'{start_node}'}})-[:contains]-(:application)"
+        ]
+    )
+    )
 ]
-
-
-

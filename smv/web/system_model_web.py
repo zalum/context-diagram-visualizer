@@ -5,6 +5,7 @@ from werkzeug.utils import redirect
 from smv.web.component_model_web_controller import config as cm_web
 from smv.web.data_model_web_controller import config as dm_web
 from smv.web.plantuml_web_controller import config as plantuml_web
+from smv.web.bounded_context_web_controller import bc_web as bc_web
 from smv.web.system_model_web_controller import config as sm_web
 from smv.web.web_utils import rule_filter
 
@@ -12,7 +13,9 @@ from smv.web.web_utils import rule_filter
 def get_swagger_config():
     return dict(endpoint="system-model",
                 route="/system-model.json",
-                rule_filter=rule_filter([cm_web.url_prefix, dm_web.url_prefix, sm_web.url_prefix,plantuml_web.url_prefix]))
+                rule_filter=rule_filter(
+                    [cm_web.url_prefix, bc_web.url_prefix,
+                     dm_web.url_prefix, sm_web.url_prefix, plantuml_web.url_prefix]))
 
 
 def init_api_specification(app):
@@ -33,9 +36,10 @@ def main():
     app.register_blueprint(dm_web.controller, url_prefix=dm_web.url_prefix)
     app.register_blueprint(sm_web.controller, url_prefix=sm_web.url_prefix)
     app.register_blueprint(sm_web.controller, url_prefix=sm_web.url_prefix)
+    app.register_blueprint(bc_web.controller, url_prefix=bc_web.url_prefix)
     app.register_blueprint(plantuml_web.controller, url_prefix=plantuml_web.url_prefix)
     init_api_specification(app)
-    app.run(port=8080,debug=False,host="0.0.0.0")
+    app.run(port=8080, debug=False, host="0.0.0.0")
 
 
 if __name__ == "__main__":

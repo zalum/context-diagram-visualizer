@@ -29,7 +29,7 @@ def get_datamodel_graph():
 def draw_datamodel():
     f = open('output-dm.png', 'wb')
     inputSystemGraph = sm.data_model(get_datamodel_graph())
-    lines = smv.datamodel_visualizer(inputSystemGraph).draw(collapsed_columns=False)
+    lines = smv.DatamodelVisualizer(inputSystemGraph).draw(collapsed_columns=False)
     picture = smo.render_image(lines).getvalue()
     f.write(picture)
 

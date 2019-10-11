@@ -13,8 +13,8 @@ class DataModelVisualiserTest(unittest.TestCase):
         model = sm.data_model()
         model.add_system_node("SCHEMA1", type=nodes.database_user)
 
-        expected_result = ["@startuml", "left to right direction", "package \"SCHEMA1\"{", "}", "@enduml"]
-        self.__run_draw_datamodel_test__(model, expected_result)
+        expected_result = ["@startuml", "left to right direction", "@enduml"]
+        self.__run_draw_datamodel_test__(model, "SCHEMA1", expected_result)
 
     def test_draw_database_user_with_table(self):
         model = sm.data_model()
@@ -30,7 +30,7 @@ class DataModelVisualiserTest(unittest.TestCase):
                            "class TABLE2 {", "}",
                            "}",
                            "@enduml"]
-        self.__run_draw_datamodel_test__(model, expected_result)
+        self.__run_draw_datamodel_test__(model, "SCHEMA1", expected_result)
 
     def test_start_database_user_end_table_relation(self):
         model = sm.data_model()
@@ -42,7 +42,7 @@ class DataModelVisualiserTest(unittest.TestCase):
                            "class TABLE1 {", "}",
                            "}",
                            "@enduml"]
-        self.__run_draw_datamodel_test__(model, expected_result)
+        self.__run_draw_datamodel_test__(model, "SCHEMA1", expected_result)
 
     def test_draw_table_with_column(self):
         model = sm.data_model()
@@ -54,7 +54,7 @@ class DataModelVisualiserTest(unittest.TestCase):
 
         expected_result = ["@startuml", "left to right direction", "package \"SCHEMA1\"{", "class TABLE1 {", "+ T1_ID",
                            "}", "}", "@enduml"]
-        self.__run_draw_datamodel_test__(model, expected_result)
+        self.__run_draw_datamodel_test__(model, "SCHEMA1", expected_result)
 
     def test_draw_table_with_colapsed_column(self):
         model = sm.data_model()
@@ -65,7 +65,7 @@ class DataModelVisualiserTest(unittest.TestCase):
         model.add_relation(start="T1_ID", end="TABLE1", relation_type=relations.contains)
         expected_result = ["@startuml", "left to right direction", "package \"SCHEMA1\"{", "class TABLE1 {", "}", "}",
                            "@enduml"]
-        self.__run_draw_datamodel_test__(model, expected_result, True)
+        self.__run_draw_datamodel_test__(model, "SCHEMA1", expected_result, True)
 
     def test_draw_foreign_key(self):
         model = sm.data_model()
@@ -91,7 +91,7 @@ class DataModelVisualiserTest(unittest.TestCase):
                            "TABLE1::T1_ID --> TABLE2::T2_ID", "@enduml"
                            ]
 
-        self.__run_draw_datamodel_test__(model, expected_result)
+        self.__run_draw_datamodel_test__(model, "SCHEMA1", expected_result)
 
     def test_draw_table_with_colapsed_column_with_fk(self):
         model = sm.data_model()
@@ -115,7 +115,7 @@ class DataModelVisualiserTest(unittest.TestCase):
                            "TABLE1 --> TABLE2 : T1_ID::T2_ID", "@enduml"
                            ]
 
-        self.__run_draw_datamodel_test__(model, expected_result, colapsed_columns=True)
+        self.__run_draw_datamodel_test__(model, "SCHEMA1", expected_result, colapsed_columns=True)
 
     def test_draw_database_user_uses_tables(self):
         # given
@@ -142,7 +142,7 @@ class DataModelVisualiserTest(unittest.TestCase):
         @enduml
         """)
 
-        self.__run_draw_datamodel_test__(model, expected)
+        self.__run_draw_datamodel_test__(model, "schema", expected)
 
     def transform_in_lines(self, text: str):
         return list(
@@ -175,7 +175,7 @@ class DataModelVisualiserTest(unittest.TestCase):
                            "}",
                            "TABLE1::T1_ID --> TABLE2::T2_ID", "@enduml"
                            ]
-        self.__run_draw_datamodel_test__(model, expected_result)
+        self.__run_draw_datamodel_test__(model, "SCHEMA1", expected_result)
 
     def test_composition_relation_on_column(self):
         # given
@@ -204,7 +204,7 @@ class DataModelVisualiserTest(unittest.TestCase):
         @enduml
         """)
 
-        self.__run_draw_datamodel_test__(datamodel, expected_result)
+        self.__run_draw_datamodel_test__(datamodel, "user", expected_result)
 
     def test_composition_relation_with_inverse_relation_direction(self):
         # given
@@ -233,7 +233,7 @@ class DataModelVisualiserTest(unittest.TestCase):
         @enduml
         """)
 
-        self.__run_draw_datamodel_test__(datamodel, expected_result)
+        self.__run_draw_datamodel_test__(datamodel, "user", expected_result)
 
     def test_composition_relation_on_colapsed_column(self):
         # given
@@ -261,7 +261,7 @@ class DataModelVisualiserTest(unittest.TestCase):
         @enduml
         """)
 
-        self.__run_draw_datamodel_test__(datamodel, expected_result, colapsed_columns=True)
+        self.__run_draw_datamodel_test__(datamodel, "user", expected_result, colapsed_columns=True)
 
     def test_composition_relation_on_table(self):
         # given
@@ -287,7 +287,7 @@ class DataModelVisualiserTest(unittest.TestCase):
         @enduml
         """)
 
-        self.__run_draw_datamodel_test__(datamodel, expected_result)
+        self.__run_draw_datamodel_test__(datamodel, "user", expected_result)
 
     def test_table_with_id(self):
         # given
@@ -305,8 +305,8 @@ class DataModelVisualiserTest(unittest.TestCase):
                            "}",
                            "@enduml"]
 
-        self.__run_draw_datamodel_test__(datamodel, expected_result)
+        self.__run_draw_datamodel_test__(datamodel, "user", expected_result)
 
-    def __run_draw_datamodel_test__(self, model, expectedResult, colapsed_columns=False):
-        result = svm.datamodel_visualizer(model).draw(colapsed_columns)
+    def __run_draw_datamodel_test__(self, model, database_user, expectedResult, colapsed_columns=False):
+        result = svm.DatamodelVisualizer(model).draw(database_user, colapsed_columns)
         self.assertListEqual(expectedResult, result)

@@ -1,9 +1,29 @@
 language: python
 python:
-  - "3.6"
-
+- '3.6'
 install:
-  - make build
-
+- make build
+- export SPEC_ARTIFACT=`make get-artifact-name`
+- export PYTHON_ARTIFACT=src/`make -s -C src get-artifact-name`
 script:
-  - make test
+- make test
+
+deploy:
+    provider: releases
+    skip_cleanup: true
+    api_key: "$GITHUB_OAUTH_TOKEN"
+    file:
+      - "$SPEC_ARTIFACT"
+      - "$PYTHON_ARTIFACT"
+    draft: true
+    on:
+      branch: master
+
+
+deploy:
+  provider: releases
+  api_key:
+    secure: TqhU3OS4tchGqeSaRLXYFh18ZNAi2PGWoRXP+GobpcOh2dedudHrtRyyMn8aASXkxizNjKSJzVHwnK8Qt4qW5amHqsEXTqV5tHDoZcplBvBhl9GmO/dEqwWOzRHMlMBRZzKYFtv/0zFFyhcdR95qAnlCH+++icaG6W475Nl4PfWNN45V4aO7kDRTDVI8j/4lASHG4VtWQa5WROpr6PF4dHSvp+RFlHouEQyyxbbyGHdUj2Vb1e5bJAX+YUwpzSr8i6FT8aIVRsEturBz7I4j3szz8/jyq1OMc0DBPPjj1/VLsFJn3sxJ1h1FxJuG2AnjFj7quMqDl4jEfsQ81nIQ0r0Op6nDycWjBMuFHvbVG6/yudBPB5F+0cjE/fT7BGLe2PLtSKdHIN0wo7daiL7plSuXzh7vwpJxU2H5xb7XPMzS1g599/OWT+j2wY0GhSL/bg+nTRyKmzskxd1O3vaNFq3ymQR0a3WdmzWlyFKSOhNDulM7l3aTDKGawH0c/Smsbavxg1UwVFRyjG8sstLbV2dGyxPuRANVXGkYoo/xa5CbHGYdRyRU/wiDJYS2v6DrRE1umX4lb3BM+XyS5KjkOpqRocccABM/iKpuESJWJMMJHHmc3E3LKEiXNLvPub1Eb4I/nc0KWnIul6TRsHkAW8uD+BFEDDqdb357KoaD55I=
+  file: ''
+  on:
+    repo: zalum/system-model-visualizer

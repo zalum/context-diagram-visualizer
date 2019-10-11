@@ -49,6 +49,6 @@ class ComponentModelVisualizerTest(unittest.TestCase):
         self.__run_draw_context_diagram_test__(model, expectedResult)
 
     def __run_draw_context_diagram_test__(self, model, expectedResult):
-        result = svm.component_model_visualizer(model).draw()
+        result = svm.ComponentModelVisualizer(model).draw()
         self.assertListEqual(expectedResult,result)
 
