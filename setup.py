@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 
 def __get_version(developement=False):
-    file = open("../version.txt", "r")
+    file = open("version.txt", "r")
     version = file.readlines()[0]
     if developement:
         version += ".dev1"
