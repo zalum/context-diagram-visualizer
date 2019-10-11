@@ -1,9 +1,5 @@
 .PHONY: build
 
-version := $(shell cat version.txt)
-artifact_name := smv
-artifact_file := target/$(artifact_name)-$(version).zip
-
 test:
 		pytest
 
@@ -15,4 +11,4 @@ build: install-requirements
 		python3 setup.py bdist_wheel egg_info -d
 
 get-artifact-name:
-	@ls $(artifact_file)
+	@ls dist/*.whl

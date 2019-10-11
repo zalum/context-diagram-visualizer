@@ -3,8 +3,7 @@ python:
 - '3.6'
 install:
 - make build
-- export SPEC_ARTIFACT=`make get-artifact-name`
-- export PYTHON_ARTIFACT=src/`make -s -C src get-artifact-name`
+- export ARTIFACT_NAME=`make get-artifact-name`
 script:
 - make test
 
@@ -13,8 +12,7 @@ deploy:
     skip_cleanup: true
     api_key: "$GITHUB_OAUTH_TOKEN"
     file:
-      - "$SPEC_ARTIFACT"
-      - "$PYTHON_ARTIFACT"
+      - "$ARTIFACT_NAME"
     draft: true
     on:
       branch: master
