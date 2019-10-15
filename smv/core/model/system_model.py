@@ -30,6 +30,9 @@ class Instrumentation:
         self.__logger.warn(
             "Relation type ('{}') from ('{}') to ('{}') does not exist".format(relation_type, from_type, to_type))
 
+    def add_relation(self, start, end, relation_type):
+        self.__logger.info("Relation ({})-[{}]-({}) added".format(start, relation_type, end))
+
 
 instrumentation = Instrumentation()
 
@@ -105,6 +108,7 @@ class system_model:
             if relation_type is not None:
                 result[RELATION_TYPE] = relation_type
             self.graph[RELATIONS].append(result)
+            instrumentation.add_relation(start, end, relation_type)
             return Response.success("Relation ({})-[{}]-({}) added".format(start, relation_type, end))
         return Response.error(result.content)
 
