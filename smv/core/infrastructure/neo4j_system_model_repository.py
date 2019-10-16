@@ -32,7 +32,6 @@ def query_db(query, **params) -> BoltStatementResult:
         return db_session.read_transaction(lambda tx: tx.run(query, **params))
 
 
-
 def write_db(query: Tuple[str, dict]) -> BoltStatementResult:
     with get_db_session() as db_session:
         return db_session.write_transaction(lambda tx: tx.run(query[0], **query[1]))
@@ -86,7 +85,7 @@ class Neo4JSystemModelsRepository(SystemModelsRepository):
         write_db(self.__add_system_node_query(system_node_id, node_type, name))
         return Response.success(system_node_id)
 
-    def add_relation(self, start, end, relation_type):
+    def add_relation(self, start, end, relation_type=None):
         response = write_db(self.__add_relation_query(start, end, relation_type))
         return Response.success(response.summary())
 
@@ -139,7 +138,7 @@ class Neo4JSystemModelsRepository(SystemModelsRepository):
         return result
 
     @staticmethod
-    def __add_relation_query(start, end, relation_type):
+    def __add_relation_query(start, end, relation_type=None):
         if relation_type is not None:
             merge_query = "merge  (x)-[:{}]-(y)".format(relation_type)
         else:

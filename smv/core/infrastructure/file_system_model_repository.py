@@ -34,7 +34,7 @@ class FileSystemModelsRepository(SystemModelsRepository):
     def get_node(self, node):
         self.state.get_system_node(node)
 
-    def add_relation(self, start, end, relation_type):
+    def add_relation(self, start, end, relation_type=None):
         self.state.add_relation(start, end, relation_type)
         return Response.success()
 
