@@ -1,9 +1,9 @@
 import json
-import logging
+
 from sms import nodes
 from sms import relations
 from sms.generic_types import Relation
-
+from smv.core.infrastructure.logging import get_logger
 from smv.core import Response
 from smv.core import RESPONSE_OK
 from smv.core import RESPONSE_ERROR
@@ -21,7 +21,7 @@ RELATION_TYPE = "relation_type"
 
 class Instrumentation:
     def __init__(self):
-        self.__logger = logging.getLogger(__name__)
+        self.__logger = get_logger(__name__)
 
     def node_type_does_not_exist(self, key, type):
         self.__logger.warn("Node type '{}' of node {} does not exist".format(type, key))
