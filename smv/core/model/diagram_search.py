@@ -89,7 +89,7 @@ queries = [
             """
             (x:database_user {{system_node_id:'{start_node}'}})--(y:table)
             -[:contains]-(:column)-[:fk]-(:column)--(:table)
-            -[:uses]-(x:database_user {{system_node_id:'{start_node}'}})
+            --(x:database_user {{system_node_id:'{start_node}'}})
             """,
             "(x:database_user {{system_node_id:'{start_node}'}})--(y:table)-[:contains|:composition]-(:column)",
             "(x:database_user {{system_node_id:'{start_node}'}})--(y:table)"
