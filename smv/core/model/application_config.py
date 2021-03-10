@@ -56,7 +56,7 @@ def __get_next_config(path: list, tree_config: dict):
     return __get_next_config(next_path, current_config_value)
 
 
-def get_config(path: list):
+def get_config(path: list) -> dict:
     return __get_next_config(path, config)
 
 
