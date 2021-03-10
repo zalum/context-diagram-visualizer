@@ -3,3 +3,4 @@ flasgger>=0.8.0
 PyYAML>=3.12
 neo4j-driver>1.6.0,<=1.6.1
 requests>=2.22.0
+https://github.com/zalum/system-model-schema/releases/download/v0.0.2/system_model_schema-0.0.2.post20200320-py3-none-any.whl

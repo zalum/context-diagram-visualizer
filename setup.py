@@ -51,7 +51,6 @@ setup(
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6'
     ],
 
     # What does your project relate to?
@@ -62,11 +61,8 @@ setup(
         "flasgger>=0.8.0",
         "PyYAML>=3.12",
         "neo4j-driver>1.6.0,<=1.6.1",
-        "requests>=2.22.0 ",
-        "sms>=0.0.1"
-    ],
-    dependency_links=[
-        'git+https://github.com/zalum/system-model-schema/releases/download/v0.0.1/system_model_schema-0.0.1.dev1_20191011-py3-none-any.whl',
+        "requests>=2.22.0",
+        "system-model-schema>=0.0.2"
     ],
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
