@@ -50,7 +50,7 @@ setup(
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.8',
     ],
 
     # What does your project relate to?
@@ -60,7 +60,7 @@ setup(
         "flask>=0.12.2",
         "flasgger>=0.8.0",
         "PyYAML>=3.12",
-        "neo4j-driver>1.6.0,<=1.6.1",
+        "neo4j-driver==4.2.1",
         "requests>=2.22.0",
         "system-model-schema>=0.0.2"
     ],

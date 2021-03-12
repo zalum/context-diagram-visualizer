@@ -1,6 +1,7 @@
 from typing import Tuple
 
-from neo4j.v1 import GraphDatabase, Session, Record, Node, BoltStatementResult
+from neo4j import GraphDatabase, Session, Record, Result
+from neo4j.graph import Node
 
 from smv.core.model.system_model import system_model
 from smv.core.model.system_models_repository import SystemModelsRepository
@@ -23,16 +24,17 @@ def __is_connection_encrypted():
 def get_db_session() -> Session:
     global driver
     if driver is None:
-            driver = GraphDatabase.driver(config[NEO4J_URL], encrypted=__is_connection_encrypted())
+        driver = GraphDatabase.driver(config[NEO4J_URL], encrypted=__is_connection_encrypted())
     return driver.session()
 
 
-def query_db(query, **params) -> BoltStatementResult:
+def query_db(query, **params) -> Result:
     with get_db_session() as db_session:
-        return db_session.read_transaction(lambda tx: tx.run(query, **params))
+        result = db_session.read_transaction(lambda tx: list(tx.run(query, **params)))
+        return result
 
 
-def write_db(query: Tuple[str, dict]) -> BoltStatementResult:
+def write_db(query: Tuple[str, dict]) -> Result:
     with get_db_session() as db_session:
         return db_session.write_transaction(lambda tx: tx.run(query[0], **query[1]))
 
@@ -69,7 +71,7 @@ class Neo4JSystemModelsRepository(SystemModelsRepository):
     def filter(self, node_type):
         query_result = query_db("match (x:{node_type}) return x".format(node_type=node_type))
         result = {}
-        for record in query_result.records():
+        for record in query_result:
             node = Neo4JSystemModelsRepository.__extract_system_node(record[0])
             result.update({node["system_node_id"]: node["properties"]})
         return result
@@ -112,16 +114,16 @@ class Neo4JSystemModelsRepository(SystemModelsRepository):
         self.__write_relations(sm)
 
     @staticmethod
-    def __extract_model(results: BoltStatementResult):
+    def __extract_model(results: Result):
         model = system_model()
-        for record in results.records():  # type: Record
+        for record in results:  # type: Record
             start = Neo4JSystemModelsRepository.__add_node_to_model(model, record, "start")
             end = Neo4JSystemModelsRepository.__add_node_to_model(model, record, "end")
             model.add_relation(start, end, record.value("relation_type"))
         return model
 
     @staticmethod
-    def __add_node_to_model(model, record, record_key):
+    def __add_node_to_model(model, record:Record, record_key:str):
         node_value = Neo4JSystemModelsRepository.__extract_system_node(record.value(record_key))
         model.add_system_node(node_value["system_node_id"], node_value["type"], **node_value["properties"])
         return node_value["system_node_id"]
