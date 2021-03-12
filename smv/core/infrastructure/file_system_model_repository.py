@@ -65,7 +65,7 @@ def _matching_edge(criteria: SearchCriteria, model: system_model, current_level,
         return True
 
     include_vertex_types = criteria.get_include_vertex_types(current_level)
-    if len(include_vertex_types) is not 0:
+    if len(include_vertex_types) != 0:
         vertex_types = [model.get_system_node(edge["start"])["type"], model.get_system_node(edge["end"])["type"]]
         for vertex_types_to_match in include_vertex_types:
             if vertex_types_to_match in vertex_types:
@@ -73,7 +73,7 @@ def _matching_edge(criteria: SearchCriteria, model: system_model, current_level,
         return False
 
     include_relation_types = criteria.get_include_relation_types(current_level)
-    if len(include_relation_types) is not 0:
+    if len(include_relation_types) != 0:
         for accepted_relation_type in include_relation_types:
             if "relation_type" in edge and accepted_relation_type == edge["relation_type"]:
                 return True
